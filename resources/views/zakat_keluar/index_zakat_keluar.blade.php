@@ -1,0 +1,225 @@
+@extends('layouts.app')
+
+@section('content')
+
+<div class="px-3">
+    <div class="mb-4" style="margin-left: 16px;">
+        <div class="d-flex align-items-center mb-2">
+            <div class="me-3">
+                <div class="d-flex align-items-center justify-content-center bg-success bg-gradient text-white rounded-circle shadow-sm"
+                    style="width: 60px; height: 60px;">
+                    <i class="bi bi-box2-fill fs-4"></i>
+                </div>
+            </div>
+            <div>
+                <h3 class="mb-0 fw-bold text-dark">Zakat Keluar</h3>
+                <div class="d-flex align-items-center d-none d-md-flex">
+                    <span class="text-muted">Zakat</span>
+                    <i class="bi bi-chevron-right mx-2 text-muted small"></i>
+                    <span class="text-success fw-semibold">Pengeluaran</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="mb-4">
+                <h4 class="text-dark mb-1 fw-bold">Data Zakat Keluar</h4>
+                <p class="text-dark-50 mb-0 small">Kelola data zakat masjid</p>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                @if(auth()->user()->role == 'Bendahara')
+                <a class="btn btn-primary mb-2" href="{{ route('zakat_keluar.create') }}">
+                    <i class="bi bi-plus-circle-fill"></i> Tambah Zakat Keluar
+                </a>
+                @endif
+                <div class="d-flex flex-column gap-2" style="max-width: 320px;">
+                    <!-- Input Pencarian -->
+                    <div class="input-group shadow rounded-3 overflow-hidden">
+                        <input type="text" id="search" name="search" class="form-control form-control-sm border-0 bg-light px-3"
+                            placeholder="Cari data zakat..." value="{{ request('search') }}">
+                        <span class="input-group-text bg-success text-white"><i class="bi bi-search"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive border shadow rounded-4">
+                <table class="table table-bordered table-hover align-items-center mb-0" style="min-width: 800px;">
+                    <thead class="table-gradient text-white">
+                        <tr>
+                            <th class="text-center">No</th>
+                            <th class="text-center">Nama Mustahik</th>
+                            <th class="text-center">Tanggal</th>
+                            <th class="text-center">Jenis Zakat</th>
+                            <th class="text-center">Bentuk Zakat</th>
+                            <th class="text-center">Nominal (Rp)</th>
+                            <th class="text-center">Jumlah (Kg)</th>
+                            <th class="text-center">Keterangan</th>
+                            <th class="text-center">Pengelola</th>
+                            @if(auth()->user()->role == 'Bendahara')
+                            <th class="text-center">Aksi</th>
+                            @endif
+                        </tr>
+                    </thead>
+                    <tbody id="tabel-zakat">
+                        @if ($zakatKeluar->isEmpty())
+                        <tr>
+                            <td colspan="9" class="text-center">Tidak ada data zakat keluar</td>
+                        </tr>
+                        @else
+                        @foreach ($zakatKeluar as $zk)
+                        <tr>
+                            <td class="text-center fw-semibold text-muted">
+                                <span class="badge bg-success bg-opacity-10 text-success">{{ $zakatKeluar->firstItem() + $loop->index }}
+                            </td>
+                            <td class="text-center">
+                                @if(isset($zk->mustahik))
+                                {{ $zk->mustahik->nama }}
+                                @else
+                                <i>Nama tidak ditemukan</i>
+                                @endif
+                            </td>
+                            <td class="text-center">{{ $zk->tanggal }}</td>
+                            <td class="text-center">{{ $zk->jenis_zakat }}</td>
+                            <td class="text-center">{{ $zk->bentuk_zakat }}</td>
+                            <td class="text-center">
+                                @if($zk->nominal == 0)
+                                <!-- 0 Kg -->
+                                @else
+                                {{ number_format($zk->nominal, 0, ',', '.') }}
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                @if($zk->jumlah == 0)
+                                <!-- 0 Kg -->
+                                @else
+                                {{ rtrim(rtrim(number_format($zk->jumlah, 2, ',', '.'), '0'), ',') }}
+                                @endif
+                            </td>
+                            <td class="text-center">{{ $zk->keterangan }}</td>
+                            <td class="text-center">
+                                {{ $zk->user->nama ?? $zk->nama }}
+                            </td>
+                            @if(auth()->user()->role == 'Bendahara')
+                            <td class="text-center">
+                                <a href="{{ route('zakat_keluar.edit', $zk->id) }}" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pen-fill"></i>
+                                </a>
+                                <form id="delete-form-{{ $zk->id }}" action="{{ route('zakat_keluar.destroy', $zk->id) }}" method="POST" style="display:inline-block;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="konfirmasiHapus('{{ $zk->id }}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            @endif
+                        </tr>
+                        @endforeach
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+            <!-- pagination -->
+            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap px-2">
+                <!-- Pagination Info -->
+                <div class="d-flex align-items-center">
+                    <div class="badge bg-success text-white rounded-pill px-3 py-2 fw-normal">
+                        <i class="bi bi-info-circle me-1"></i>
+                        {{ $zakatKeluar->firstItem() }} - {{ $zakatKeluar->lastItem() }} of {{ $zakatKeluar->total() }} rows
+                    </div>
+                </div>
+
+                <!-- Pagination Navigation -->
+                <div class="d-flex align-items-center">
+                    <!-- Previous and Next buttons -->
+                    <div class="badge bg-success text-white rounded-pill px-3 py-2 fw-normal">
+                        <a href="{{ $zakatKeluar->previousPageUrl() }}" class="btn-sm text-white">
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </a>
+                        <span class="mx-2">Page {{ $zakatKeluar->currentPage() }} of {{ $zakatKeluar->lastPage() }}</span>
+                        <a href="{{ $zakatKeluar->nextPageUrl() }}" class="btn-sm text-white">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function konfirmasiHapus(id) {
+        Swal.fire({
+            title: "Hapus Zakat Keluar",
+            html: "Apakah anda yakin akan menghapus data ini? <b>Data yang dihapus tidak dapat dikembalikan lagi.</b>",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Ya, hapus",
+            cancelButtonText: "Tidak, kembali",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById("delete-form-" + id).submit();
+            }
+        });
+    }
+</script>
+
+<!-- Notifikasi Sukses -->
+@if (session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session("success") }}',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#2d7d32',
+        timer: 4000,
+        timerProgressBar: true,
+    });
+</script>
+@endif
+<!-- Notifikasi Error -->
+@if (session('error'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal!',
+        text: '{{ session("error") }}',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#2d7d32',
+    });
+</script>
+@endif
+<!-- Live Search Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search');
+        let timeout = null;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                const keyword = searchInput.value;
+
+                fetch(`?search=${encodeURIComponent(keyword)}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newRows = doc.querySelector('#tabel-zakat');
+                        const oldRows = document.querySelector('#tabel-zakat');
+                        if (newRows && oldRows) {
+                            oldRows.innerHTML = newRows.innerHTML;
+                        }
+                    });
+            }, 300); // debounce delay
+        });
+    });
+</script>
+@endsection
