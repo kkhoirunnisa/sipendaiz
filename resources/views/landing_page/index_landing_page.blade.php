@@ -459,7 +459,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand d-none d-md-flex" href="#">
                 <div class="logo-container">
                     <i class="fas fa-mosque text-white fs-4"></i>
                 </div>
