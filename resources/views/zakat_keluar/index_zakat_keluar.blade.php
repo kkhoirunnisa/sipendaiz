@@ -53,10 +53,10 @@
                             <th class="text-center">Tanggal</th>
                             <th class="text-center">Jenis Zakat</th>
                             <th class="text-center">Bentuk Zakat</th>
-                            <th class="text-center">Nominal (Rp)</th>
-                            <th class="text-center">Jumlah (Kg)</th>
-                            <th class="text-center">Keterangan</th>
-                            <th class="text-center">Pengelola</th>
+                            <th class="text-center">Nominal (Rp) / Jumlah (Kg)</th>
+                            <!-- <th class="text-center">Jumlah (Kg)</th> -->
+                            <!-- <th class="text-center">Keterangan</th>
+                            <th class="text-center">Pengelola</th> -->
                             @if(auth()->user()->role == 'Bendahara')
                             <th class="text-center">Aksi</th>
                             @endif
@@ -84,25 +84,30 @@
                             <td class="text-center">{{ $zk->jenis_zakat }}</td>
                             <td class="text-center">{{ $zk->bentuk_zakat }}</td>
                             <td class="text-center">
-                                @if($zk->nominal == 0)
-                                <!-- 0 Kg -->
+                                @if($zk->bentuk_zakat == 'Beras')
+                                {{ $zk->jumlah == 0 ? '-' : rtrim(rtrim(number_format($zk->jumlah, 2, ',', '.'), '0'), ',') . ' Kg' }}
                                 @else
-                                {{ number_format($zk->nominal, 0, ',', '.') }}
+                                {{ $zk->nominal == 0 ? '-' : 'Rp ' . number_format($zk->nominal, 0, ',', '.') }}
                                 @endif
                             </td>
-                            <td class="text-center">
+                            <!-- <td class="text-center">
                                 @if($zk->jumlah == 0)
-                                <!-- 0 Kg -->
+                                0 Kg
                                 @else
                                 {{ rtrim(rtrim(number_format($zk->jumlah, 2, ',', '.'), '0'), ',') }}
                                 @endif
-                            </td>
-                            <td class="text-center">{{ $zk->keterangan }}</td>
+                            </td> -->
+                            <!-- <td class="text-center">{{ $zk->keterangan }}</td>
                             <td class="text-center">
                                 {{ $zk->user->nama ?? $zk->nama }}
-                            </td>
+                            </td> -->
                             @if(auth()->user()->role == 'Bendahara')
                             <td class="text-center">
+                                <!-- Tombol untuk membuka modal detail -->
+                                <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
+                                    data-bs-target="#modalDetailZakat{{ $zk->id }}">
+                                    <i class="bi bi-eye-fill"></i>
+                                </button>
                                 <a href="{{ route('zakat_keluar.edit', $zk->id) }}" class="btn btn-sm btn-warning">
                                     <i class="bi bi-pen-fill"></i>
                                 </a>
@@ -149,6 +154,105 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Detail Zakat -->
+@if (!$zakatKeluar->isEmpty())
+@foreach ($zakatKeluar as $zk)
+<div class="modal fade" id="modalDetailZakat{{ $zk->id }}" tabindex="-1" aria-labelledby="modalDetailZakatLabel{{ $zk->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header bg-success text-white rounded-top-4">
+                <h5 class="modal-title fw-bold" id="modalDetailZakatLabel{{ $zk->id }}">
+                    <i class="bi bi-receipt-cutoff me-2"></i>Detail Zakat Keluar
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body bg-light p-4">
+                <div class="row g-3">
+                    @php
+                    $formatTanggal = \Carbon\Carbon::parse($zk->tanggal)->translatedFormat('d F Y');
+                    @endphp
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm p-3 h-100">
+                            <small class="fw-semibold"><i class="bi bi-person-fill-check me-1"></i> Nama Mustahik</small>
+                            <h6 class="text-dark mt-1">{{ $zk->mustahik->nama ?? '-' }}</h6>
+                        </div>
+                    </div>
+                     <div class="col-md-6">
+                        <div class="card border-0 shadow-sm p-3 h-100">
+                            <small class="fw-semibold"><i class="bi bi-person-fill-check me-1"></i> Kategori Mustahik</small>
+                            <h6 class="text-dark mt-1">{{ $zk->mustahik->kategori ?? '-' }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm p-3 h-100">
+                            <small class="fw-semibold"><i class="bi bi-calendar3 me-1"></i> Tanggal</small>
+                            <h6 class="text-dark mt-1">{{ $formatTanggal }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm p-3 h-100">
+                            <small class="fw-semibold"><i class="bi bi-bookmark-check me-1"></i> Jenis Zakat</small>
+                            <h6 class="text-dark mt-1">{{ $zk->jenis_zakat }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm p-3 h-100">
+                            <small class="fw-semibold"><i class="bi bi-box2-heart me-1"></i> Bentuk Zakat</small>
+                            <h6 class="text-dark mt-1">{{ $zk->bentuk_zakat }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm p-3 h-100">
+                            <small class="fw-semibold">
+                                <i class="bi bi-cash-stack me-1"></i>
+                                @if ($zk->bentuk_zakat == 'Beras')
+                                Jumlah (Kg)
+                                @else
+                                Nominal (Rp)
+                                @endif
+                            </small>
+                            <h6 class="text-dark mt-1">
+                                @if($zk->bentuk_zakat == 'Beras')
+                                {{ $zk->jumlah == 0 ? '-' : rtrim(rtrim(number_format($zk->jumlah, 2, ',', '.'), '0'), ',') }} Kg
+                                @else
+                                {{ $zk->nominal == 0 ? '-' : 'Rp ' . number_format($zk->nominal, 0, ',', '.') }}
+                                @endif
+                            </h6>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm p-3 h-100">
+                            <small class="fw-semibold"><i class="bi bi-person-check me-1"></i> Pengelola</small>
+                            <h6 class="text-dark mt-1">{{ $zk->user->nama ?? $zk->nama ?? '-' }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm p-3">
+                            <small class="fw-semibold"><i class="bi bi-chat-text me-1"></i> Keterangan</small>
+                            <p class="mt-2 mb-0 text-dark">{!! $zk->keterangan ?? '-' !!}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Terakhir diperbarui: {{ $zk->updated_at ? $zk->updated_at->format('d F Y') : 'Tidak diketahui' }}
+                    </small>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+@endif
+
+
 <script>
     function konfirmasiHapus(id) {
         Swal.fire({
@@ -220,6 +324,16 @@
                     });
             }, 300); // debounce delay
         });
+    });
+</script>
+
+<!-- latar belakang modal agar terhapus -->
+<script>
+    document.addEventListener('hidden.bs.modal', function() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open'); // menghapus kelas yang mencegah scroll
+        document.body.style = ''; // reset style body
     });
 </script>
 @endsection

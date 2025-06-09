@@ -1,6 +1,129 @@
 @extends('layouts.app')
 
 @section('content')
+
+<style>
+    .modal-xl {
+        max-width: 1200px;
+    }
+
+    .modal-xxl {
+        max-width: 90vw;
+    }
+
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+
+    /* Hilangkan hover effect pada card di dalam modal */
+    .modal .card:hover {
+        transform: none;
+    }
+
+    .badge {
+        font-weight: 300;
+    }
+
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-content {
+        border-radius: 1rem;
+        overflow: hidden;
+        max-height: 90vh;
+    }
+
+    .modal-header {
+        border-bottom: none;
+        padding: 1rem 1.5rem 0.5rem;
+    }
+
+    .modal-body {
+        padding: 1rem 1.5rem;
+        max-height: calc(90vh - 120px);
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        padding: 0.5rem 1.5rem 1rem;
+        border-top: none;
+    }
+
+    .modal {
+        --bs-backdrop-opacity: 0.5;
+    }
+
+    .modal.fade .modal-dialog {
+        transition: transform 0.3s ease-out;
+    }
+
+    .table-hover tbody tr:hover {
+        --bs-table-accent-bg: var(--bs-table-hover-bg);
+        color: var(--bs-table-hover-color);
+        transition: all 0.15s ease-in-out;
+    }
+
+    .modal-dialog-centered {
+        display: flex;
+        align-items: center;
+        min-height: calc(100% - 1rem);
+    }
+
+    .modal .card {
+        margin-bottom: 0.75rem;
+    }
+
+    .modal .card-body {
+        padding: 0.75rem;
+    }
+
+    .modal .card-header {
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* Responsive untuk modal */
+    @media (max-width: 1200px) {
+        .modal-xxl {
+            max-width: 95vw;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        .modal-xxl,
+        .modal-xl {
+            max-width: calc(100vw - 1rem);
+        }
+
+        .modal-content {
+            max-height: 95vh;
+        }
+
+        .modal-body {
+            max-height: calc(95vh - 100px);
+            padding: 0.75rem;
+        }
+
+        .modal .card-body {
+            padding: 0.5rem;
+        }
+
+        .modal .row.g-2 {
+            --bs-gutter-x: 0.5rem;
+            --bs-gutter-y: 0.5rem;
+        }
+    }
+</style>
+
 <div class="px-3">
     <div class="mb-4" style="margin-left: 16px;">
         <div class="d-flex align-items-center mb-2">
@@ -51,24 +174,18 @@
                         <tr>
                             <th class="text-center">No</th>
                             <th class="text-center">Donatur</th>
-                            <th class="text-center">Alamat</th>
-                            <th class="text-center">Nomor HP</th>
                             <th class="text-center">Tanggal Infak</th>
                             <th class="text-center">Kategori</th>
                             <th class="text-center">Metode</th>
-                            <th class="text-center">Nominal</th>
-                            <th class="text-center">Barang</th>
-                            <th class="text-center">Bukti</th>
+                            <th class="text-center">Nominal/Barang</th>
                             <th class="text-center">Tanggal Konfirmasi</th>
-                            @if(in_array(auth()->user()->role, ['Bendahara', 'Petugas']))
-                            <th class="text-center">Kuitansi</th>
-                            @endif
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="infak">
                         @if($infakMasuk->isEmpty())
                         <tr>
-                            <td colspan="12" class="text-center">Tidak ada data infak masuk</td>
+                            <td colspan="8" class="text-center">Tidak ada data infak masuk</td>
                         </tr>
                         @else
                         @foreach ($infakMasuk as $im)
@@ -79,42 +196,41 @@
                                 </span>
                             </td>
                             <td class="text-center">{{ $im->buktiTransaksi->donatur }}</td>
-                            <td class="text-center">{{ $im->buktiTransaksi->alamat }}</td>
-                            <td class="text-center">{{ $im->buktiTransaksi->nomor_telepon }}</td>
                             <td class="text-center">{{ \Carbon\Carbon::parse($im->buktiTransaksi->tanggal_infak)->format('d-m-Y') }}</td>
                             <td class="text-center">{{ $im->buktiTransaksi->kategori }}</td>
                             <td class="text-center">{{ $im->buktiTransaksi->metode }}</td>
                             <td class="text-center">
+                                @if($im->buktiTransaksi->jenis_infak == 'Barang')
+                                {{ $im->buktiTransaksi->barang }}
+                                @else
                                 @if($im->buktiTransaksi->nominal == 0)
-                                <!-- 0 -->
+                                -
                                 @else
-                                {{ number_format($im->buktiTransaksi->nominal, 0, ',', '.') }}
+                                Rp {{ number_format($im->buktiTransaksi->nominal, 0, ',', '.') }}
                                 @endif
-                            </td>
-                            <td class="text-center">{{ $im->buktiTransaksi->barang }}</td>
-                            <td class="text-center">
-                                @if($im->buktiTransaksi->bukti_transaksi)
-                                <a href="{{ asset('storage/' . $im->buktiTransaksi->bukti_transaksi) }}" target="_blank"
-                                    style="color: black; text-decoration: none;" title="Lihat Bukti">
-                                    <i class="bi bi-file-earmark-fill" style="font-size: 1.2rem;"></i>
-                                </a>
-                                @else
-                                <i class="text-muted">Tidak ada</i>
                                 @endif
                             </td>
                             <td class="text-center">
                                 {{ \Carbon\Carbon::parse($im->tanggal_konfirmasi)->format('d-m-Y') }}
                             </td>
-                            @if(in_array(auth()->user()->role, ['Bendahara', 'Petugas']))
-                            <td class="text-center text-xs text-secondary mb-0">
+                            <td class="text-center">
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Detail">
+                                    <button class="btn btn-sm btn-info text-white modal-trigger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#detailModal-{{ $im->id }}"
+                                        type="button">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                </span>
+                                <!-- @if(in_array(auth()->user()->role, ['Bendahara', 'Petugas']))
                                 <a href="{{ route('infak.kuitansi.pdf', $im->id) }}"
                                     class="btn btn-sm btn-danger"
                                     title="Lihat Kuitansi PDF"
                                     target="_blank">
                                     <i class="bi bi-file-earmark-pdf-fill"></i>
                                 </a>
+                                @endif -->
                             </td>
-                            @endif
                         </tr>
                         @endforeach
                         @endif
@@ -150,6 +266,223 @@
     </div>
 </div>
 
+<!-- Modal Detail untuk setiap infak masuk -->
+@if (!$infakMasuk->isEmpty())
+@foreach ($infakMasuk as $im)
+<div class="modal fade mt-2" id="detailModal-{{ $im->id }}" tabindex="-1" aria-labelledby="detailModalLabel-{{ $im->id }}" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xxl modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header bg-success text-white">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-donate me-2"></i>
+                    <div>
+                        <h5 class="modal-title mb-0" id="detailModalLabel-{{ $im->id }}">Detail Infak Masuk</h5>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Status Banner -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                            <span class="fw-semibold">Status Infak</span>
+                            <div>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>Terverifikasi
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content dengan layout 2 kolom untuk desktop -->
+                <div class="row g-3">
+                    <!-- Kolom Kiri -->
+                    <div class="col-lg-6">
+                        <!-- Informasi Donatur -->
+                        <div class="card border h-100">
+                            <div class="card-header bg-success text-white py-2">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-user me-2"></i>Informasi Donatur
+                                </h6>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="form-label small mb-1 fw-semibold">Nama Donatur</label>
+                                        <p class="mb-2">{{ $im->buktiTransaksi->donatur }}</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small mb-1 fw-semibold">Alamat</label>
+                                        <p class="mb-2">{{ $im->buktiTransaksi->alamat ?: '-' }}</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small mb-1 fw-semibold">Nomor Telepon</label>
+                                        <p class="mb-2">{{ $im->buktiTransaksi->nomor_telepon ?: '-' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kolom Kanan -->
+                    <div class="col-lg-6">
+                        <!-- Detail Transaksi -->
+                        <div class="card border h-100">
+                            <div class="card-header bg-success text-white py-2">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-receipt me-2"></i>Detail Transaksi
+                                </h6>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Tanggal Infak</label>
+                                        <p class="mb-2">
+                                            {{ \Carbon\Carbon::parse($im->buktiTransaksi->tanggal_infak)->format('d F Y') }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Tanggal Konfirmasi</label>
+                                        <p class="mb-2">
+                                            {{ \Carbon\Carbon::parse($im->tanggal_konfirmasi)->format('d F Y') }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Kategori</label>
+                                        <p class="mb-2">
+                                            <span class="badge bg-secondary">{{ $im->buktiTransaksi->kategori }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Metode</label>
+                                        <p class="mb-2">
+                                            <span class="badge bg-secondary">{{ $im->buktiTransaksi->metode }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Jenis Infak</label>
+                                        <p class="mb-2">
+                                            <span class="badge bg-secondary">{{ $im->buktiTransaksi->jenis_infak }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Nominal</label>
+                                        <p class="fw-bold text-success mb-2">
+                                            @if($im->buktiTransaksi->nominal == 0)
+                                            <span class="text-muted">-</span>
+                                            @else
+                                            Rp {{ number_format($im->buktiTransaksi->nominal, 0, ',', '.') }}
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small mb-1 fw-semibold">Barang</label>
+                                        <p class="mb-0">
+                                            {{ $im->buktiTransaksi->barang ?: '-' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bukti Transaksi dan Pengelola - Full Width -->
+                    <div class="col-12">
+                        <div class="card border">
+                            <div class="card-header bg-success text-white py-2">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-file-alt me-2"></i>Dokumentasi & Pengelola
+                                </h6>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-md-4">
+                                        <label class="form-label small mb-1 fw-semibold">Bukti Transaksi</label>
+                                        <div>
+                                            @if ($im->buktiTransaksi->bukti_transaksi)
+                                            <a href="{{ asset('storage/' . $im->buktiTransaksi->bukti_transaksi) }}" target="_blank"
+                                                class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-external-link-alt me-1"></i>Lihat Bukti
+                                            </a>
+                                            @else
+                                            <span class="text-muted small">
+                                                <i class="fas fa-times-circle me-1"></i>Tidak ada bukti
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small mb-1 fw-semibold">Dikelola Oleh</label>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-user text-primary me-2"></i>
+                                            <span class="">{{ $im->buktiTransaksi->user->nama ?? $im->buktiTransaksi->nama }}</span>
+                                        </div>
+                                    </div>
+                                    @if(in_array(auth()->user()->role, ['Bendahara', 'Petugas']))
+                                    <div class="col-md-4">
+                                        <label class="form-label small mb-1 fw-semibold">Kuitansi</label>
+                                        <div>
+                                            <a href="{{ route('infak.kuitansi.pdf', $im->id) }}"
+                                                class="btn btn-outline-danger btn-sm"
+                                                target="_blank">
+                                                <i class="fas fa-file-pdf me-1"></i>Unduh Kuitansi
+                                            </a>
+                                        </div>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Terakhir diperbarui: {{ $im->updated_at ? $im->updated_at->format('d F Y') : 'Tidak diketahui' }}
+                    </small>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+@endif
+
+<script>
+    // Script untuk mencegah multiple modal trigger
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalTriggers = document.querySelectorAll('.modal-trigger');
+        modalTriggers.forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const targetModal = this.getAttribute('data-bs-target');
+                const modal = new bootstrap.Modal(document.querySelector(targetModal));
+                modal.show();
+            });
+        });
+    });
+
+    // Script untuk membersihkan modal backdrop
+    document.addEventListener('hidden.bs.modal', function() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style = '';
+    });
+</script>
+
 <!-- Live Search Script -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -174,6 +507,16 @@
                     });
             }, 300); // debounce delay
         });
+    });
+</script>
+
+<!-- latar belakang modal agar terhapus -->
+<script>
+    document.addEventListener('hidden.bs.modal', function() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open'); // menghapus kelas yang mencegah scroll
+        document.body.style = ''; // reset style body
     });
 </script>
 @endsection

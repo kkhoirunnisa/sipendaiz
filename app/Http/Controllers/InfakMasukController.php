@@ -59,8 +59,8 @@ class InfakMasukController extends Controller
 
             $namaDonatur = preg_replace('/[^\w\s-]/', '', $infak->buktiTransaksi->donatur);
             $namaFile = 'Kuitansi Infak - ' . $namaDonatur . '.pdf';
-            return $pdf->stream($namaFile);
-            // return $pdf->download($namaFile);
+            // return $pdf->stream($namaFile);
+            return $pdf->download($namaFile);
         } catch (Exception $e) {
             return back()->with('error', 'Gagal mencetak kuitansi: ' . $e->getMessage());
         }

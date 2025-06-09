@@ -182,6 +182,7 @@ class LaporanZakatController extends Controller
         $pdf = PDF::loadView('laporan.unduh_laporan_zakat', $data)
             ->setPaper('A4', 'landscape');
 
-        return $pdf->stream('laporan_zakat_' . date('Ymd') . '.pdf');
+        return $pdf->download('laporan_zakat_' . date('Ymd') . '.pdf');
+        //  return $pdf->stream('laporan_zakat_' . date('Ymd') . '.pdf');
     }
 }

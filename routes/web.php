@@ -86,7 +86,7 @@ Route::middleware('auth')->group(function () {
 
         // INFAK MASUK
         Route::get('/infak_masuk', [InfakMasukController::class, 'index'])->name('infak_masuk.index');
-        Route::post('/bukti-transaksi/verifikasi/{id}', [BuktiTransaksiController::class, 'verifikasi'])->name('bukti_transaksi.verifikasi');
+        // Route::post('/bukti-transaksi/verifikasi/{id}', [BuktiTransaksiController::class, 'verifikasi'])->name('bukti_transaksi.verifikasi');
 
         // INFAK KELUAR
         Route::get('/infak-keluar/{kategori}', [InfakKeluarController::class, 'index'])->name('infak_keluar.index'); //menampilkan

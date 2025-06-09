@@ -1,11 +1,150 @@
 @extends('layouts.app')
 
 @section('content')
+
+
+<style>
+    .modal-xl {
+        max-width: 1200px;
+        /* Diperbesar dari 1000px */
+    }
+
+    .modal-xxl {
+        max-width: 90vw;
+        /* Menggunakan 90% dari viewport width */
+    }
+
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+
+    /* Hilangkan hover effect pada card di dalam modal */
+    .modal .card:hover {
+        transform: none;
+    }
+
+    .badge {
+        font-weight: 300;
+    }
+
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-content {
+        border-radius: 1rem;
+        overflow: hidden;
+        max-height: 90vh;
+        /* Batasi tinggi modal */
+    }
+
+    .modal-header {
+        border-bottom: none;
+        padding: 1rem 1.5rem 0.5rem;
+        /* Kurangi padding */
+    }
+
+    .modal-body {
+        padding: 1rem 1.5rem;
+        /* Kurangi padding */
+        max-height: calc(90vh - 120px);
+        /* Batasi tinggi body */
+        overflow-y: auto;
+        /* Scroll jika diperlukan */
+    }
+
+    .modal-footer {
+        padding: 0.5rem 1.5rem 1rem;
+        /* Kurangi padding */
+        border-top: none;
+    }
+
+    /* Perbaikan untuk mencegah kedap-kedip */
+    .modal {
+        --bs-backdrop-opacity: 0.5;
+    }
+
+    .modal.fade .modal-dialog {
+        transition: transform 0.3s ease-out;
+    }
+
+    /* Hilangkan hover effect pada tabel saat modal aktif */
+    .table-hover tbody tr:hover {
+        --bs-table-accent-bg: var(--bs-table-hover-bg);
+        color: var(--bs-table-hover-color);
+        transition: all 0.15s ease-in-out;
+    }
+
+    /* Stabilkan modal dialog */
+    .modal-dialog-centered {
+        display: flex;
+        align-items: center;
+        min-height: calc(100% - 1rem);
+    }
+
+    /* Perbaikan untuk card di dalam modal */
+    .modal .card {
+        margin-bottom: 0.75rem;
+        /* Kurangi margin */
+    }
+
+    .modal .card-body {
+        padding: 0.75rem;
+        /* Kurangi padding card body */
+    }
+
+    .modal .card-header {
+        padding: 0.5rem 0.75rem;
+        /* Kurangi padding header */
+    }
+
+    /* Responsive untuk modal */
+    @media (max-width: 1200px) {
+        .modal-xxl {
+            max-width: 95vw;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        .modal-xxl,
+        .modal-xl {
+            max-width: calc(100vw - 1rem);
+        }
+
+        .modal-content {
+            max-height: 95vh;
+        }
+
+        .modal-body {
+            max-height: calc(95vh - 100px);
+            padding: 0.75rem;
+        }
+
+        .modal .card-body {
+            padding: 0.5rem;
+        }
+
+        .modal .row.g-2 {
+            --bs-gutter-x: 0.5rem;
+            --bs-gutter-y: 0.5rem;
+        }
+    }
+</style>
+
 <div class="px-3">
     <div class="mb-4" style="margin-left: 16px;">
         <div class="d-flex align-items-center mb-2">
             <div class="me-3">
-                <div class="d-flex align-items-center justify-content-center bg-success bg-gradient text-white rounded-circle shadow-sm"
+                <div class="d-flex align-items-center justify-content-center bg-success text-white rounded-circle shadow-sm"
                     style="width: 60px; height: 60px;">
                     <i class="fas fa-receipt fs-4"></i>
                 </div>
@@ -49,21 +188,16 @@
 
         <!-- tabel -->
         <div class="table-responsive border shadow rounded-4">
-            <table class="table table-bordered table-hover align-items-center mb-0" style="min-width: 800px;">
+            <table class="table table-bordered align-items-center mb-0" style="min-width: 800px;">
                 <thead class="table-gradient text-white">
                     <tr>
                         <th class="text-center">No</th>
                         <th class="text-center">Donatur</th>
-                        <th class="text-center">Alamat</th>
-                        <th class="text-center">Nomor HP</th>
                         <th class="text-center">Tanggal Infak</th>
-                        <th class="text-center">Kategori</th>
                         <th class="text-center">Metode</th>
-                        <th class="text-center">Nominal</th>
-                        <th class="text-center">Barang</th>
-                        <th class="text-center">Bukti</th>
+                        <th class="text-center">Jenis Infak</th>
+                        <th class="text-center">Nominal/Barang</th>
                         <th class="text-center">Status</th>
-                        <th class="text-center">Pengelola</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -79,23 +213,14 @@
                             <span class="badge bg-success bg-opacity-10 text-success">{{ $buktiTransaksi->firstItem() + $loop->index }}</span>
                         </td>
                         <td class="text-center">{{ $bt->donatur }}</td>
-                        <td class="text-center">{{ $bt->alamat }}</td>
-                        <td class="text-center">{{ $bt->nomor_telepon }}</td>
                         <td class="text-center">{{ \Carbon\Carbon::parse($bt->tanggal_infak)->format('d-m-Y') }}</td>
-                        <td class="text-center">{{ $bt->kategori }}</td>
                         <td class="text-center">{{ $bt->metode }}</td>
+                        <td class="text-center">{{ $bt->jenis_infak }}</td>
                         <td class="text-center">
-                            {{ $bt->nominal == 0 ? '' : number_format($bt->nominal, 0, ',', '.') }}
-                        </td>
-                        <td class="text-center">{{ $bt->barang }}</td>
-                        <td class="text-center">
-                            @if($bt->bukti_transaksi)
-                            <a href="{{ asset('storage/' . $bt->bukti_transaksi) }}" target="_blank"
-                                style="color: black; text-decoration: none;" title="Lihat Bukti">
-                                <i class="bi bi-file-earmark-fill" style="font-size: 1.2rem;"></i>
-                            </a>
+                            @if($bt->jenis_infak == 'Barang')
+                            {{ $bt->barang }}
                             @else
-                            <i class="text-muted">Tidak ada</i>
+                            {{ number_format($bt->nominal, 0, ',', '.') }}
                             @endif
                         </td>
                         <td class="text-center">
@@ -107,11 +232,19 @@
                             <span class="badge bg-danger">Ditolak</span>
                             @endif
                         </td>
+
                         <td class="text-center">
-                            {{ $bt->user->nama ?? $bt->nama }}
-                        </td>
-                        <td class="text-center">
+                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Detail">
+                                <button class="btn btn-sm btn-info text-white modal-trigger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#detailModal-{{ $bt->id }}"
+                                    type="button">
+                                    <i class="bi bi-eye-fill"></i>
+                                </button>
+                            </span>
                             @if($bt->status == 'Pending')
+                            <!-- Tombol Detail -->
+
                             <a href="{{ route('bukti_transaksi.edit', $bt->id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pen-fill"></i></a>
                             <form action="{{ route('bukti_transaksi.destroy', $bt->id) }}" method="POST" class="d-inline" id="delete-form-{{ $bt->id }}">
                                 @csrf
@@ -121,7 +254,7 @@
                                 </button>
                             </form>
                             @else
-                            <span class="text-muted">-</span>
+                            <span class="text-muted"></span>
                             @endif
                         </td>
                     </tr>
@@ -158,6 +291,191 @@
     </div>
 </div>
 
+<!-- Modal dipindahkan ke luar loop dan dibuat sekali saja -->
+@if (!$buktiTransaksi->isEmpty())
+@foreach ($buktiTransaksi as $bt)
+<!-- Modal Detail (Gunakan modal-xxl dan hapus modal-dialog-scrollable) -->
+<div class="modal fade mt-2" id="detailModal-{{ $bt->id }}" tabindex="-1" aria-labelledby="detailModalLabel-{{ $bt->id }}" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xxl modal-dialog-centered"> <!-- Ganti dari modal-lg ke modal-xxl dan hapus modal-dialog-scrollable -->
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header bg-success text-white">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-receipt me-2"></i>
+                    <div>
+                        <h5 class="modal-title mb-0" id="detailModalLabel-{{ $bt->id }}">Detail Bukti Transaksi</h5>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Status Banner -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                            <span class="fw-semibold">Status Verifikasi</span>
+                            <div>
+                                @if($bt->status == 'Terverifikasi')
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>Terverifikasi
+                                </span>
+                                @elseif($bt->status == 'Pending')
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-clock me-1"></i>Pending
+                                </span>
+                                @else
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times-circle me-1"></i>Ditolak
+                                </span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content dengan layout 2 kolom untuk desktop -->
+                <div class="row g-3">
+                    <!-- Kolom Kiri -->
+                    <div class="col-lg-6">
+                        <!-- Informasi Donatur -->
+                        <div class="card border h-100">
+                            <div class="card-header bg-success text-white py-2">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-user me-2"></i>Informasi Donatur
+                                </h6>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="form-label small mb-1 fw-semibold">Nama Donatur</label>
+                                        <p class=" mb-2">{{ $bt->donatur }}</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small mb-1 fw-semibold">Alamat</label>
+                                        <p class="mb-2">{{ $bt->alamat ?: '-' }}</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small mb-1 fw-semibold">Nomor Telepon</label>
+                                        <p class="mb-2">{{ $bt->nomor_telepon ?: '-' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kolom Kanan -->
+                    <div class="col-lg-6">
+                        <!-- Detail Transaksi -->
+                        <div class="card border h-100">
+                            <div class="card-header bg-success text-white py-2">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-receipt me-2"></i>Detail Transaksi
+                                </h6>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Tanggal Infak</label>
+                                        <p class="mb-2">
+                                            {{ \Carbon\Carbon::parse($bt->tanggal_infak)->format('d F Y') }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Kategori</label>
+                                        <p class="mb-2">
+                                            <span class="badge bg-secondary">{{ $bt->kategori }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Metode</label>
+                                        <p class="mb-2">
+                                            <span class="badge bg-secondary">{{ $bt->metode }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Jenis Infak</label>
+                                        <p class="mb-2">
+                                            <span class="badge bg-secondary">{{ $bt->jenis_infak }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small mb-1 fw-semibold">Nominal</label>
+                                        <p class="fw-bold text-success mb-2">
+                                            @if($bt->nominal == 0)
+                                            <span class="text-muted">-</span>
+                                            @else
+                                            Rp {{ number_format($bt->nominal, 0, ',', '.') }}
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small mb-1 fw-semibold">Barang</label>
+                                        <p class="mb-0">
+                                            {{ $bt->barang ?: '-' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bukti Transaksi dan Pengelola - Full Width -->
+                    <div class="col-12">
+                        <div class="card border">
+                            <div class="card-header bg-success text-white py-2">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-file-alt me-2"></i>Dokumentasi & Pengelola
+                                </h6>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Bukti Transaksi</label>
+                                        <div>
+                                            @if ($bt->bukti_transaksi)
+                                            <a href="{{ asset('storage/' . $bt->bukti_transaksi) }}" target="_blank"
+                                                class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-external-link-alt me-1"></i>Lihat Bukti
+                                            </a>
+                                            @else
+                                            <span class="text-muted small">
+                                                <i class="fas fa-times-circle me-1"></i>Tidak ada bukti
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Dikelola Oleh</label>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-user text-primary me-2"></i>
+                                            <span class="">{{ $bt->user->nama ?? $bt->nama }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Terakhir diperbarui: {{ $bt->updated_at ? $bt->updated_at->format('d F Y') : 'Tidak diketahui' }}
+                    </small>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+@endif
 
 <script>
     function konfirmasiHapus(id) {
@@ -176,7 +494,22 @@
             }
         });
     }
+
+    // Script untuk mencegah multiple modal trigger
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalTriggers = document.querySelectorAll('.modal-trigger');
+        modalTriggers.forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const targetModal = this.getAttribute('data-bs-target');
+                const modal = new bootstrap.Modal(document.querySelector(targetModal));
+                modal.show();
+            });
+        });
+    });
 </script>
+
 <!-- Notifikasi Sukses -->
 @if (session('success'))
 <script>
@@ -192,6 +525,7 @@
     });
 </script>
 @endif
+
 <!-- Notifikasi Error -->
 @if (session('error'))
 <script>
@@ -230,6 +564,16 @@
                     });
             }, 300); // debounce delay
         });
+    });
+</script>
+
+<!-- latar belakang modal agar terhapus -->
+<script>
+    document.addEventListener('hidden.bs.modal', function() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open'); // menghapus kelas yang mencegah scroll
+        document.body.style = ''; // reset style body
     });
 </script>
 @endsection

@@ -132,7 +132,7 @@ class LaporanInfakController extends Controller
         foreach ($infakMasuk as $item) {
             $transactions[] = [
                 'tanggal' => $item->buktiTransaksi->tanggal_infak,
-                'keterangan' => 'Infak atas nama' .' ' .$item->buktiTransaksi->donatur ?: 'Infak masuk',
+                'keterangan' => 'Infak atas nama' . ' ' . $item->buktiTransaksi->donatur ?: 'Infak masuk',
                 'alamat' => $item->buktiTransaksi->alamat,
                 'jenis_transaksi' => 'Pemasukan',
                 'jenis_barang' => $item->buktiTransaksi->barang ?: 'Uang',
@@ -170,7 +170,7 @@ class LaporanInfakController extends Controller
         unset($item); // Hindari reference bug
 
         $totalSaldo = $saldo;
-         $totalMasuk = array_sum(array_column($transactions, 'masuk'));
+        $totalMasuk = array_sum(array_column($transactions, 'masuk'));
         $totalKeluar = abs(array_sum(array_column($transactions, 'keluar')));
         $formattedStartDate = Carbon::parse($startDate)->format('d-m-Y');
         $formattedEndDate = Carbon::parse($endDate)->format('d-m-Y');
@@ -187,6 +187,7 @@ class LaporanInfakController extends Controller
             'formattedEndDate' => $formattedEndDate,
         ])->setPaper('A4', 'landscape');
 
-        return $pdf->stream("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
+        // return $pdf->stream("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
+        return $pdf->download("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
     }
 }
