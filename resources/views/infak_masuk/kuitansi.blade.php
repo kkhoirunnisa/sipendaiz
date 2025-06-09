@@ -79,7 +79,7 @@
                     <!-- Kolom Teks Header -->
                     <td style="width: 85%; text-align: center;">
                         <h1 style="margin: 5px 0; color: green; font-size: 25px;">
-                            @if ($infak->kategori == 'Pembangunan')
+                            @if ($infak->buktiTransaksi->kategori == 'Pembangunan')
                             PANITIA RENOVASI MASJID JAMI' AL MUNAWWAROH
                             @else
                             PANITIA TAKMIR MASJID JAMI' AL MUNAWWAROH
