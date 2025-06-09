@@ -73,8 +73,8 @@ class UserController extends Controller
         try {
             $request->validate([
                 'role' => 'required|string|max:10',
-                'nama' => 'required|string|max:10',
-                'username' => 'required|max: 10|unique:users,username',
+                'nama' => 'required|string|max:50',
+                'username' => 'required|max:10',
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
                 'password' => 'nullable', // optional password
             ]);

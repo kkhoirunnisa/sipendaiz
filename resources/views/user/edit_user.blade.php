@@ -56,6 +56,9 @@
                                 Nama
                             </label>
                             <input type="text" id="nama" name="nama" value="{{ $user->nama }}" class="form-control" required>
+                            @error('nama')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="nomor_telepon" class="form-label fw-bold text-dark">
@@ -70,6 +73,9 @@
                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 value="{{ $user->nomor_telepon }}"
                                 class="form-control">
+                            @error('nomor_telepon')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="role" class="form-label fw-bold text-dark">
@@ -82,6 +88,9 @@
                                 <option value="Petugas" {{ old('role', $user->role) == 'Petugas' ? 'selected' : '' }}>Petugas</option>
                                 <option value="Ketua" {{ old('role', $user->role) == 'Ketua' ? 'selected' : '' }}>Ketua</option>
                             </select>
+                            @error('role')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-3">
@@ -90,6 +99,9 @@
                                 Username
                             </label>
                             <input type="text" id="username" name="username" value="{{ $user->username }}" class="form-control" required>
+                            @error('username')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label fw-bold text-dark">
@@ -102,8 +114,10 @@
                                     <i class="bi bi-eye-slash" id="iconToggle"></i>
                                 </span>
                             </div>
+                            @error('password')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
-
                         <div class="text-end">
                             <button type="button" class="btn btn-warning" onclick="konfirmasiEdit()">
                                 <i class="bi bi-save-fill me-1"></i>
