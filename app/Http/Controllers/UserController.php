@@ -40,7 +40,7 @@ class UserController extends Controller
                 'role' => 'required|srting|max:10',
                 'nama' => 'required|srting|max:50',
                 'username' => 'required|max: 10|unique:users,username',
-                'password' => 'required|srting|min:6',
+                'password' => 'required|srting',
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
             ]);
 
