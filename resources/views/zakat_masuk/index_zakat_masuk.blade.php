@@ -57,9 +57,9 @@
                             <!-- <th class="text-center">Jumlah (Kg)</th> -->
                             <!-- <th class="text-center">Keterangan (Muzaki)</th> -->
                             <!-- <th class="text-center">Pengelola</th> -->
-                            @if(auth()->user()->role == 'Bendahara')
+                            
                             <th class="text-center">Aksi</th>
-                            @endif
+                          
                         </tr>
                     </thead>
                     <tbody id="tabel-zakat">
@@ -87,7 +87,7 @@
                             <!-- <td class="text-center">
                                 {{ $zm->user->nama ?? $zm->nama }}
                             </td> -->
-                            @if(auth()->user()->role == 'Bendahara')
+                           
                             <td class="text-center">
                                 <span data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Detail">
                                     <button class="btn btn-sm btn-info text-white modal-trigger"
@@ -97,6 +97,7 @@
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
                                 </span>
+                                 @if(auth()->user()->role == 'Bendahara')
                                 <a href="{{ route('zakat_masuk.edit', $zm->id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pen-fill"></i></a>
                                 <form id="delete-form-{{ $zm->id }}" action="{{ route('zakat_masuk.destroy', $zm->id) }}" method="POST" style="display:inline-block;">
                                     @csrf

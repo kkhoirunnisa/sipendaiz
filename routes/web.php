@@ -66,7 +66,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/mustahik/pdf', [MustahikController::class, 'exportPdf'])->name('mustahik.pdf'); //cetak
     });
 
-    Route::middleware('role:Petugas,Bendahara')->group(function () {
+    // Route::middleware('role:Petugas,Bendahara, Ketua')->group(function () {
 
         // ZAKAT MASUK
         Route::get('zakat-masuk', [ZakatMasukController::class, 'index'])->name('zakat_masuk.index'); //menampilkan
@@ -108,7 +108,7 @@ Route::middleware('auth')->group(function () {
         // KUITANSI
         Route::get('/infak-masuk/kuitansi/{id}', [InfakMasukController::class, 'kuitansi'])->name('infak.kuitansi');
         Route::get('/infak-masuk/kuitansi/{id}/pdf', [InfakMasukController::class, 'cetakKuitansiPdf'])->name('infak.kuitansi.pdf');
-    });
+    // });
 
     // DASHBOARD
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');

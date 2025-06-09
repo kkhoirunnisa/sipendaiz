@@ -151,7 +151,7 @@
             @endif
 
             <!-- LAPORAN (bendahara dan ketua) -->
-            @if(in_array(auth()->user()->role, ['Bendahara', 'Ketua']))
+        
             <li class="text-muted small mt-4">LAPORAN</li>
 
             <li class="nav-item">
@@ -186,7 +186,7 @@
                     <i class="bi bi-archive-fill me-2"></i> <span>Zakat</span>
                 </a>
             </li>
-            @endif
+    
 
 
             <!-- USERS (hanya bendahara)  -->

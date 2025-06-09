@@ -57,9 +57,9 @@
                             <!-- <th class="text-center">Jumlah (Kg)</th> -->
                             <!-- <th class="text-center">Keterangan</th>
                             <th class="text-center">Pengelola</th> -->
-                            @if(auth()->user()->role == 'Bendahara')
+                          
                             <th class="text-center">Aksi</th>
-                            @endif
+                           
                         </tr>
                     </thead>
                     <tbody id="tabel-zakat">
@@ -101,13 +101,14 @@
                             <td class="text-center">
                                 {{ $zk->user->nama ?? $zk->nama }}
                             </td> -->
-                            @if(auth()->user()->role == 'Bendahara')
+                           
                             <td class="text-center">
                                 <!-- Tombol untuk membuka modal detail -->
                                 <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
                                     data-bs-target="#modalDetailZakat{{ $zk->id }}">
                                     <i class="bi bi-eye-fill"></i>
                                 </button>
+                                 @if(auth()->user()->role == 'Bendahara')
                                 <a href="{{ route('zakat_keluar.edit', $zk->id) }}" class="btn btn-sm btn-warning">
                                     <i class="bi bi-pen-fill"></i>
                                 </a>
@@ -158,7 +159,7 @@
 <!-- Modal Detail Zakat -->
 @if (!$zakatKeluar->isEmpty())
 @foreach ($zakatKeluar as $zk)
-<div class="modal fade" id="modalDetailZakat{{ $zk->id }}" tabindex="-1" aria-labelledby="modalDetailZakatLabel{{ $zk->id }}" aria-hidden="true">
+<div class="modal fade mt-4" id="modalDetailZakat{{ $zk->id }}" tabindex="-1" aria-labelledby="modalDetailZakatLabel{{ $zk->id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
             <div class="modal-header bg-success text-white rounded-top-4">
