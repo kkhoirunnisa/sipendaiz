@@ -271,23 +271,24 @@ class BuktiTransaksiController extends Controller
                 'tanggal_konfirmasi' => Carbon::now()->toDateString(),
             ]);
 
+            $infak = $infakMasuk;
             $pdf = Pdf::loadView('infak_masuk.kuitansi', compact('infak'))
                 ->setPaper('a4', 'landscape');
 
             $namaDonatur = preg_replace('/[^\w\s-]/', '', $infakMasuk->buktiTransaksi->donatur);
             $namaFile = 'Kuitansi Infak - ' . $namaDonatur . '.pdf';
 
-            // Path untuk disimpan di folder public/storage/kuitansi
+            // Simpan file PDF ke folder public/storage/kuitansi
             $path = public_path('storage/kuitansi/' . $namaFile);
-
-            // Pastikan foldernya ada
             if (!file_exists(public_path('storage/kuitansi'))) {
                 mkdir(public_path('storage/kuitansi'), 0755, true);
             }
-            // Simpan PDF ke path
             $pdf->save($path);
 
-            // Pesan WhatsApp ke donatur (seperti yang sudah kamu buat)
+            // Buat URL publik untuk akses kuitansi
+            $urlKuitansi = asset('storage/kuitansi/' . rawurlencode($namaFile));
+
+            // Pesan WhatsApp
             $message = "*Terima kasih, transaksi infak Anda telah diverifikasi.*\n\n";
             $message .= "*Nama:* {$bukti->donatur}\n";
             $message .= "*Alamat:* {$bukti->alamat}\n";
@@ -302,7 +303,8 @@ class BuktiTransaksiController extends Controller
             $message .= "\n";
             $message .= "*Tanggal Infak:* " . Carbon::parse($bukti->tanggal_infak)->format('d-m-Y') . "\n";
             $message .= "*Tanggal Konfirmasi:* " . Carbon::parse($infakMasuk->tanggal_konfirmasi)->format('d-m-Y') . "\n";
-            $message .= "*Kuitansi:* " . 'https://sipendaiz.my.id'.$path . "\n\n";
+            $message .= "*Kuitansi:* " . $urlKuitansi . "\n\n";
+
             $message .= "Semoga Allah membalas kebaikan Anda. Jazakumullahu khairan.\n\n";
             $message .= "_Pesan ini dikirim secara resmi oleh Masjid Jami' Al Munawwarah._";
 
