@@ -6,6 +6,7 @@ use App\Models\UserModel;
 use Illuminate\Http\Request;
 use TheSeer\Tokenizer\Exception;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -36,20 +37,30 @@ class UserController extends Controller
     {
         try {
             // Validasi data input dari form
-            $request->validate([
+            $validator = Validator::make($request->all(), [
                 'role' => 'required|string|max:10',
                 'nama' => 'required|string|max:50',
-                'username' => 'required|max: 10|unique:users,username',
+                'username' => 'required|max:10|unique:users,username',
                 'password' => 'required|string',
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
             ]);
+
+            // Jika validasi gagal, redirect dengan session error
+            if ($validator->fails()) {
+                $errors = $validator->errors()->all();
+                $errorMessage = implode(', ', $errors);
+
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', $errorMessage);
+            }
 
             // Simpan data pengelola baru ke database
             UserModel::create([
                 'role' => $request->role,
                 'nama' => $request->nama,
                 'username' => $request->username,
-                'password' =>  Hash::make($request->password),
+                'password' => Hash::make($request->password),
                 'nomor_telepon' => $request->nomor_telepon,
             ]);
 
@@ -71,13 +82,24 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $request->validate([
+            // Manual validation dengan custom error handling
+            $validator = Validator::make($request->all(), [
                 'role' => 'required|string|max:10',
                 'nama' => 'required|string|max:50',
-                'username' => 'required|max:10',
+                'username' => 'required|max:10|unique:users,username,' . $id, // exclude current user from unique check
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
                 'password' => 'nullable', // optional password
             ]);
+
+            // Jika validasi gagal, redirect dengan session error
+            if ($validator->fails()) {
+                $errors = $validator->errors()->all();
+                $errorMessage = implode(', ', $errors);
+
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', $errorMessage);
+            }
 
             $user = UserModel::findOrFail($id);
 

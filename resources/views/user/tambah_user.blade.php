@@ -161,7 +161,7 @@
             const value = field.value.trim();
 
             if (id === 'nomor_telepon') {
-                if (/^\d+$/.test(value) && value.length >= 10) { //minimal 10 digit
+                if (/^\d+$/.test(value) && value.length >= 10) { //minimal  digit
                     filledFields++;
                 }
             } else if (value !== '') {
