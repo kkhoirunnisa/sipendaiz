@@ -147,12 +147,12 @@ class ZakatKeluarController extends Controller
             $request->validate([
                 'id_users' => 'required|exists:users,id',
                 'id_mustahik' => 'required|exists:mustahik,id',
-                'tanggal' => 'required',
-                'jenis_zakat' => 'required',
-                'bentuk_zakat' => 'required',
+                'tanggal' => 'required|date',
+                'jenis_zakat' => 'required|string|max:10',
+                'bentuk_zakat' => 'required|string|max:10',
                 'nominal' => 'nullable|numeric',
                 'jumlah' => 'nullable',
-                'keterangan' => 'required',
+                'keterangan' => 'required|string|max:255',
             ]);
 
             $jenis = $request->jenis_zakat;
