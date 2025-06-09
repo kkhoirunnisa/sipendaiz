@@ -244,7 +244,6 @@
                             </span>
                             @if($bt->status == 'Pending')
                             <!-- Tombol Detail -->
-
                             <a href="{{ route('bukti_transaksi.edit', $bt->id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pen-fill"></i></a>
                             <form action="{{ route('bukti_transaksi.destroy', $bt->id) }}" method="POST" class="d-inline" id="delete-form-{{ $bt->id }}">
                                 @csrf

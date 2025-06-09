@@ -197,7 +197,7 @@ class BuktiTransaksiController extends Controller
             // $buktiTransaksi->update($validated);
 
             // Isi data ke model
-            $buktiTransaksi->fill($request->all());
+            $buktiTransaksi->fill($validated);
             // Set nominal menjadi null jika kosong
             $buktiTransaksi->nominal = $request->nominal ?: null;
             // Simpan ke database
