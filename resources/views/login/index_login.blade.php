@@ -350,10 +350,10 @@
 </head>
 
 <body>
-    <div class="container-fluid d-none d-md-flex main-container p-0">
+    <div class="container-fluid main-container p-0">
         <div class="row w-100 g-0 min-vh-100">
             <!-- Hero Section -->
-            <div class="col-lg-6 hero-section d-flex align-items-center">
+            <div class="col-lg-6 hero-section  d-none d-md-flex d-flex align-items-center">
                 <div class="hero-content w-100 text-center fade-in">
                     <div class="mosque-icon">
                         <i class="fas fa-mosque"></i>
