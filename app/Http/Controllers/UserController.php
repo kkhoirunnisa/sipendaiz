@@ -37,10 +37,10 @@ class UserController extends Controller
         try {
             // Validasi data input dari form
             $request->validate([
-                'role' => 'required|srting|max:10',
-                'nama' => 'required|srting|max:50',
+                'role' => 'required|string|max:10',
+                'nama' => 'required|string|max:50',
                 'username' => 'required|max: 10|unique:users,username',
-                'password' => 'required|srting',
+                'password' => 'required|string',
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
             ]);
 
@@ -72,8 +72,8 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'role' => 'required|srting|max:10',
-                'nama' => 'required|srting|max:10',
+                'role' => 'required|string|max:10',
+                'nama' => 'required|string|max:10',
                 'username' => 'required|max: 10|unique:users,username',
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
                 'password' => 'nullable', // optional password
