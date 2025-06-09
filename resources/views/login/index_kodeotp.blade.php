@@ -97,13 +97,6 @@
             font-weight: 600;
         }
 
-        /* .security-text {
-            font-size: 0.9rem;
-            text-align: center;
-            margin-top: 15px;
-            color: #6c757d;
-        } */
-
         .security-badge {
             background: rgba(37, 211, 102, 0.1);
             color: #25D366;
@@ -188,7 +181,17 @@
                 icon: 'warning',
                 title: 'Kode OTP kosong!',
                 text: 'Silakan isi kode OTP Anda terlebih dahulu.',
-                confirmButtonColor: '#2d7d32'
+                confirmButtonColor: '#2d7d32',
+                confirmButtonText: 'OK'
+            });
+        } else if (otp.length !== 6 || !/^\d+$/.test(otp)) {
+            e.preventDefault(); // Mencegah form terkirim
+            Swal.fire({
+                icon: 'warning',
+                title: 'Format OTP tidak valid!',
+                text: 'Kode OTP harus terdiri dari 6 digit angka.',
+                confirmButtonColor: '#2d7d32',
+                confirmButtonText: 'OK'
             });
         } else {
             // Tampilkan loading SweetAlert sebelum form dikirim
@@ -260,8 +263,26 @@
     }
 
     // Saat tombol diklik, simpan waktu ke localStorage
-    document.getElementById('resendOtpForm').addEventListener('submit', function() {
+    document.getElementById('resendOtpForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Mencegah form terkirim langsung
+        
+        Swal.fire({
+            title: 'Mengirim ulang OTP...',
+            text: 'Mohon tunggu sebentar',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
         localStorage.setItem('lastResendOtpTime', Date.now());
+        
+        // Submit form setelah delay
+        setTimeout(() => {
+            e.target.submit();
+        }, 1000);
     });
 
     // Jalankan saat halaman dimuat
@@ -281,15 +302,25 @@
     });
 </script>
 @endif
+
 <!-- Notifikasi Error -->
 @if (session('error'))
 <script>
     Swal.fire({
         icon: 'error',
-        title: 'Gagal!',
+        title: 'Kode OTP Salah!',
         text: '{{ session("error") }}',
         showConfirmButton: true,
-        confirmButtonText: 'OK'
+        confirmButtonText: 'Coba Lagi',
+        confirmButtonColor: '#dc3545',
+        allowOutsideClick: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Focus kembali ke input OTP setelah user menutup alert
+            document.getElementById('otp').focus();
+            document.getElementById('otp').select();
+        }
     });
 </script>
 @endif
+

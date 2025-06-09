@@ -54,12 +54,35 @@ class LupaPasswordController extends Controller
 
     public function verifikasiOtp(Request $request)
     {
-        $kodeOtp = $request->otp;
-        $user = UserModel::find($request->id_user);
-        if ($kodeOtp == $user->kode_otp) {
+        try {
+            $kodeOtp = $request->otp;
+            $user = UserModel::find($request->id_user);
+            
+            // Validasi jika user tidak ditemukan
+            if (!$user) {
+                return redirect()->back()->with('error', 'Pengguna tidak ditemukan. Silakan ulangi proses verifikasi.');
+            }
+            
+            // Validasi jika kode OTP kosong
+            if (empty($kodeOtp)) {
+                return redirect()->back()->with('error', 'Kode OTP tidak boleh kosong.');
+            }
+            
+            // Validasi jika kode OTP tidak sesuai
+            if ($kodeOtp != $user->kode_otp) {
+                return redirect()->back()
+                    ->with([
+                        'error' => 'Kode OTP yang Anda masukkan salah. Silakan periksa kembali kode OTP Anda.',
+                        'id_user' => $user->id,
+                        'telepon' => $user->nomor_telepon
+                    ]);
+            }
+            
+            // Jika OTP benar, lanjutkan ke halaman ganti password
             return redirect('/password')->with(['id_user' => $user->id]);
-        } else {
-            abort(401);
+            
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memverifikasi OTP. Silakan coba lagi.');
         }
     }
 
@@ -72,7 +95,6 @@ class LupaPasswordController extends Controller
         }
         return view('login.index_ganti_password', compact('id_user'));
     }
-
 
     public function gantiPassword(Request $request)
     {
@@ -89,7 +111,6 @@ class LupaPasswordController extends Controller
 
         return redirect('/login')->with('success', 'Password berhasil diubah.');
     }
-
 
     public function kirimUlangOtp(Request $request)
     {
@@ -124,7 +145,11 @@ class LupaPasswordController extends Controller
                 ],
             ]);
 
-            return back()->with(['id_user' => $user->id, 'telepon' => $user->nomor_telepon]);
+            return back()->with([
+                'success' => 'Kode OTP baru telah dikirim ke nomor telepon Anda.',
+                'id_user' => $user->id, 
+                'telepon' => $user->nomor_telepon
+            ]);
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Gagal mengirim ulang OTP: ' . $e->getMessage()]);
         }

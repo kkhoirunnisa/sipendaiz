@@ -159,18 +159,39 @@
 
         if (!telepon) {
             e.preventDefault(); // Mencegah form terkirim
+
             Swal.fire({
                 icon: 'warning',
                 title: 'Nomor WhatsApp kosong!',
                 text: 'Silakan isi nomor WhatsApp Anda terlebih dahulu.',
-                confirmButtonColor: '#2d7d32'
+                confirmButtonColor: '#2d7d32',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('telepon').focus();
+                }
+            });
+        } else if (!isValidPhoneNumber(telepon)) {
+            e.preventDefault(); // Mencegah form terkirim
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Format nomor tidak valid!',
+                text: 'Nomor WhatsApp harus dimulai dengan 08 dan minimal 10 digit.',
+                confirmButtonColor: '#2d7d32',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('telepon').focus();
+                    document.getElementById('telepon').select();
+                }
             });
         } else {
             // Tampilkan loading SweetAlert sebelum form dikirim
             e.preventDefault(); // Tahan dulu pengiriman
 
             Swal.fire({
-                title: 'Memverifikasi...',
+                title: 'Memverifikasi nomor...',
                 text: 'Mohon tunggu sebentar',
                 icon: 'info',
                 allowOutsideClick: false,
@@ -186,4 +207,62 @@
             }, 1000);
         }
     });
+
+    // Fungsi validasi format nomor telepon
+    function isValidPhoneNumber(phone) {
+        // Hapus spasi dan karakter non-digit
+        const cleanPhone = phone.replace(/\D/g, '');
+
+        // Cek apakah dimulai dengan 08 dan panjang minimal 10 digit
+        return /^08\d{8,}$/.test(cleanPhone);
+    }
+
+    // Format input nomor telepon secara real-time
+    document.getElementById('telepon').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Hapus semua karakter non-digit
+
+        // Batasi panjang maksimal 13 digit
+        if (value.length > 13) {
+            value = value.substring(0, 13);
+        }
+
+        e.target.value = value;
+    });
 </script>
+
+
+
+<!-- Notifikasi Error dari Controller -->
+@if ($errors->has('telepon'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Nomor WhatsApp Tidak Terdaftar!',
+        text: '{{ $errors->first("telepon") }}',
+        showConfirmButton: true,
+        confirmButtonText: 'Coba Lagi',
+        confirmButtonColor: '#dc3545',
+        allowOutsideClick: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Focus kembali ke input telepon setelah user menutup alert
+            document.getElementById('telepon').focus();
+            document.getElementById('telepon').select();
+        }
+    });
+</script>
+@endif
+
+<!-- Notifikasi Sukses -->
+@if (session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session("success") }}',
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+    });
+</script>
+@endif
