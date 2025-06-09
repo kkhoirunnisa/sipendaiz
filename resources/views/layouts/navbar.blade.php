@@ -19,7 +19,7 @@
             </a> -->
 
             <!-- <div class="dropdown"> -->
-            <a href="#" class="d-flex align-items-center text-decoration-none text-white" aria-expanded="false">
+            <a href="#" class="d-flex align-items-center d-none d-md-flex text-decoration-none text-white" aria-expanded="false">
                 <i class="bi bi-person-fill bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center me-2"
                     style="width: 30px; height: 30px; font-size: 18px;"></i>
                 <strong>{{ auth()->user()->nama }}</strong>
