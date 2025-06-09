@@ -68,12 +68,12 @@
                         <button type="button" class="btn btn-outline-danger" onclick="resetFilter()">
                             <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filter
                         </button>
-                       <!-- download -->
+                        <!-- download -->
                         <a href="{{ route('laporan_zakat.download', ['tanggal_awal' => $startDate, 'tanggal_akhir' => $endDate]) }}"
                             target="_blank" class="btn btn-outline-danger">
                             <i class="bi bi-download me-1"></i>Unduh PDF
                         </a>
-                       
+
                         @endif
                     </div>
                 </div>
@@ -85,9 +85,46 @@
                 <div class="col-12">
                     @if(isset($transactions))
                     @if(count($transactions) > 0)
-                    <!-- Summary Cards -->
+                    <!-- Summary Cards - Updated Layout -->
                     <div class="row mb-4 mt-4">
-                        <div class="col-lg-6 col-md-6 mb-3">
+                        <!-- Total Pemasukan Uang -->
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                                            <i class="bi bi-arrow-down-circle text-success fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-muted mb-1">Total Pemasukan Uang</h6>
+                                            <h4 class="text-success mb-0 fw-bold">Rp {{ number_format($pemasukanUang, 0, ',', '.') }}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Pemasukan Beras -->
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                                            <i class="bi bi-arrow-down-circle text-success fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-muted mb-1">Total Pemasukan Beras</h6>
+                                            <h4 class="text-success mb-0 fw-bold">
+                                                {{ $pemasukanBeras == 0 ? '0 kg' : rtrim(rtrim(number_format($pemasukanBeras, 2, ',', '.'), '0'), ',') . ' kg' }}
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Saldo Uang -->
+                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
@@ -95,14 +132,16 @@
                                             <i class="bi bi-cash-coin text-primary fs-4"></i>
                                         </div>
                                         <div>
-                                            <h6 class="text-muted mb-1">Total Saldo Uang</h6>
+                                            <h6 class="text-muted mb-1">Total Saldo Uang Saat Ini</h6>
                                             <h4 class="text-primary mb-0 fw-bold">Rp {{ number_format($totalUang, 0, ',', '.') }}</h4>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-6 mb-3">
+
+                        <!-- Total Saldo Beras -->
+                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
@@ -110,7 +149,7 @@
                                             <i class="bi bi-basket text-primary fs-4"></i>
                                         </div>
                                         <div>
-                                            <h6 class="text-muted mb-1">Total Saldo Beras</h6>
+                                            <h6 class="text-muted mb-1">Total Saldo Beras Saat Ini</h6>
                                             <h4 class="text-primary mb-0 fw-bold">
                                                 {{ $saldoBeras == 0 ? '0 kg' : rtrim(rtrim(number_format($saldoBeras, 2, ',', '.'), '0'), ',') . ' kg' }}
                                             </h4>
@@ -119,12 +158,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-6 mb-3">
+
+                        <!-- Total Pengeluaran Uang -->
+                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
                                         <div class="bg-danger bg-opacity-10 rounded p-3 me-3">
-                                            <i class="bi bi-cash-coin text-danger fs-4"></i>
+                                            <i class="bi bi-arrow-up-circle text-danger fs-4"></i>
                                         </div>
                                         <div>
                                             <h6 class="text-muted mb-1">Total Pengeluaran Uang</h6>
@@ -134,12 +175,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-6 mb-3">
+
+                        <!-- Total Pengeluaran Beras -->
+                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
                                         <div class="bg-danger bg-opacity-10 rounded p-3 me-3">
-                                            <i class="bi bi-basket text-danger fs-4"></i>
+                                            <i class="bi bi-arrow-up-circle text-danger fs-4"></i>
                                         </div>
                                         <div>
                                             <h6 class="text-muted mb-1">Total Pengeluaran Beras</h6>
@@ -232,9 +275,9 @@
 
                                             <td class="text-end py-3">
                                                 @if($trx['jumlah_kg'] > 0)
-                                                <span class="fw-semibold text-success"> {{ number_format($trx['jumlah_kg'], 0, ',', '.') }} Kg</span>
+                                                <span class="fw-semibold text-success">{{ rtrim(rtrim(number_format($trx['jumlah_kg'], 2, ',', '.'), '0'), ',') }} Kg</span>
                                                 @elseif($trx['jumlah_kg'] < 0)
-                                                    <span class="fw-semibold text-danger"> -{{ number_format(abs($trx['jumlah_kg']), 0, ',', '.') }} Kg</span>
+                                                    <span class="fw-semibold text-danger">{{ rtrim(rtrim(number_format(abs($trx['jumlah_kg']), 2, ',', '.'), '0'), ',') }} Kg</span>
                                                     @else
                                                     <span class="text-muted">-</span>
                                                     @endif

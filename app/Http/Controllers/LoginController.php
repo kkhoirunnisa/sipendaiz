@@ -30,6 +30,7 @@ class LoginController extends Controller
             ];
 
             if (Auth::attempt($infoLogin)) {
+                session()->flash('success', 'Anda berhasil login!');
                 return redirect('/dashboard');
                 exit();
             }
@@ -53,6 +54,7 @@ class LoginController extends Controller
     public function logout()
     {
         session()->flush(); // Menghapus semua session
+        session()->flash('success', 'Anda berhasil logout!');
         return redirect()->route('login.index_login');
     }
 

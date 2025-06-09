@@ -632,7 +632,7 @@
                                             <i class="fas fa-user me-2 text-dark"></i>Sumber
                                         </th>
                                         <th class="text-dark">
-                                            <i class="fas fa-money-bill me-2 text-dark"></i>Nominal
+                                            <i class="fas fa-money-bill me-2 text-dark"></i>Infak
                                         </th>
                                         <th class="text-dark">
                                             <i class="fas fa-calendar me-2 text-dark"></i>Tanggal
@@ -645,7 +645,15 @@
                                     @forelse($recentInfak as $infak)
                                     <tr>
                                         <td>{{ $infak->buktiTransaksi->donatur }}</td>
-                                        <td class="text-success">Rp {{ number_format($infak->buktiTransaksi->nominal, 0, ',', '.') }}</td>
+                                        <td class="text-success">
+                                            @if(isset($infak->buktiTransaksi->barang) && !empty($infak->buktiTransaksi->barang))
+                                            {{ $infak->buktiTransaksi->barang }}
+                                            @elseif($infak->buktiTransaksi->nominal == 0)
+                                            Barang Infak
+                                            @else
+                                            Rp {{ number_format($infak->buktiTransaksi->nominal, 0, ',', '.') }}
+                                            @endif
+                                        </td>
                                         <td>{{ \Carbon\Carbon::parse($infak->buktiTransaksi->tanggal_infak)->format('d-m-Y') }}</td>
                                     </tr>
                                     @empty
@@ -816,7 +824,8 @@
                             <div class="table-responsive mb-4">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="fw-bold mb-0">Mustahik</h6>
-                                    <a href="{{ route('mustahik.pdf') }}" class="badge bg-success text-decoration-none">Lihat Mustahik</a>
+                                     <span class="badge bg-success">Mustahik Terbaru </span>
+                                   
                                 </div>
                                 <ul class="list-group list-group-numbered shadow-sm rounded" id="mustahikList">
                                     @foreach($listMustahik as $nama)

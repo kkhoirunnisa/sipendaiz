@@ -28,6 +28,12 @@ class MustahikController extends Controller
         return view('mustahik.index_mustahik', compact('mustahik'));
     }
 
+    public function publicView()
+    {
+        $listMustahik = MustahikModel::pluck('nama')->toArray();
+        return view('mustahik.public', compact('listMustahik'));
+    }
+
     // Menampilkan form untuk menambah mustahik
     public function create()
     {

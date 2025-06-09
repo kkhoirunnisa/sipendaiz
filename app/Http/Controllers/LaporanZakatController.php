@@ -61,6 +61,7 @@ class LaporanZakatController extends Controller
         $pemasukanUang = 0;
         $pengeluaranUang = 0;
         $pengeluaranBeras = 0;
+        $pemasukanBeras = 0; // Tambahan untuk total pemasukan beras
 
         foreach ($transactions as $i => &$item) {
             $saldo_uang += $item['nominal'];
@@ -70,6 +71,8 @@ class LaporanZakatController extends Controller
                 $saldo_beras += $item['jumlah_kg'];
                 if ($item['jenis_transaksi'] === 'Pengeluaran') {
                     $pengeluaranBeras += abs($item['jumlah_kg']);
+                } else if ($item['jenis_transaksi'] === 'Pemasukan') {
+                    $pemasukanBeras += $item['jumlah_kg']; // Tambahan pemasukan beras
                 }
             }
 
@@ -94,6 +97,7 @@ class LaporanZakatController extends Controller
             'pemasukanUang' => $pemasukanUang,
             'pengeluaranUang' => $pengeluaranUang,
             'pengeluaranBeras' => $pengeluaranBeras,
+            'pemasukanBeras' => $pemasukanBeras, // Tambahan untuk view
         ]);
     }
 
@@ -144,6 +148,7 @@ class LaporanZakatController extends Controller
         $pemasukanUang = 0;
         $pengeluaranUang = 0;
         $pengeluaranBeras = 0;
+        $pemasukanBeras = 0; // Tambahan untuk total pemasukan beras
 
         foreach ($transactions as $i => &$item) {
             $saldo_uang += $item['nominal'];
@@ -153,6 +158,8 @@ class LaporanZakatController extends Controller
                 $saldo_beras += $item['jumlah_kg'];
                 if ($item['jenis_transaksi'] === 'Pengeluaran') {
                     $pengeluaranBeras += abs($item['jumlah_kg']);
+                } else if ($item['jenis_transaksi'] === 'Pemasukan') {
+                    $pemasukanBeras += $item['jumlah_kg']; // Tambahan pemasukan beras
                 }
             }
 
@@ -177,6 +184,7 @@ class LaporanZakatController extends Controller
             'pemasukanUang' => $pemasukanUang,
             'pengeluaranUang' => $pengeluaranUang,
             'pengeluaranBeras' => $pengeluaranBeras,
+            'pemasukanBeras' => $pemasukanBeras, // Tambahan untuk PDF
         ];
 
         $pdf = PDF::loadView('laporan.unduh_laporan_zakat', $data)
