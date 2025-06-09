@@ -28,6 +28,7 @@ class InfakMasukController extends Controller
                             ->orWhere('tanggal_infak', 'like', "%{$search}%")
                             ->orWhere('kategori', 'like', "%{$search}%")
                             ->orWhere('metode', 'like', "%{$search}%")
+                            ->orWhere('donatur', 'like', "%{$search}%")
                             ->orWhere('barang', 'like', "%{$search}%");
                     });
                 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\MustahikModel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use TheSeer\Tokenizer\Exception;
+use Illuminate\Validation\ValidationException;
 
 class MustahikController extends Controller
 {
@@ -36,6 +37,19 @@ class MustahikController extends Controller
     // Menyimpan mustahik baru
     public function store(Request $request)
     {
+        // try {
+        //     $request->validate([
+        //         'nama' => 'required|string|max:50',
+        //         'alamat' => 'required|string|max:30',
+        //         'kategori' => 'required|string|max:26',
+        //     ]);
+
+        //     MustahikModel::create($request->all()); // Menyimpan data mustahik
+        //     return redirect()->route('mustahik.index')->with('success', 'Mustahik berhasil ditambahkan!');
+        // } catch (Exception $e) {
+        //     return redirect()->back()->withInput()->with('error', 'Gagal menambahkan data: ' . $e->getMessage());
+        // }
+
         try {
             $request->validate([
                 'nama' => 'required|string|max:50',
@@ -43,10 +57,24 @@ class MustahikController extends Controller
                 'kategori' => 'required|string|max:26',
             ]);
 
-            MustahikModel::create($request->all()); // Menyimpan data mustahik
+            MustahikModel::create($request->all());
             return redirect()->route('mustahik.index')->with('success', 'Mustahik berhasil ditambahkan!');
+        } catch (ValidationException $e) {
+            // Tangkap validation error dan kirim sebagai session error
+            $errorMessages = [];
+            foreach ($e->errors() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $errorMessages[] = $message;
+                }
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', implode('. ', $errorMessages));
         } catch (Exception $e) {
-            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan data: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal menambahkan data: ' . $e->getMessage());
         }
     }
     // Menampilkan form untuk mengedit mustahik

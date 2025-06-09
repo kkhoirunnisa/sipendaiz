@@ -129,8 +129,8 @@
                                     Nominal (Rp)
                                 </label>
                                 <input type="text" name="nominal" id="nominal" class="form-control" placeholder="Masukkan besar nominal zakat, contoh 40000" value="{{ old('nominal') }}">
-                                <small class="text-muted d-block">Sisa Fitrah Uang: <strong>{{ number_format($sisa['Fitrah_Uang'], 0, ',', '.') }}</strong></small>
-                                <small class="text-muted d-block">Sisa Maal Uang: <strong>{{ number_format($sisa['Maal_Uang'], 0, ',', '.') }}</strong></small>
+                                <small class="text-muted d-block">Sisa Fitrah Uang: <strong>Rp {{ number_format($sisa['Fitrah_Uang'], 2, ',', '.') }}</strong></small>
+                                <small class="text-muted d-block">Sisa Maal Uang: <strong>Rp {{ number_format($sisa['Maal_Uang'], 2, ',', '.') }}</strong></small>
                                 @error('nominal')
                                 <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -144,9 +144,16 @@
                                     <i class="fas fa-scale-balanced me-2 text-primary"></i>
                                     Jumlah (Kg)
                                 </label>
-                                <input type="number" name="jumlah" id="jumlah" class="form-control" placeholder="Masukkan berat beras, contoh 4" value="{{ old('jumlah') }}">
-                                <small class="text-muted d-block">Sisa Fitrah Beras: <strong>{{ number_format($sisa['Fitrah_Beras'], 0, ',', '.') }}</strong></small>
-                                <small class="text-muted d-block">Sisa Maal Beras: <strong>{{ number_format($sisa['Maal_Beras'], 0, ',', '.') }}</strong></small>
+                                <input type="number"
+                                    name="jumlah"
+                                    id="jumlah"
+                                    class="form-control"
+                                    placeholder="Masukkan berat beras, contoh 2.5"
+                                    value="{{ old('jumlah') }}"
+                                    step="0.01"
+                                    min="0">
+                                <small class="text-muted d-block">Sisa Fitrah Beras: <strong>{{ number_format($sisa['Fitrah_Beras'], 2, ',', '.') }} Kg</strong></small>
+                                <small class="text-muted d-block">Sisa Maal Beras: <strong>{{ number_format($sisa['Maal_Beras'], 2, ',', '.') }} Kg</strong></small>
                                 @error('jumlah')
                                 <div class="text-danger">{{ $message }}</div>
                                 @enderror

@@ -142,7 +142,7 @@
 <!-- Modal Detail Zakat -->
 @if (!$zakatMasuk->isEmpty())
 @foreach ($zakatMasuk as $zm)
-<div class="modal fade" id="detailModal{{ $zm->id }}" tabindex="-1" aria-labelledby="detailModalLabel{{ $zm->id }}" aria-hidden="true">
+<div class="modal fade mt-4" id="detailModal{{ $zm->id }}" tabindex="-1" aria-labelledby="detailModalLabel{{ $zm->id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
             <div class="modal-header bg-success text-white rounded-top-4">

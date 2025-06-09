@@ -68,7 +68,7 @@ class BuktiTransaksiController extends Controller
                 'nominal' => 'nullable',
                 'barang' => 'nullable|string|max:20',
                 'metode' => 'required|string|max:17',
-                'bukti_transaksi' => ' nullable|file|mimes:jpg,png,jpeg|max:10240',
+                'bukti_transaksi' => 'required|file|mimes:jpg,png,jpeg|max:10240',
                 'keterangan' => 'required|string|max:50',
             ]);
 
@@ -170,7 +170,7 @@ class BuktiTransaksiController extends Controller
                 'nominal' => 'nullable',
                 'barang' => 'nullable|string|max:20',
                 'metode' => 'required|string|max:17',
-                'bukti_transaksi' => ' nullable|file|mimes:jpg,png,jpeg|max:10240',
+                'bukti_transaksi' => ' required|file|mimes:jpg,png,jpeg|max:10240',
                 'keterangan' => 'required|string|max:50',
             ]);
 
