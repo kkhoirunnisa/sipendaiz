@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+
+// use Barryvdh\DomPDF\PDF;
+use Illuminate\Http\Request;
 use App\Models\ZakatMasukModel;
 use App\Models\ZakatKeluarModel;
-use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LaporanZakatController extends Controller
 {
