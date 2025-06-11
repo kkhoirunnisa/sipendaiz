@@ -50,7 +50,7 @@ class LaporanInfakController extends Controller
             $transactions[] = [
                 'donatur' => $item->buktiTransaksi->donatur,
                 'tanggal' => $item->buktiTransaksi->tanggal_infak,
-                'keterangan' => $item->buktiTransaksi->keterangan ?: 'Infak masuk',
+                // 'keterangan' => $item->buktiTransaksi->keterangan ?: 'Infak masuk',
                 'alamat' => $item->buktiTransaksi->alamat,
                 'jenis_transaksi' => 'Pemasukan',
                 'jenis_barang' => $item->buktiTransaksi->barang ?: 'Uang',
@@ -69,7 +69,7 @@ class LaporanInfakController extends Controller
                 'jenis_transaksi' => 'Pengeluaran',
                 'jenis_barang' => $item->barang ?: 'Uang',
                 'masuk' => 0,
-                'keluar' => -$item->nominal,
+                'keluar' => $item->nominal,
                 'saldo' => 0, // akan dihitung ulang nanti
             ];
         }
@@ -81,7 +81,7 @@ class LaporanInfakController extends Controller
         $saldo = 0;
         foreach ($transactions as $i => &$item) {
             $saldo += $item['masuk'];
-            $saldo += $item['keluar'];
+            $saldo -= $item['keluar'];
             $item['saldo'] = $saldo;
             $item['no'] = $i + 1;
         }
@@ -134,7 +134,7 @@ class LaporanInfakController extends Controller
             $transactions[] = [
                 'donatur' => $item->buktiTransaksi->donatur,
                 'tanggal' => $item->buktiTransaksi->tanggal_infak,
-                'keterangan' => 'Infak atas nama' . ' ' . $item->buktiTransaksi->donatur ?: 'Infak masuk',
+                // 'keterangan' => 'Infak atas nama' . ' ' . $item->buktiTransaksi->donatur ?: 'Infak masuk',
                 'alamat' => $item->buktiTransaksi->alamat,
                 'jenis_transaksi' => 'Pemasukan',
                 'jenis_barang' => $item->buktiTransaksi->barang ?: 'Uang',
@@ -153,7 +153,7 @@ class LaporanInfakController extends Controller
                 'jenis_transaksi' => 'Pengeluaran',
                 'jenis_barang' => $item->barang ?: 'Uang',
                 'masuk' => 0,
-                'keluar' => -$item->nominal,
+                'keluar' => $item->nominal,
                 'saldo' => 0, // akan dihitung ulang nanti
             ];
         }
@@ -165,7 +165,7 @@ class LaporanInfakController extends Controller
         $saldo = 0;
         foreach ($transactions as $i => &$item) {
             $saldo += $item['masuk'];
-            $saldo += $item['keluar'];
+            $saldo -= $item['keluar'];
             $item['saldo'] = $saldo;
             $item['no'] = $i + 1;
         }

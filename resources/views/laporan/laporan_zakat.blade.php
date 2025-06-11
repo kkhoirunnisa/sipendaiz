@@ -277,7 +277,7 @@
                                                 @if($trx['jumlah_kg'] > 0)
                                                 <span class="fw-semibold text-success">{{ rtrim(rtrim(number_format($trx['jumlah_kg'], 2, ',', '.'), '0'), ',') }} Kg</span>
                                                 @elseif($trx['jumlah_kg'] < 0)
-                                                    <span class="fw-semibold text-danger">{{ rtrim(rtrim(number_format(abs($trx['jumlah_kg']), 2, ',', '.'), '0'), ',') }} Kg</span>
+                                                    <span class="fw-semibold text-danger"> -{{ rtrim(rtrim(number_format(abs($trx['jumlah_kg']), 2, ',', '.'), '0'), ',') }} Kg</span>
                                                     @else
                                                     <span class="text-muted">-</span>
                                                     @endif

@@ -117,8 +117,8 @@
                     <th class="text-center">Bentuk</th>
                     <th class="text-center">Transaksi</th>
                     <th class="text-center">Uang</th>
-                    <th class="text-center">Beras</th>
                     <th class="text-center">Saldo Uang</th>
+                    <th class="text-center">Beras</th>
                     <th class="text-center">Saldo Beras</th>
                 </tr>
             </thead>
@@ -131,11 +131,25 @@
                     <td class="text-center">{!! nl2br(e($trx['keterangan'])) !!}</td>
                     <td class="text-center">{{ $trx['bentuk_zakat'] }}</td>
                     <td class="text-center">{{ $trx['jenis_transaksi'] }}</td>
-                    <td class="text-right">Rp {{ number_format($trx['nominal'], 0, ',', '.') }}</td>
                     <td class="text-right">
-                        {{ $trx['jumlah_kg'] == 0 ? '0 kg' : rtrim(rtrim(number_format($trx['jumlah_kg'], 2, ',', '.'), '0'), ',') . ' kg' }}
+                        @if($trx['nominal'] > 0)
+                        <span class="fw-semibold text-success">Rp {{ number_format($trx['nominal'], 0, ',', '.') }}</span>
+                        @elseif($trx['nominal'] < 0)
+                            <span class="fw-semibold text-danger">Rp -{{ number_format(abs($trx['nominal']), 0, ',', '.') }}</span>
+                            @else
+                            <span class="text-muted">-</span>
+                            @endif
                     </td>
                     <td class="text-right">Rp {{ number_format($trx['saldo'], 0, ',', '.') }}</td>
+                    <td class="text-right">
+                        @if($trx['jumlah_kg'] > 0)
+                        <span class="fw-semibold text-success">{{ rtrim(rtrim(number_format($trx['jumlah_kg'], 2, ',', '.'), '0'), ',') }} Kg</span>
+                        @elseif($trx['jumlah_kg'] < 0)
+                            <span class="fw-semibold text-danger">-{{ rtrim(rtrim(number_format(abs($trx['jumlah_kg']), 2, ',', '.'), '0'), ',') }} Kg</span>
+                            @else
+                            <span class="text-muted">-</span>
+                            @endif
+                    </td>
                     <td class="text-right">
                         {{ $trx['saldo_beras'] == 0 ? '0 kg' : rtrim(rtrim(number_format($trx['saldo_beras'], 2, ',', '.'), '0'), ',') . ' kg' }}
                     </td>
@@ -144,14 +158,47 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="8" class="text-right">TOTAL</td>
+                    <td colspan="7" class="text-right">TOTAL</td>
                     <td class="text-right">Rp {{ number_format($totalSaldo, 0, ',', '.') }}</td>
+                    <td class="text-right">
+                    </td>
                     <td class="text-right">
                         {{ $trx['saldo_beras'] == 0 ? '0 kg' : rtrim(rtrim(number_format($trx['saldo_beras'], 2, ',', '.'), '0'), ',') . ' kg' }}
                     </td>
                 </tr>
             </tfoot>
         </table>
+        <!-- REKAP PEMASUKAN & PENGELUARAN -->
+        <table style="width: 100%; margin-top: 25px; font-size: 12px; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th colspan="2" style="background-color: #e0f1e2; text-align: left; padding: 6px; font-weight: bold;">REKAPITULASI ZAKAT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 6px;">Pemasukan Zakat Uang</td>
+                    <td style="text-align: right; padding: 6px;">Rp {{ number_format($pemasukanUang, 0, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px;">Pengeluaran Zakat Uang</td>
+                    <td style="text-align: right; padding: 6px;">Rp {{ number_format($pengeluaranUang, 0, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px;">Pemasukan Zakat Beras</td>
+                    <td style="text-align: right; padding: 6px;">
+                        {{ $pemasukanBeras == 0 ? '0 kg' : rtrim(rtrim(number_format($pemasukanBeras, 2, ',', '.'), '0'), ',') . ' kg' }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px;">Pengeluaran Zakat Beras</td>
+                    <td style="text-align: right; padding: 6px;">
+                        {{ $pengeluaranBeras == 0 ? '0 kg' : rtrim(rtrim(number_format($pengeluaranBeras, 2, ',', '.'), '0'), ',') . ' kg' }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
         <table style="width: 100%; margin-top: 40px; font-size: 12px; color: green; border: none; border-collapse: collapse;">
             <tr>
                 <td style="width: 50%; border: none; text-align: left;">

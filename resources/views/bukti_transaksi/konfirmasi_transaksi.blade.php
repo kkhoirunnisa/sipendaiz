@@ -371,7 +371,7 @@
                                             <span class="badge bg-secondary">{{ $bt->jenis_infak ?? 'Tidak Diketahui' }}</span>
                                         </p>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-md-6">
                                         <label class="form-label small mb-1 fw-semibold">Nominal</label>
                                         <p class="fw-bold text-success mb-2">
                                             @if($bt->nominal == 0)
@@ -381,10 +381,16 @@
                                             @endif
                                         </p>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-md-6">
                                         <label class="form-label small mb-1 fw-semibold">Barang</label>
                                         <p class="mb-0">
                                             {{ $bt->barang ?: '-' }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Keterangan</label>
+                                        <p class="mb-0">
+                                            {{ $bt->keterangan ?: '-' }}
                                         </p>
                                     </div>
                                 </div>

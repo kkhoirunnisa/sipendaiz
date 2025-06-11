@@ -72,9 +72,9 @@
             transition: transform 0.3s ease;
         }
 
-        .logo-container:hover {
+        /* .logo-container:hover {
             transform: scale(1.1) rotate(5deg);
-        }
+        } */
 
         .logo-text h1 {
             font-size: 1.4rem;
@@ -412,7 +412,7 @@
             }
         }
 
-        /* Animations */
+        /* Animations untuk teks muncul dari atas*/
         .fade-in-up {
             opacity: 0;
             transform: translateY(30px);
@@ -436,7 +436,7 @@
         }
 
         /* Scrollbar Styling */
-        ::-webkit-scrollbar {
+        /* ::-webkit-scrollbar {
             width: 8px;
         }
 
@@ -451,7 +451,7 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--dark-green);
-        }
+        } */
     </style>
 </head>
 
@@ -824,8 +824,7 @@
                             <div class="table-responsive mb-4">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="fw-bold mb-0">Mustahik</h6>
-                                     <span class="badge bg-success">Mustahik Terbaru </span>
-                                   
+                                    <span class="badge bg-success">Terbaru</span>
                                 </div>
                                 <ul class="list-group list-group-numbered shadow-sm rounded" id="mustahikList">
                                     @foreach($listMustahik as $nama)
@@ -1064,14 +1063,14 @@
         });
 
         // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.navbar-custom');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
+        // window.addEventListener('scroll', function() {
+        //     const navbar = document.querySelector('.navbar-custom');
+        //     if (window.scrollY > 50) {
+        //         navbar.classList.add('scrolled');
+        //     } else {
+        //         navbar.classList.remove('scrolled');
+        //     }
+        // });
     </script>
 </body>
 

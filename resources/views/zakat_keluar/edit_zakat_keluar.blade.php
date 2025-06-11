@@ -155,8 +155,8 @@
                                     </label>
                                     <input type="number" name="jumlah" id="jumlah" class="form-control"
                                         value="{{ old('jumlah', rtrim(rtrim(number_format($zakatKeluar->jumlah, 2, '.', ''), '0'), '.')) }}">
-                                    <small class="text-muted d-block">Sisa Fitrah Beras: <strong>{{ number_format($sisa['Fitrah_Beras'], 0, ',', '.') }}</strong></small>
-                                    <small class="text-muted d-block">Sisa Maal Beras: <strong>{{ number_format($sisa['Maal_Beras'], 0, ',', '.') }}</strong></small>
+                                    <small class="text-muted d-block">Sisa Fitrah Beras: <strong>{{ number_format($sisa['Fitrah_Beras'], 2, ',', '.') }} Kg</strong></small>
+                                    <small class="text-muted d-block">Sisa Maal Beras: <strong>{{ number_format($sisa['Maal_Beras'], 2, ',', '.') }} Kg</strong></small>
                                     @error('jumlah')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror

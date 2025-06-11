@@ -35,7 +35,7 @@
                 <!-- Form Pencarian dan Tombol PDF -->
                 <div class="d-flex flex-column gap-2" style="max-width: 320px;">
                     <!-- Form Pencarian -->
-                     <!-- Input Pencarian -->
+                    <!-- Input Pencarian -->
                     <div class="input-group shadow rounded-3 overflow-hidden">
                         <input type="text" id="search" name="search" class="form-control form-control-sm border-0 bg-light px-3"
                             placeholder="Cari data mustahik..." value="{{ request('search') }}">
@@ -66,7 +66,12 @@
                     </tr>
                 </thead>
                 <tbody id="mustahik">
-                    @forelse ($mustahik as $m)
+                    @if ($mustahik->isEmpty())
+                    <tr>
+                        <td colspan="7" class="text-center">Tidak ada data mustahik</td>
+                    </tr>
+                    @else
+                    @foreach ($mustahik as $m)
                     <tr>
                         <td class="text-center fw-semibold text-muted">
                             <span class="badge bg-success bg-opacity-10 text-success">
@@ -87,11 +92,8 @@
                             </form>
                         </td>
                     </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="text-center">Tidak ada data mustahik</td>
-                    </tr>
-                    @endforelse
+                    @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>
@@ -171,29 +173,29 @@
 @endif
 
 <!-- Live Search Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('search');
-            let timeout = null;
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search');
+        let timeout = null;
 
-            searchInput.addEventListener('input', function() {
-                clearTimeout(timeout);
-                timeout = setTimeout(function() {
-                    const keyword = searchInput.value;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                const keyword = searchInput.value;
 
-                    fetch(`?search=${encodeURIComponent(keyword)}`)
-                        .then(response => response.text())
-                        .then(html => {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(html, 'text/html');
-                            const newRows = doc.querySelector('#mustahik');
-                            const oldRows = document.querySelector('#mustahik');
-                            if (newRows && oldRows) {
-                                oldRows.innerHTML = newRows.innerHTML;
-                            }
-                        });
-                }, 300); // debounce delay
-            });
+                fetch(`?search=${encodeURIComponent(keyword)}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newRows = doc.querySelector('#mustahik');
+                        const oldRows = document.querySelector('#mustahik');
+                        if (newRows && oldRows) {
+                            oldRows.innerHTML = newRows.innerHTML;
+                        }
+                    });
+            }, 300); // debounce delay
         });
-    </script>
+    });
+</script>
 @endsection

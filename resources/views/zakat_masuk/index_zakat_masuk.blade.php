@@ -35,12 +35,15 @@
                     <i class="bi bi-plus-circle-fill"></i> Tambah Zakat Masuk
                 </a>
                 @endif
-                <div class="d-flex flex-column gap-2" style="max-width: 320px;">
-                    <!-- Input Pencarian -->
+                <div class="d-flex flex-column gap-2 ms-md-auto mb-2" style="max-width: 100%; min-width: 335px;">
+                    <!-- Form Pencarian -->
                     <div class="input-group shadow rounded-3 overflow-hidden">
-                        <input type="text" id="search" name="search" class="form-control form-control-sm border-0 bg-light px-3"
+                        <input type="text" id="search" name="search"
+                            class="form-control form-control-sm border-0 bg-light px-3"
                             placeholder="Cari data zakat..." value="{{ request('search') }}">
-                        <span class="input-group-text bg-success text-white"><i class="bi bi-search"></i></span>
+                        <span class="input-group-text bg-success text-white">
+                            <i class="bi bi-search"></i>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -57,9 +60,9 @@
                             <!-- <th class="text-center">Jumlah (Kg)</th> -->
                             <!-- <th class="text-center">Keterangan (Muzaki)</th> -->
                             <!-- <th class="text-center">Pengelola</th> -->
-                            
+
                             <th class="text-center">Aksi</th>
-                          
+
                         </tr>
                     </thead>
                     <tbody id="tabel-zakat">
@@ -87,7 +90,7 @@
                             <!-- <td class="text-center">
                                 {{ $zm->user->nama ?? $zm->nama }}
                             </td> -->
-                           
+
                             <td class="text-center">
                                 <span data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Detail">
                                     <button class="btn btn-sm btn-info text-white modal-trigger"
@@ -97,7 +100,7 @@
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
                                 </span>
-                                 @if(auth()->user()->role == 'Bendahara')
+                                @if(auth()->user()->role == 'Bendahara')
                                 <a href="{{ route('zakat_masuk.edit', $zm->id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pen-fill"></i></a>
                                 <form id="delete-form-{{ $zm->id }}" action="{{ route('zakat_masuk.destroy', $zm->id) }}" method="POST" style="display:inline-block;">
                                     @csrf
@@ -154,7 +157,7 @@
             <div class="modal-body bg-light p-4">
                 <div class="row g-3">
                     @php
-                        $formatTanggal = \Carbon\Carbon::parse($zm->tanggal)->translatedFormat('d F Y');
+                    $formatTanggal = \Carbon\Carbon::parse($zm->tanggal)->translatedFormat('d F Y');
                     @endphp
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm p-3 h-100">
@@ -201,7 +204,7 @@
                 </div>
             </div>
             <!-- footer -->
-             <div class="modal-footer bg-light">
+            <div class="modal-footer bg-light">
                 <div class="d-flex justify-content-between align-items-center w-100">
                     <small class="text-muted">
                         <i class="fas fa-info-circle me-1"></i>

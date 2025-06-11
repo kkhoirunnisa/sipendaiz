@@ -140,8 +140,20 @@
                     </td>
                     <td class="text-center">{{ $trx['jenis_barang'] }}</td>
                     <td class="text-center">{{ $trx['jenis_transaksi'] }}</td>
-                    <td class="text-right">Rp {{ number_format($trx['masuk'], 0, ',', '.') }}</td>
-                    <td class="text-right">Rp {{ number_format($trx['keluar'], 0, ',', '.') }}</td>
+                    <td class="text-right">
+                        @if ($trx['masuk'] == 0)
+                        <span class="text-muted">-</span>
+                        @else
+                        <span class="text-success fw-semibold">Rp {{ number_format($trx['masuk'], 0, ',', '.') }}</span>
+                        @endif
+                    </td>
+                    <td class="text-right">
+                        @if ($trx['keluar'] == 0)
+                        <span class="text-muted">-</span>
+                        @else
+                        <span class="text-success fw-semibold">Rp {{ number_format($trx['keluar'], 0, ',', '.') }}</span>
+                        @endif
+                    </td>
                     <td class="text-right">Rp {{ number_format($trx['saldo'], 0, ',', '.') }}</td>
                 </tr>
                 @endforeach

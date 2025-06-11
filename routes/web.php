@@ -25,6 +25,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // LANDING PAGE
 Route::get('/', [LandingPageController::class, 'index'])->name('landing.index');
 
+
 //KODE OTP
 Route::get('/lupa-password', [LupaPasswordController::class, 'indexTelepon'])->name('password.telepon');
 Route::get('/otp', [LupaPasswordController::class, 'indexOtp'])->name('password.index_otp');
@@ -68,46 +69,46 @@ Route::middleware('auth')->group(function () {
 
     // Route::middleware('role:Petugas,Bendahara, Ketua')->group(function () {
 
-        // ZAKAT MASUK
-        Route::get('zakat-masuk', [ZakatMasukController::class, 'index'])->name('zakat_masuk.index'); //menampilkan
-        Route::get('zakat-masuk/create', [ZakatMasukController::class, 'create'])->name('zakat_masuk.create'); //form tambah
-        Route::post('zakat-masuk', [ZakatMasukController::class, 'store'])->name('zakat_masuk.store'); // menyimpan
-        Route::get('zakat-masuk/{id}/edit', [ZakatMasukController::class, 'edit'])->name('zakat_masuk.edit'); //form edit
-        Route::put('zakat-masuk/{id}', [ZakatMasukController::class, 'update'])->name('zakat_masuk.update'); //update
-        Route::delete('zakat-masuk/{id}', [ZakatMasukController::class, 'destroy'])->name('zakat_masuk.destroy'); //hapus
+    // ZAKAT MASUK
+    Route::get('zakat-masuk', [ZakatMasukController::class, 'index'])->name('zakat_masuk.index'); //menampilkan
+    Route::get('zakat-masuk/create', [ZakatMasukController::class, 'create'])->name('zakat_masuk.create'); //form tambah
+    Route::post('zakat-masuk', [ZakatMasukController::class, 'store'])->name('zakat_masuk.store'); // menyimpan
+    Route::get('zakat-masuk/{id}/edit', [ZakatMasukController::class, 'edit'])->name('zakat_masuk.edit'); //form edit
+    Route::put('zakat-masuk/{id}', [ZakatMasukController::class, 'update'])->name('zakat_masuk.update'); //update
+    Route::delete('zakat-masuk/{id}', [ZakatMasukController::class, 'destroy'])->name('zakat_masuk.destroy'); //hapus
 
-        // ZAKAT KELUAR
-        Route::get('zakat-keluar', [ZakatKeluarController::class, 'index'])->name('zakat_keluar.index'); // menampilkan
-        Route::get('zakat-keluar/create', [ZakatKeluarController::class, 'create'])->name('zakat_keluar.create'); // form tambah
-        Route::post('zakat-keluar', [ZakatKeluarController::class, 'store'])->name('zakat_keluar.store'); // menyimpan
-        Route::get('zakat-keluar/{id}/edit', [ZakatKeluarController::class, 'edit'])->name('zakat_keluar.edit'); // form edit
-        Route::put('zakat-keluar/{id}', [ZakatKeluarController::class, 'update'])->name('zakat_keluar.update'); // update
-        Route::delete('zakat-keluar/{id}', [ZakatKeluarController::class, 'destroy'])->name('zakat_keluar.destroy'); // hapus
+    // ZAKAT KELUAR
+    Route::get('zakat-keluar', [ZakatKeluarController::class, 'index'])->name('zakat_keluar.index'); // menampilkan
+    Route::get('zakat-keluar/create', [ZakatKeluarController::class, 'create'])->name('zakat_keluar.create'); // form tambah
+    Route::post('zakat-keluar', [ZakatKeluarController::class, 'store'])->name('zakat_keluar.store'); // menyimpan
+    Route::get('zakat-keluar/{id}/edit', [ZakatKeluarController::class, 'edit'])->name('zakat_keluar.edit'); // form edit
+    Route::put('zakat-keluar/{id}', [ZakatKeluarController::class, 'update'])->name('zakat_keluar.update'); // update
+    Route::delete('zakat-keluar/{id}', [ZakatKeluarController::class, 'destroy'])->name('zakat_keluar.destroy'); // hapus
 
-        // INFAK MASUK
-        Route::get('/infak_masuk', [InfakMasukController::class, 'index'])->name('infak_masuk.index');
-        // Route::post('/bukti-transaksi/verifikasi/{id}', [BuktiTransaksiController::class, 'verifikasi'])->name('bukti_transaksi.verifikasi');
+    // INFAK MASUK
+    Route::get('/infak_masuk', [InfakMasukController::class, 'index'])->name('infak_masuk.index');
+    // Route::post('/bukti-transaksi/verifikasi/{id}', [BuktiTransaksiController::class, 'verifikasi'])->name('bukti_transaksi.verifikasi');
 
-        // INFAK KELUAR
-        Route::get('/infak-keluar/{kategori}', [InfakKeluarController::class, 'index'])->name('infak_keluar.index'); //menampilkan
-        // Route::get('infak-keluar', [InfakKeluarController::class, 'index'])->name('infak_keluar.index'); // menampilkan
-        Route::get('infak-keluar/create/{kategori}', [InfakKeluarController::class, 'create'])->name('infak_keluar.create'); // form tambah
-        Route::post('infak-keluar', [InfakKeluarController::class, 'store'])->name('infak_keluar.store'); // menyimpan
-        Route::get('infak-keluar/{id}/edit', [InfakKeluarController::class, 'edit'])->name('infak_keluar.edit'); // form edit
-        Route::put('infak-keluar/{id}', [InfakKeluarController::class, 'update'])->name('infak_keluar.update'); // update
-        Route::delete('infak-keluar/{id}', [InfakKeluarController::class, 'destroy'])->name('infak_keluar.destroy'); // hapus
+    // INFAK KELUAR
+    Route::get('/infak-keluar/{kategori}', [InfakKeluarController::class, 'index'])->name('infak_keluar.index'); //menampilkan
+    // Route::get('infak-keluar', [InfakKeluarController::class, 'index'])->name('infak_keluar.index'); // menampilkan
+    Route::get('infak-keluar/create/{kategori}', [InfakKeluarController::class, 'create'])->name('infak_keluar.create'); // form tambah
+    Route::post('infak-keluar', [InfakKeluarController::class, 'store'])->name('infak_keluar.store'); // menyimpan
+    Route::get('infak-keluar/{id}/edit', [InfakKeluarController::class, 'edit'])->name('infak_keluar.edit'); // form edit
+    Route::put('infak-keluar/{id}', [InfakKeluarController::class, 'update'])->name('infak_keluar.update'); // update
+    Route::delete('infak-keluar/{id}', [InfakKeluarController::class, 'destroy'])->name('infak_keluar.destroy'); // hapus
 
-        // BUKTI TRANSAKSI
-        Route::get('bukti-transaksi', [BuktiTransaksiController::class, 'index'])->name('bukti_transaksi.index'); // menampilkan semua bukti
-        Route::get('bukti-transaksi/create', [BuktiTransaksiController::class, 'create'])->name('bukti_transaksi.create'); // form tambah
-        Route::post('bukti-transaksi', [BuktiTransaksiController::class, 'store'])->name('bukti_transaksi.store'); // simpan data
-        Route::get('bukti-transaksi/{id}/edit', [BuktiTransaksiController::class, 'edit'])->name('bukti_transaksi.edit'); // edit
-        Route::put('bukti-transaksi/{id}', [BuktiTransaksiController::class, 'update'])->name('bukti_transaksi.update'); // update
-        Route::delete('bukti-transaksi/{id}', [BuktiTransaksiController::class, 'destroy'])->name('bukti_transaksi.destroy'); // hapus
+    // BUKTI TRANSAKSI
+    Route::get('bukti-transaksi', [BuktiTransaksiController::class, 'index'])->name('bukti_transaksi.index'); // menampilkan semua bukti
+    Route::get('bukti-transaksi/create', [BuktiTransaksiController::class, 'create'])->name('bukti_transaksi.create'); // form tambah
+    Route::post('bukti-transaksi', [BuktiTransaksiController::class, 'store'])->name('bukti_transaksi.store'); // simpan data
+    Route::get('bukti-transaksi/{id}/edit', [BuktiTransaksiController::class, 'edit'])->name('bukti_transaksi.edit'); // edit
+    Route::put('bukti-transaksi/{id}', [BuktiTransaksiController::class, 'update'])->name('bukti_transaksi.update'); // update
+    Route::delete('bukti-transaksi/{id}', [BuktiTransaksiController::class, 'destroy'])->name('bukti_transaksi.destroy'); // hapus
 
-        // KUITANSI
-        Route::get('/infak-masuk/kuitansi/{id}', [InfakMasukController::class, 'kuitansi'])->name('infak.kuitansi');
-        Route::get('/infak-masuk/kuitansi/{id}/pdf', [InfakMasukController::class, 'cetakKuitansiPdf'])->name('infak.kuitansi.pdf');
+    // KUITANSI
+    Route::get('/infak-masuk/kuitansi/{id}', [InfakMasukController::class, 'kuitansi'])->name('infak.kuitansi');
+    Route::get('/infak-masuk/kuitansi/{id}/pdf', [InfakMasukController::class, 'cetakKuitansiPdf'])->name('infak.kuitansi.pdf');
     // });
 
     // DASHBOARD
