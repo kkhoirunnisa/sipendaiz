@@ -373,45 +373,55 @@
                                 </h6>
                             </div>
                             <div class="card-body py-2">
-                                <div class="container">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label small mb-1 fw-semibold">Tanggal Infak</label>
-                                            <p class="mb-2">{{ \Carbon\Carbon::parse($bt->tanggal_infak)->format('d F Y') }}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small mb-1 fw-semibold">Kategori</label>
-                                            <p class="mb-2"><span class="badge bg-secondary">{{ $bt->kategori }}</span></p>
-                                        </div>
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Tanggal Infak</label>
+                                        <p class="mb-2">
+                                            {{ \Carbon\Carbon::parse($bt->tanggal_infak)->format('d F Y') }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Kategori</label>
+                                        <p class="mb-2">
+                                            <span class="badge bg-secondary">{{ $bt->kategori }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Metode</label>
+                                        <p class="mb-2">
+                                            <span class="badge bg-secondary">{{ $bt->metode }}</span>
+                                        </p>
+                                    </div>
 
-                                        <div class="col-md-6">
-                                            <label class="form-label small mb-1 fw-semibold">Metode</label>
-                                            <p class="mb-2"><span class="badge bg-secondary">{{ $bt->metode }}</span></p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small mb-1 fw-semibold">Jenis Infak</label>
-                                            <p class="mb-2"><span class="badge bg-secondary">{{ $bt->jenis_infak }}</span></p>
-                                        </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Jenis Infak</label>
+                                        <p class="mb-2">
+                                            <span class="badge bg-secondary">{{ $bt->jenis_infak }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Nominal</label>
+                                        <p class="fw-bold text-success mb-2">
+                                            @if($bt->nominal == 0)
+                                            <span class="text-muted">-</span>
+                                            @else
+                                            Rp {{ number_format($bt->nominal, 0, ',', '.') }}
+                                            @endif
+                                        </p>
+                                    </div>
 
-                                        <div class="col-md-6">
-                                            <label class="form-label small mb-1 fw-semibold">Keterangan</label>
-                                            <p class="mb-2"><span class="">{{ $bt->keterangan }}</span></p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small mb-1 fw-semibold">Nominal</label>
-                                            <p class="fw-bold text-success mb-2">
-                                                @if($bt->nominal == 0)
-                                                <span class="text-muted">-</span>
-                                                @else
-                                                Rp {{ number_format($bt->nominal, 0, ',', '.') }}
-                                                @endif
-                                            </p>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label small mb-1 fw-semibold">Barang</label>
-                                            <p class="mb-0">{{ $bt->barang ?: '-' }}</p>
-                                        </div>
+                                    {{-- Barang dan Keterangan dalam satu baris --}}
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Barang</label>
+                                        <p class="mb-0">
+                                            {{ $bt->barang ?: '-' }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Keterangan</label>
+                                        <p class="mb-0">
+                                            {{ $bt->keterangan ?: '-' }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
