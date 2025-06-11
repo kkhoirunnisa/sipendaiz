@@ -351,6 +351,7 @@
                                             {{ \Carbon\Carbon::parse($im->tanggal_konfirmasi)->format('d F Y') }}
                                         </p>
                                     </div>
+
                                     <div class="col-md-6">
                                         <label class="form-label small mb-1 fw-semibold">Kategori</label>
                                         <p class="mb-2">
@@ -363,6 +364,7 @@
                                             <span class="badge bg-secondary">{{ $im->buktiTransaksi->metode }}</span>
                                         </p>
                                     </div>
+
                                     <div class="col-md-6">
                                         <label class="form-label small mb-1 fw-semibold">Jenis Infak</label>
                                         <p class="mb-2">
@@ -379,10 +381,18 @@
                                             @endif
                                         </p>
                                     </div>
-                                    <div class="col-12">
+
+                                    {{-- Barang dan Keterangan dalam satu baris --}}
+                                    <div class="col-md-6">
                                         <label class="form-label small mb-1 fw-semibold">Barang</label>
                                         <p class="mb-0">
                                             {{ $im->buktiTransaksi->barang ?: '-' }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1 fw-semibold">Keterangan</label>
+                                        <p class="mb-0">
+                                            {{ $im->buktiTransaksi->keterangan ?: '-' }}
                                         </p>
                                     </div>
                                 </div>

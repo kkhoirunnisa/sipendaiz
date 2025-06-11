@@ -233,7 +233,7 @@
                                 <i class="bi bi-card-text me-2 text-warning"></i>
                                 Keterangan
                             </label>
-                            <textarea name="keterangan" id="keterangan" class="form-control bg-light" rows="3" readonly>{{ $buktiTransaksi->keterangan }}</textarea>
+                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Keterangan infak">{{ old('keterangan', $buktiTransaksi->keterangan) }}</textarea>
                             @error('keterangan')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -276,17 +276,17 @@
         });
     }
     // Update otomatis isi textarea keterangan saat donatur diisi
-    document.querySelector('input[name="donatur"]').addEventListener('input', function() {
-        const namaDonatur = this.value.trim();
-        const keteranganField = document.getElementById('keterangan');
+    // document.querySelector('input[name="donatur"]').addEventListener('input', function() {
+    //     const namaDonatur = this.value.trim();
+    //     const keteranganField = document.getElementById('keterangan');
 
-        if (namaDonatur !== '') {
-            keteranganField.value = 'Infak atas nama ' + namaDonatur;
-        } else {
-            keteranganField.value = '';
-        }
-        updateProgress();
-    });
+    //     if (namaDonatur !== '') {
+    //         keteranganField.value = 'Infak atas nama ' + namaDonatur;
+    //     } else {
+    //         keteranganField.value = '';
+    //     }
+    //     updateProgress();
+    // });
 
     // Update progress bar
     // Inisialisasi elemen global

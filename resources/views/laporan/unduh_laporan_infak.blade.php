@@ -128,10 +128,14 @@
                     <td class="text-center">{{ $trx['no'] }}</td>
                     <td class="text-center">{{ \Carbon\Carbon::parse($trx['tanggal'])->format('d-m-Y') }}</td>
                     <td class="text-center">
-                    @if (!empty($trx['alamat']) && $trx['alamat'] !== '-')
-                        {!! nl2br(e($trx['keterangan'])) !!} - {{ $trx['alamat'] }}
+                        @if ($trx['jenis_transaksi'] === 'Pemasukan')
+                        @php
+                        $donatur = $trx['donatur'] ?? '-';
+                        $alamat = $trx['alamat'] ?? '-';
+                        @endphp
+                        Infak atas nama {{ $donatur }}@if (!empty($alamat) && $alamat !== '-') - {{ $alamat }}@endif
                         @else
-                        {!! nl2br(e($trx['keterangan'])) !!}
+                        Infak untuk {{ $trx['jenis_barang'] ?? '-' }} - {{ $trx['keterangan'] ?? '-' }}
                         @endif
                     </td>
                     <td class="text-center">{{ $trx['jenis_barang'] }}</td>

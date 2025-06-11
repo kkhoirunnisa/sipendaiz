@@ -227,14 +227,11 @@
                                 <i class="bi bi-card-text me-2 text-primary"></i>
                                 Keterangan
                             </label>
-                            <textarea name="keterangan" id="keterangan" class="form-control bg-light" rows="3" placeholder="Keterangan infak berasal dari donatur siapa" readonly>{{ old('keterangan') }}</textarea>
-                            {{ old('keterangan') }}
-                            </textarea>
+                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Keterangan infak">{{ old('keterangan') }}</textarea>
                             @error('keterangan')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
-
                     </div>
                     <div class="text-end">
                         <button type="button" class="btn btn-primary" onclick="konfirmasiTambah()">
@@ -271,17 +268,17 @@
         });
     }
     // Update otomatis isi textarea keterangan saat donatur diisi
-    document.querySelector('input[name="donatur"]').addEventListener('input', function() {
-        const namaDonatur = this.value.trim();
-        const keteranganField = document.getElementById('keterangan');
+    // document.querySelector('input[name="donatur"]').addEventListener('input', function() {
+    //     const namaDonatur = this.value.trim();
+    //     const keteranganField = document.getElementById('keterangan');
 
-        if (namaDonatur !== '') {
-            keteranganField.value = 'Infak atas nama ' + namaDonatur;
-        } else {
-            keteranganField.value = '';
-        }
-        updateProgress();
-    });
+    //     if (namaDonatur !== '') {
+    //         keteranganField.value = 'Infak atas nama ' + namaDonatur;
+    //     } else {
+    //         keteranganField.value = '';
+    //     }
+    //     updateProgress();
+    // });
 
     // Update progress bar
     // Inisialisasi elemen global

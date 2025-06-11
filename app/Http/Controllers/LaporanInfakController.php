@@ -48,6 +48,7 @@ class LaporanInfakController extends Controller
         // Gabung semua transaksi pemasukan
         foreach ($infakMasuk as $item) {
             $transactions[] = [
+                'donatur' => $item->buktiTransaksi->donatur,
                 'tanggal' => $item->buktiTransaksi->tanggal_infak,
                 'keterangan' => $item->buktiTransaksi->keterangan ?: 'Infak masuk',
                 'alamat' => $item->buktiTransaksi->alamat,
@@ -131,6 +132,7 @@ class LaporanInfakController extends Controller
         // Gabung semua transaksi pemasukan
         foreach ($infakMasuk as $item) {
             $transactions[] = [
+                'donatur' => $item->buktiTransaksi->donatur,
                 'tanggal' => $item->buktiTransaksi->tanggal_infak,
                 'keterangan' => 'Infak atas nama' . ' ' . $item->buktiTransaksi->donatur ?: 'Infak masuk',
                 'alamat' => $item->buktiTransaksi->alamat,

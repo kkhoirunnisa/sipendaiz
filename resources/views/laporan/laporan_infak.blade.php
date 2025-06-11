@@ -69,12 +69,12 @@
                         <button type="button" class="btn btn-outline-danger" onclick="resetFilter()">
                             <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filter
                         </button>
-                       <!-- download -->
+                        <!-- download -->
                         <a href="{{ route('laporan_infak.download', ['tanggal_awal' => $startDate, 'tanggal_akhir' => $endDate, 'kategori' => $kategori]) }}"
                             target="_blank" class="btn btn-outline-danger">
                             <i class="bi bi-download me-1"></i>Unduh PDF
                         </a>
-                    
+
                         @endif
                     </div>
                 </div>
@@ -179,14 +179,18 @@
                                             </td>
                                             <td class="py-3">
                                                 <div class="text-wrap text-center" style="max-width: 300px;">
-                                                    @if (!empty($trx['alamat']) && $trx['alamat'] !== '-')
-                                                    {!! nl2br(e($trx['keterangan'])) !!}
-                                                    - {{ $trx['alamat'] }}
+                                                    @if ($trx['jenis_transaksi'] === 'Pemasukan')
+                                                    @php
+                                                    $donatur = $trx['donatur'] ?? '-';
+                                                    $alamat = $trx['alamat'] ?? '-';
+                                                    @endphp
+                                                    Infak atas nama {{ $donatur }}@if (!empty($alamat) && $alamat !== '-') - {{ $alamat }}@endif
                                                     @else
-                                                    {!! nl2br(e($trx['keterangan'])) !!}
+                                                    Infak untuk {{ $trx['jenis_barang'] ?? '-' }} - {{ $trx['keterangan'] ?? '-' }}
                                                     @endif
                                                 </div>
                                             </td>
+
                                             <td class="text-center py-3">
                                                 <span class="badge bg-secondary bg-opacity-10 text-secondary px-2 py-1">
                                                     {{ $trx['jenis_barang'] }}
