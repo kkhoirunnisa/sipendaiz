@@ -202,17 +202,17 @@
         <table style="width: 100%; margin-top: 40px; font-size: 12px; color: green; border: none; border-collapse: collapse;">
             <tr>
                 <td style="width: 50%; border: none; text-align: left;">
-                    Ketua<br><br>
-                    <img src="{{ public_path('gambar/ttd_ketua.png') }}" alt="Ttd Ketua" style="width: 150px; border: none;">
+                    Ketua<br><br><br><br>
+                    <!-- <img src="{{ public_path('gambar/ttd_ketua.png') }}" alt="Ttd Ketua" style="width: 150px; border: none;"> -->
                     <div style=" border-top: 1px ; width: 200px; padding-top: 5px; font-style: italic; font-size: 12px;">
-                        (Agus Tisngadi, SE., M.Si.)
+                        (Mukhasan, S.Ag.)
                     </div>
                 </td>
                 <td style="width: 50%; border: none; text-align: right;">
-                    Bendahara<br><br>
-                    <img src="{{ public_path('gambar/ttd_bendahara.png') }}" alt="Ttd Bendahara" style="width: 65px; border: none;">
+                    Bendahara<br><br><br><br>
+                    <!-- <img src="{{ public_path('gambar/ttd_bendahara.png') }}" alt="Ttd Bendahara" style="width: 65px; border: none;"> -->
                     <div style=" border-top: 1px ; width: 200px; padding-top: 5px; font-style: italic; font-size: 12px; margin-left: auto;">
-                        (Benny Hermanto)
+                        (Suparno)
                     </div>
                 </td>
             </tr>

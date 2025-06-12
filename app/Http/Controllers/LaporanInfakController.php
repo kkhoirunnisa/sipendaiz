@@ -177,6 +177,18 @@ class LaporanInfakController extends Controller
         $formattedStartDate = Carbon::parse($startDate)->format('d-m-Y');
         $formattedEndDate = Carbon::parse($endDate)->format('d-m-Y');
 
+        // Tentukan nama ketua dan bendahara berdasarkan kategori
+        if (strtolower($kategori) === 'pembangunan') {
+            $ketua = 'Agus Tisngadi, SE., M.Si.';
+            $bendahara = 'Benny Hermanto';
+        } elseif (strtolower($kategori) === 'takmir') {
+            $ketua = 'Mukhasan, S.Ag.';
+            $bendahara = 'Suparno';
+        } else {
+            $ketua = '-';
+            $bendahara = '-';
+        }
+
         $pdf = Pdf::loadView('laporan.unduh_laporan_infak', [
             'transactions' => $transactions,
             'startDate' => $startDate,
@@ -187,6 +199,9 @@ class LaporanInfakController extends Controller
             'totalSaldo' => $totalSaldo,
             'formattedStartDate' => $formattedStartDate,
             'formattedEndDate' => $formattedEndDate,
+            'ketua' => $ketua,
+            'bendahara' => $bendahara,
+
         ])->setPaper('A4', 'landscape');
 
         // return $pdf->stream("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
