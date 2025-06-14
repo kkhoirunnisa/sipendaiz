@@ -6,8 +6,9 @@ namespace App\Http\Controllers;
 // use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
 use App\Models\ZakatMasukModel;
-use App\Models\ZakatKeluarModel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\ZakatKeluarModel;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class LaporanZakatController extends Controller
 {
@@ -89,8 +90,25 @@ class LaporanZakatController extends Controller
             $item['no'] = $i + 1;
         }
 
+        // Manual pagination
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+        $offset = ($currentPage - 1) * $perPage;
+
+        // Slice array transaksi untuk halaman saat ini
+        $currentPageItems = array_slice($transactions, $offset, $perPage);
+
+        // Buat paginator instance
+        $paginatedTransactions = new LengthAwarePaginator(
+            $currentPageItems,
+            count($transactions),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
         return view('laporan.laporan_zakat', [
-            'transactions' => $transactions,
+            'transactions' => $paginatedTransactions,
             'startDate' => $startDate,
             'endDate' => $endDate,
             'totalUang' => $totalUang,

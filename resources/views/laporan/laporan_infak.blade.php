@@ -264,6 +264,46 @@
                                 </table>
                             </div>
                         </div>
+                        <!-- pagination -->
+                        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap px-2">
+                            <!-- Pagination Info -->
+                            <div class="d-flex align-items-center">
+                                <div class="badge bg-success text-white rounded-pill px-3 py-2 fw-normal">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Menampilkan {{ $transactions->firstItem() }} - {{ $transactions->lastItem() }} dari {{ $transactions->total() }} data
+                                </div>
+                            </div>
+
+                            <!-- Pagination Navigation -->
+                            <div class="d-flex align-items-center">
+                                <!-- Previous and Next buttons -->
+                                <div class="badge bg-success text-white rounded-pill px-3 py-2 fw-normal">
+                                    {{-- Previous button --}}
+                                    @if ($transactions->onFirstPage())
+                                    <span class="btn-sm text-white opacity-50">
+                                        <i class="bi bi-chevron-left"></i> Previous
+                                    </span>
+                                    @else
+                                    <a href="{{ $transactions->previousPageUrl() }}" class="btn-sm text-white">
+                                        <i class="bi bi-chevron-left"></i> Previous
+                                    </a>
+                                    @endif
+
+                                    <span class="mx-2">Page {{ $transactions->currentPage() }} of {{ $transactions->lastPage() }}</span>
+
+                                    {{-- Next button --}}
+                                    @if ($transactions->currentPage() == $transactions->lastPage())
+                                    <span class="btn-sm text-white opacity-50">
+                                        Next <i class="bi bi-chevron-right"></i>
+                                    </span>
+                                    @else
+                                    <a href="{{ $transactions->nextPageUrl() }}" class="btn-sm text-white">
+                                        Next <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                         @else
                         <!-- No Data State -->
                         <div class="card border-0 shadow-sm">

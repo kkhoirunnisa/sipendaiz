@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\InfakMasukModel;
-use App\Models\InfakKeluarModel;
-use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\InfakKeluarModel;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class LaporanInfakController extends Controller
 {
@@ -91,8 +92,26 @@ class LaporanInfakController extends Controller
         $totalMasuk = array_sum(array_column($transactions, 'masuk'));
         $totalKeluar = abs(array_sum(array_column($transactions, 'keluar')));
 
+        // Manual pagination
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+        $offset = ($currentPage - 1) * $perPage;
+
+        // Slice array transaksi untuk halaman saat ini
+        $currentPageItems = array_slice($transactions, $offset, $perPage);
+
+        // Buat paginator instance
+        $paginatedTransactions = new LengthAwarePaginator(
+            $currentPageItems,
+            count($transactions),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
         return view('laporan.laporan_infak', [
-            'transactions' => $transactions,
+            // 'transactions' => $transactions,
+            'transactions' => $paginatedTransactions,
             'startDate' => $startDate,
             'endDate' => $endDate,
             'kategori' => $kategori,

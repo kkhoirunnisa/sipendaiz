@@ -275,17 +275,33 @@
 
             <!-- Pagination Navigation -->
             <div class="d-flex align-items-center">
-                <!-- Previous and Next buttons -->
                 <div class="badge bg-success text-white rounded-pill px-3 py-2 fw-normal">
+                    {{-- Previous button --}}
+                    @if ($buktiTransaksi->onFirstPage())
+                    <span class="btn-sm text-white opacity-50">
+                        <i class="bi bi-chevron-left"></i> Previous
+                    </span>
+                    @else
                     <a href="{{ $buktiTransaksi->previousPageUrl() }}" class="btn-sm text-white">
                         <i class="bi bi-chevron-left"></i> Previous
                     </a>
+                    @endif
+
                     <span class="mx-2">Page {{ $buktiTransaksi->currentPage() }} of {{ $buktiTransaksi->lastPage() }}</span>
+
+                    {{-- Next button --}}
+                    @if ($buktiTransaksi->currentPage() == $buktiTransaksi->lastPage())
+                    <span class="btn-sm text-white opacity-50">
+                        Next <i class="bi bi-chevron-right"></i>
+                    </span>
+                    @else
                     <a href="{{ $buktiTransaksi->nextPageUrl() }}" class="btn-sm text-white">
                         Next <i class="bi bi-chevron-right"></i>
                     </a>
+                    @endif
                 </div>
             </div>
+
         </div>
     </div>
 </div>
