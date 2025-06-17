@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('mustahik', function (Blueprint $table) {
             $table->id();
             $table->string('nama', 50);
-            $table->string('alamat', 30);
+            $table->string('alamat', 50);
             $table->string('kategori', 26);
             $table->timestamps();
             $table->softDeletes();

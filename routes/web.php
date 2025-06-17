@@ -86,7 +86,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('zakat-keluar/{id}', [ZakatKeluarController::class, 'destroy'])->name('zakat_keluar.destroy'); // hapus
 
     // INFAK MASUK
-    Route::get('/infak_masuk', [InfakMasukController::class, 'index'])->name('infak_masuk.index');
+    Route::get('/infak_masuk/{kategori}', [InfakMasukController::class, 'index'])->name('infak_masuk.index');
     // Route::post('/bukti-transaksi/verifikasi/{id}', [BuktiTransaksiController::class, 'verifikasi'])->name('bukti_transaksi.verifikasi');
 
     // INFAK KELUAR

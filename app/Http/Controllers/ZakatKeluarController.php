@@ -24,11 +24,13 @@ class ZakatKeluarController extends Controller
                         ->orWhere('tanggal', 'like', "%{$search}%")
                         ->orWhere('jenis_zakat', 'like', "%{$search}%")
                         ->orWhere('bentuk_zakat', 'like', "%{$search}%")
-                        ->orWhere('keterangan', 'like', "%{$search}%");
+                        ->orWhere('jumlah', 'like', "%{$search}%")
+                        ->orWhere('nominal', 'like', "%{$search}%");
                 });
             })
             ->orderBy('updated_at', 'desc')
-            ->paginate(10); //menampilkan data 10 pada tabel
+            ->paginate(10);//menampilkan data 10 pada tabel
+ 
 
         return view('zakat_keluar.index_zakat_keluar', compact('zakatKeluar'));
     }

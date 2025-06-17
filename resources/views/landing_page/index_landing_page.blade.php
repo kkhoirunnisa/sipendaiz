@@ -816,11 +816,8 @@
                             </table>
                         </div>
 
-                        <!-- Muzaki dan Mustahik Table -->
+                        <!-- Mustahik Table
                         <div class="row mt-4">
-                            <!-- Daftar Muzaki -->
-
-                            <!-- Daftar Mustahik -->
                             <div class="table-responsive mb-4">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="fw-bold mb-0">Mustahik</h6>
@@ -834,7 +831,7 @@
                                     @endforeach
                                 </ul>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </div>

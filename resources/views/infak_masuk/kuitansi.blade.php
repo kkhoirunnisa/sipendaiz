@@ -79,11 +79,7 @@
                     <!-- Kolom Teks Header -->
                     <td style="width: 85%; text-align: center;">
                         <h1 style="margin: 5px 0; color: green; font-size: 25px;">
-                            @if ($infak->buktiTransaksi->kategori == 'Pembangunan')
                             PANITIA RENOVASI MASJID JAMI' AL MUNAWWAROH
-                            @else
-                            PANITIA TAKMIR MASJID JAMI' AL MUNAWWAROH
-                            @endif
                         </h1>
                         <h2 style="margin: 5px 0; color: green; font-size: 19px;">
                             Sekretariat: Jl. Raya Maoslor Kec. Maos, Kab. Cilacap<br>

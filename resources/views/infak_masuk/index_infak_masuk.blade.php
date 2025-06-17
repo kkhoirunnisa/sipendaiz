@@ -161,11 +161,16 @@
 
             <div class="d-flex flex-column gap-2 ms-md-auto mb-4" style="max-width: 320px;">
                 <!-- Form Pencarian -->
-                <div class="input-group shadow rounded-3 overflow-hidden">
-                    <input type="text" id="search" name="search" class="form-control form-control-sm border-0 bg-light px-3"
-                        placeholder="Cari data infak..." value="{{ request('search') }}">
-                    <span class="input-group-text bg-success text-white"><i class="bi bi-search"></i></span>
-                </div>
+                <form method="GET" action="{{ route('infak_masuk.index', ['kategori' => request('kategori') ?? 'Pembangunan']) }}" class="d-flex">
+                    <div class="input-group shadow rounded-3 overflow-hidden">
+                        <input type="text" id="search" name="search"
+                            class="form-control form-control-sm border-0 bg-light px-3"
+                            placeholder="Cari data infak..." value="{{ request('search') }}">
+                        <button class="input-group-text bg-success text-white border-0" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
             <!-- tabel -->
             <div class="table-responsive border shadow rounded-4">
@@ -177,7 +182,7 @@
                             <th class="text-center">Tanggal Infak</th>
                             <th class="text-center">Kategori</th>
                             <th class="text-center">Metode</th>
-                            <th class="text-center">Nominal/Barang</th>
+                            <th class="text-center">Nominal (Rp)/Barang</th>
                             <th class="text-center">Tanggal Konfirmasi</th>
                             <th class="text-center">Aksi</th>
                         </tr>
@@ -206,7 +211,7 @@
                                 @if($im->buktiTransaksi->nominal == 0)
                                 -
                                 @else
-                                Rp {{ number_format($im->buktiTransaksi->nominal, 0, ',', '.') }}
+                                {{ number_format($im->buktiTransaksi->nominal, 0, ',', '.') }}
                                 @endif
                                 @endif
                             </td>
@@ -447,7 +452,9 @@
                                             <span class="">{{ $im->buktiTransaksi->user->nama ?? $im->buktiTransaksi->nama }}</span>
                                         </div>
                                     </div>
-                                    @if(in_array(auth()->user()->role, ['Bendahara', 'Petugas']))
+
+                                    <!-- Kuitansi hanya muncul jika kategori bukan Takmir -->
+                                    @if($im->buktiTransaksi->kategori !== 'Takmir' && in_array(auth()->user()->role, ['Bendahara', 'Petugas']))
                                     <div class="col-md-4">
                                         <label class="form-label small mb-1 fw-semibold">Kuitansi</label>
                                         <div>
@@ -459,6 +466,7 @@
                                         </div>
                                     </div>
                                     @endif
+
                                 </div>
                             </div>
                         </div>

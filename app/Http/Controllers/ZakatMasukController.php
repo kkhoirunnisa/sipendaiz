@@ -22,14 +22,14 @@ class ZakatMasukController extends Controller
                     $q->where('tanggal', 'like', "%{$search}%")
                         ->orWhere('jenis_zakat', 'like', "%{$search}%")
                         ->orWhere('bentuk_zakat', 'like', "%{$search}%")
-                        ->orWhere('keterangan', 'like', "%{$search}%")
-                        ->orWhereHas('user', function ($q2) use ($search) {
-                            $q2->where('nama', 'like', "%{$search}%");
-                        });
+                        ->orWhere('nominal', 'like', "%{$search}%")
+                        ->orWhere('jumlah', 'like', "%{$search}%");
                 });
             })
             ->orderBy('updated_at', 'desc')
-            ->paginate(10); //menampilkan data 10 pada tabel
+            ->paginate(10);//menampilkan data 10 pada tabel
+ 
+          
 
         // Menambahkan nl2br untuk mengganti \n menjadi <br> di keterangan
         foreach ($zakatMasuk as $zm) {

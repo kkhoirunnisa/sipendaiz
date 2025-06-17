@@ -33,14 +33,18 @@
                 </a>
 
                 <!-- Form Pencarian dan Tombol PDF -->
-                <div class="d-flex flex-column gap-2" style="max-width: 320px;">
+                <div class="d-flex flex-column gap-2" style="max-width: 100%; min-width: 335px;">
                     <!-- Form Pencarian -->
-                    <!-- Input Pencarian -->
-                    <div class="input-group shadow rounded-3 overflow-hidden">
-                        <input type="text" id="search" name="search" class="form-control form-control-sm border-0 bg-light px-3"
-                            placeholder="Cari data mustahik..." value="{{ request('search') }}">
-                        <span class="input-group-text bg-success text-white"><i class="bi bi-search"></i></span>
-                    </div>
+                    <form method="GET" action="{{ route('mustahik.index') }}" class="d-flex">
+                        <div class="input-group shadow rounded-3 overflow-hidden">
+                            <input type="text" id="search" name="search"
+                                class="form-control form-control-sm border-0 bg-light px-3"
+                                placeholder="Cari data mustahik..." value="{{ request('search') }}">
+                            <button class="input-group-text bg-success text-white border-0" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
 
                     <!-- Tombol PDF -->
                     <a class="btn btn-outline-danger btn-sm shadow-sm d-flex align-items-center justify-content-center gap-2 w-100"

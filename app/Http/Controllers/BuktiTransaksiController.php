@@ -26,11 +26,9 @@ class BuktiTransaksiController extends Controller
         $buktiTransaksi = BuktiTransaksiModel::when($search, function ($query, $search) {
             return $query->where(function ($q) use ($search) {
                 $q->where('donatur', 'like', "%{$search}%")
-                    ->orWhere('alamat', 'like', "%{$search}%")
-                    ->orWhere('nomor_telepon', 'like', "%{$search}%")
                     ->orWhere('jenis_infak', 'like', "%{$search}%")
                     ->orWhere('tanggal_infak', 'like', "%{$search}%")
-                    ->orWhere('kategori', 'like', "%{$search}%")
+                    ->orWhere('nominal', 'like', "%{$search}%")
                     ->orWhere('metode', 'like', "%{$search}%")
                     ->orWhere('barang', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%")
@@ -245,12 +243,11 @@ class BuktiTransaksiController extends Controller
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('donatur', 'like', "%{$search}%")
-                        ->orWhere('alamat', 'like', "%{$search}%")
-                        ->orWhere('nomor_telepon', 'like', "%{$search}%")
                         ->orWhere('tanggal_infak', 'like', "%{$search}%")
-                        ->orWhere('kategori', 'like', "%{$search}%")
+                        ->orWhere('jenis_infak', 'like', "%{$search}%")
                         ->orWhere('metode', 'like', "%{$search}%")
                         ->orWhere('barang', 'like', "%{$search}%")
+                        ->orWhere('nominal', 'like', "%{$search}%")
                         ->orWhere('status', 'like', "%{$search}%");
                 });
             })

@@ -177,11 +177,16 @@
                 <!-- Form Pencarian dan Tombol PDF -->
                 <div class="d-flex flex-column gap-2" style="max-width: 320px;">
                     <!-- Form Pencarian -->
-                    <div class="input-group shadow rounded-3 overflow-hidden">
-                        <input type="text" id="search" name="search" class="form-control form-control-sm border-0 bg-light px-3"
-                            placeholder="Cari data bukti transaksi..." value="{{ request('search') }}">
-                        <span class="input-group-text bg-success text-white"><i class="bi bi-search"></i></span>
-                    </div>
+                    <form method="GET" action="{{ route('bukti_transaksi.index') }}" class="d-flex">
+                        <div class="input-group shadow rounded-3 overflow-hidden">
+                            <input type="text" id="search" name="search"
+                                class="form-control form-control-sm border-0 bg-light px-3"
+                                placeholder="Cari data bukti transaksi..." value="{{ request('search') }}">
+                            <button class="input-group-text bg-success text-white border-0" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -416,7 +421,7 @@
                                         </p>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label small mb-1 fw-semibold">Nominal</label>
+                                        <label class="form-label small mb-1 fw-semibold">Nominal (Rp)</label>
                                         <p class="fw-bold text-success mb-2">
                                             @if($bt->nominal == 0)
                                             <span class="text-muted">-</span>

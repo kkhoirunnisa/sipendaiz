@@ -47,14 +47,16 @@
                 @endif
                 <div class="d-flex flex-column gap-2 ms-md-auto mb-2" style="max-width: 100%; min-width: 335px;">
                     <!-- Form Pencarian -->
-                    <div class="input-group shadow rounded-3 overflow-hidden">
-                        <input type="text" id="search" name="search"
-                            class="form-control form-control-sm border-0 bg-light px-3"
-                            placeholder="Cari data infak..." value="{{ request('search') }}">
-                        <span class="input-group-text bg-success text-white">
-                            <i class="bi bi-search"></i>
-                        </span>
-                    </div>
+                    <form method="GET" action="{{ route('infak_keluar.index', ['kategori' => request('kategori') ?? 'Pembangunan']) }}" class="d-flex">
+                        <div class="input-group shadow rounded-3 overflow-hidden">
+                            <input type="text" id="search" name="search"
+                                class="form-control form-control-sm border-0 bg-light px-3"
+                                placeholder="Cari data infak..." value="{{ request('search') }}">
+                            <button class="input-group-text bg-success text-white border-0" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
             </div>
@@ -90,7 +92,7 @@
                                     {{ $infakKeluar->firstItem() + $loop->index }}
                                 </span>
                             </td>
-                            <td class="text-center">{{ $ik->tanggal }}</td>
+                            <td class="text-center">{{ \Carbon\Carbon::parse($ik->tanggal)->format('d-m-Y') }}</td>
                             <td class="text-center">{{ ucfirst($ik->kategori) }}</td>
                             <td class="text-center">{{ number_format($ik->nominal, 0, ',', '.') }}</td>
                             <td class="text-center">{{ $ik->barang }}</td>

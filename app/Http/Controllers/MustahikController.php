@@ -59,7 +59,7 @@ class MustahikController extends Controller
         try {
             $request->validate([
                 'nama' => 'required|string|max:50',
-                'alamat' => 'required|string|max:30',
+                'alamat' => 'required|string|max:50',
                 'kategori' => 'required|string|max:26',
             ]);
 
@@ -96,7 +96,7 @@ class MustahikController extends Controller
         try {
             $request->validate([
                 'nama' => 'required|string|max:50',
-                'alamat' => 'required|string|max:30',
+                'alamat' => 'required|string|max:50',
                 'kategori' => 'required|string|max:26',
             ]);
 

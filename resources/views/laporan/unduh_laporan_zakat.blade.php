@@ -14,7 +14,7 @@
 
         .laporan-container {
             border: 3px solid green;
-            padding: 20px 25px;
+            padding: 10px 10px;
             background-color: white;
         }
 

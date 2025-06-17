@@ -10,26 +10,24 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class InfakMasukController extends Controller
 {
-    public function index(Request $request)
+    public function index($kategori, Request $request)
     {
-        $kategori = $request->kategori;
-        $search = $request->search; // tambahkan jika ingin fitur pencarian juga
+        $search = $request->input('search');
 
         $infakMasuk = InfakMasukModel::with('buktiTransaksi')
             ->whereHas('buktiTransaksi', function ($query) use ($kategori, $search) {
-                $query->when($kategori, function ($q) use ($kategori) {
-                    $q->where('kategori', $kategori);
-                });
+                // Filter kategori langsung diterapkan (tidak pakai when)
+                $query->where('kategori', $kategori);
 
+                // Filter pencarian hanya jika ada
                 if ($search) {
                     $query->where(function ($q) use ($search) {
-                        $q->where('alamat', 'like', "%{$search}%")
-                            ->orWhere('nomor_telepon', 'like', "%{$search}%")
+                        $q->where('tanggal_konfirmasi', 'like', "%{$search}%")
                             ->orWhere('tanggal_infak', 'like', "%{$search}%")
-                            ->orWhere('kategori', 'like', "%{$search}%")
                             ->orWhere('metode', 'like', "%{$search}%")
                             ->orWhere('donatur', 'like', "%{$search}%")
-                            ->orWhere('barang', 'like', "%{$search}%");
+                            ->orWhere('barang', 'like', "%{$search}%")
+                            ->orWhere('nominal', 'like', "%{$search}%");
                     });
                 }
             })
@@ -60,6 +58,7 @@ class InfakMasukController extends Controller
 
             $namaDonatur = preg_replace('/[^\w\s-]/', '', $infak->buktiTransaksi->donatur);
             $namaFile = 'Kuitansi Infak - ' . $namaDonatur . '.pdf';
+
             // return $pdf->stream($namaFile);
             return $pdf->download($namaFile);
         } catch (Exception $e) {

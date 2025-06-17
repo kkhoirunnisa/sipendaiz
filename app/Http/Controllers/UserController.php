@@ -19,7 +19,7 @@ class UserController extends Controller
                 $q->where('nama', 'like', "%{$search}%")
                     ->orWhere('role', 'like', "%{$search}%")
                     ->orWhere('username', 'like', "%{$search}%")
-                    ->orWhere('password', 'like', "%{$search}%");
+                    ->orWhere('nomor_telepon', 'like', "%{$search}%");
             });
         })
             ->orderBy('updated_at', 'desc')
@@ -40,7 +40,7 @@ class UserController extends Controller
             $validator = Validator::make($request->all(), [
                 'role' => 'required|string|max:10',
                 'nama' => 'required|string|max:50',
-                'username' => 'required|max:10|unique:users,username',
+                'username' => 'required|max:10',
                 'password' => 'required|string',
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
             ]);
@@ -86,7 +86,7 @@ class UserController extends Controller
             $validator = Validator::make($request->all(), [
                 'role' => 'required|string|max:10',
                 'nama' => 'required|string|max:50',
-                'username' => 'required|max:10|unique:users,username,' . $id, // exclude current user from unique check
+                'username' => 'required|max:10' . $id, // exclude current user from unique check
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
                 'password' => 'nullable', // optional password
             ]);
