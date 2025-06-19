@@ -20,10 +20,6 @@
         transform: none;
     }
 
-    .badge {
-        font-weight: 300;
-    }
-
     .btn {
         transition: all 0.3s ease;
     }
