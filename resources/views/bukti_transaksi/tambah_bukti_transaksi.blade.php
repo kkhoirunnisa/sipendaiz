@@ -69,7 +69,7 @@
                         <div class="col-md-6">
                             <label for="tanggal_infak" class="form-label fw-bold text-dark">
                                 <i class="bi bi-calendar2-range-fill me-2 text-primary"></i>
-                                Tanggal
+                                Tanggal<span class="text-danger"> *</span>
                             </label>
                             <input type="date" name="tanggal_infak" id="tanggal" class="form-control" value="{{ old('tanggal_infak') }}" required>
                             @error('tanggal_infak')
@@ -82,9 +82,9 @@
                         <div class="col-md-6 mb-3">
                             <label for="donatur" class="form-label fw-bold text-dark">
                                 <i class="bi bi-person-circle me-2 text-primary"></i>
-                                Donatur
+                                Donatur<span class="text-danger"> *</span>
                             </label>
-                            <input type="text" name="donatur" class="form-control" id="donatur" placeholder="Masukkan nama orang yang infak (donatur)" value="{{ old('donatur') }}" required>
+                            <input  oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" type="text" name="donatur" class="form-control" id="donatur" placeholder="Masukkan nama orang yang infak (donatur)" value="{{ old('donatur') }}" required>
                             @error('donatur')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -123,7 +123,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="kategori" class="form-label fw-bold text-dark">
                                 <i class="fas fa-layer-group me-2 text-primary"></i>
-                                Kategori
+                                Kategori<span class="text-danger"> *</span>
                             </label>
                             <select name="kategori" class="form-select" id="kategori" required>
                                 <option disabled selected>Pilih Kategori</option>
@@ -140,7 +140,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="sumber" class="form-label fw-bold text-dark">
                                 <i class="fas fa-wallet me-2 text-primary"></i>
-                                Sumber
+                                Sumber<span class="text-danger"> *</span>
                             </label>
                             <select name="sumber" class="form-select" id="sumber" required>
                                 <option disabled selected>Pilih Sumber</option>
@@ -154,7 +154,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="metode" class="form-label fw-bold text-dark">
                                 <i class="fas fa-receipt me-2 text-primary"></i>
-                                Metode
+                                Metode<span class="text-danger"> *</span>
                             </label>
                             <select name="metode" class="form-select" id="metode" required>
                                 <option disabled selected>Pilih Metode</option>
@@ -171,7 +171,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="jenis_infak" class="form-label fw-bold text-dark">
                                 <i class="bi bi-box2-fill me-2 text-primary"></i>
-                                Jenis Infak
+                                Jenis Infak<span class="text-danger"> *</span>
                             </label>
                             <select name="jenis_infak" class="form-select" id="jenis_infak" required>
                                 <option value="Uang" {{ old('jenis_infak', 'Uang') == 'Uang' ? 'selected' : '' }}>Uang</option>
@@ -184,7 +184,7 @@
                         <div class="col-md-6 mb-3" id="nominal_section">
                             <label for="nominal" class="form-label fw-bold text-dark">
                                 <i class="bi bi-cash-coin me-2 text-primary"></i>
-                                Nominal
+                                Nominal (Rp)<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="nominal" class="form-control" id="nominal"
                                 placeholder="Masukkan nominal infak, contoh 40000" value="{{ old('nominal') }}" required>
@@ -198,7 +198,7 @@
                         <div class="col-md-6 mb-3" id="barang_section">
                             <label for="barang" class="form-label fw-bold text-dark">
                                 <i class="bi bi-box-seam-fill me-2 text-primary"></i>
-                                Barang
+                                Barang<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="barang" id="barang" class="form-control" placeholder="Masukkan barang yang diinfakkan donatur" value="{{ old('barang') }}">
                             @error('barang')
@@ -208,7 +208,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="bukti_transaksi" class="form-labe fw-bold text-dark">
                                 <i class="fas fa-receipt me-2 text-primary"></i>
-                                Bukti Transaksi Pemasukan
+                                Bukti Transaksi Pemasukan<span class="text-danger"> *</span>
                             </label>
                             <input type="file" name="bukti_transaksi" id="bukti_transaksi_pemasukan" class="form-control">
                             <small class="text-muted"> Bukti jpg,png,jpeg max:10240 </small>
@@ -225,7 +225,7 @@
                         <div class="mb-3">
                             <label for="keterangan" class="form-label fw-bold text-dark">
                                 <i class="bi bi-card-text me-2 text-primary"></i>
-                                Keterangan
+                                Keterangan<span class="text-danger"> *</span>
                             </label>
                             <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Keterangan infak">{{ old('keterangan') }}</textarea>
                             @error('keterangan')

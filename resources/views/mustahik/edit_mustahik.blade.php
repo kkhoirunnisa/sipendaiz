@@ -54,14 +54,14 @@
                         <div class="mb-3">
                             <label for="nama" class="form-label fw-bold text-dark">
                                 <i class="fas fa-user me-2 text-warning"></i>
-                                Nama
+                                Nama<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="nama" id="nama" value="{{ $mustahik->nama }}" class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label for="kategori" class="form-label fw-bold text-dark">
                                 <i class="fas fa-tags me-2 text-warning"></i>
-                                Kategori Penerima
+                                Kategori Penerima<span class="text-danger"> *</span>
                             </label>
                             <select name="kategori" id="kategori" class="form-select" required>
                                 <option value="" disabled {{ old('kategori', $mustahik->kategori) == '' ? 'selected' : '' }}>Pilih Kategori</option>
@@ -83,7 +83,7 @@
                         <div class="mb-3">
                             <label for="alamat" class="form-label fw-bold text-dark">
                                 <i class="fas fa-map-marker-alt me-2 text-warning"></i>
-                                Alamat Penerima
+                                Alamat Penerima<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="alamat" id="alamat" value="{{ $mustahik->alamat }}" class="form-control" required>
                         </div>

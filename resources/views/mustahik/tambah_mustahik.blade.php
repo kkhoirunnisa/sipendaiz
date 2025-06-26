@@ -55,7 +55,7 @@
                         <div class="mb-3">
                             <label for="nama" class="form-label fw-bold text-dark">
                                 <i class="fas fa-user me-2 text-primary"></i>
-                                Nama
+                                Nama<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama mustahik" required value="{{ old('nama') }}">
                             @error('nama')
@@ -66,7 +66,7 @@
                         <div class="mb-3">
                             <label for="kategori" class="form-label fw-bold text-dark">
                                 <i class="fas fa-tags me-2 text-primary"></i>
-                                Kategori Penerima
+                                Kategori Penerima<span class="text-danger"> *</span>
                             </label>
                             <select name="kategori" id="kategori" class="form-select" required>
                                 <option value="" disabled selected>Pilih Kategori</option>
@@ -88,7 +88,7 @@
                         <div class="mb-3">
                             <label for="alamat" class="form-label fw-bold text-dark">
                                 <i class="fas fa-map-marker-alt me-2 text-primary"></i>
-                                Alamat Penerima
+                                Alamat Penerima<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="alamat" id="alamat" class="form-control" placeholder="Masukkan alamat mustahik, contoh : Jalan Sawo - DK 1"
                                 required value="{{ old('alamat') }}">

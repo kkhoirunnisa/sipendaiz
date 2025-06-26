@@ -54,7 +54,7 @@
                         <div class="mb-3">
                             <label for="nama" class="form-label fw-bold text-dark">
                                 <i class="fas fa-user me-2 text-primary"></i>
-                                Nama
+                                Nama<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama user"
                                 required value="{{ old('nama') }}">
@@ -66,7 +66,7 @@
                         <div class="mb-3">
                             <label for="nomor_telepon" class="form-label fw-bold text-dark">
                                 <i class="fas fa-phone me-2 text-primary"></i>
-                                Nomor Telepon
+                                Nomor Telepon<span class="text-danger"> *</span>
                             </label>
                             <input type="text"
                                 name="nomor_telepon"
@@ -85,7 +85,7 @@
                         <div class="mb-3">
                             <label for="role" class="form-label fw-bold text-dark">
                                 <i class="fas fa-shield me-2 text-primary"></i>
-                                Role
+                                Role<span class="text-danger"> *</span>
                             </label>
                             <select name="role" id="role" class="form-select" required>
                                 <option value="" disabled selected>Pilih Role</option>
@@ -101,7 +101,7 @@
                         <div class="mb-3">
                             <label for="username" class="form-label fw-bold text-dark">
                                 <i class="fas fa-circle-user me-2 text-primary"></i>
-                                Username
+                                Username<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="username" id="username" class="form-control" placeholder="Masukkan username user"
                                 required value="{{ old('username') }}">
@@ -113,7 +113,7 @@
                         <div class="mb-3">
                             <label for="password" class="form-label fw-bold text-dark">
                                 <i class="fas fa-lock me-2 text-primary"></i>
-                                Password
+                                Password<span class="text-danger"> *</span>
                             </label>
                             <input type="password" name="password" id="password" class="form-control" placeholder="Masukkan password user" required>
                             @error('password')

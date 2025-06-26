@@ -167,6 +167,7 @@
                     <thead class="table-gradient text-white">
                         <tr>
                             <th class="text-center">No</th>
+                            <th class="text-center">Kategori</th>
                             <th class="text-center">Donatur</th>
                             <th class="text-center">Tanggal Infak</th>
                             <th class="text-center">Metode</th>
@@ -189,6 +190,7 @@
                                     {{ $buktiTransaksi->firstItem() + $loop->index }}
                                 </span>
                             </td>
+                             <td class="text-center">{{ $bt->kategori }}</td>
                             <td class="text-center">{{ $bt->donatur }}</td>
                             <td class="text-center">{{ \Carbon\Carbon::parse($bt->tanggal_infak)->format('d-m-Y') }}</td>
                             <td class="text-center">{{ $bt->metode }}</td>

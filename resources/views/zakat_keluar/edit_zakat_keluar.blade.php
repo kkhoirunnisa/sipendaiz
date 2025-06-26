@@ -68,7 +68,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="tanggal" class="form-label fw-bold text-dark">
                                         <i class="bi bi-calendar2-range-fill me-2 text-warning"></i>
-                                        Tanggal
+                                        Tanggal<span class="text-danger"> *</span>
                                     </label>
                                     <input type="date" name="tanggal" id="tanggal" class="form-control" required
                                         value="{{ old('tanggal', $zakatKeluar->tanggal) }}">
@@ -83,7 +83,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="id_mustahik" class="form-label fw-bold text-dark">
                                         <i class="fas fa-circle-user me-2 text-warning"></i>
-                                        Nama Mustahik
+                                        Nama Mustahik<span class="text-danger"> *</span>
                                     </label>
                                     <select name="id_mustahik" id="id_mustahik" class="form-control" required>
                                         <option value="" disabled>Pilih Mustahik</option>
@@ -101,7 +101,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="jenis_zakat" class="form-label fw-bold text-dark">
                                         <i class="fas fa-boxes-stacked me-2 text-warning"></i>
-                                        Jenis Zakat
+                                        Jenis Zakat<span class="text-danger"> *</span>
                                     </label>
                                     <select name="jenis_zakat" id="jenis_zakat" class="form-select" required>
                                         <option value="" disabled>Pilih Jenis Zakat</option>
@@ -119,7 +119,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="bentuk_zakat" class="form-label fw-bold text-dark">
                                         <i class="bi bi-box2-fill me-2 text-warning"></i>
-                                        Bentuk Zakat
+                                        Bentuk Zakat<span class="text-danger"> *</span>
                                     </label>
                                     <select name="bentuk_zakat" id="bentuk_zakat" class="form-select">
                                         <option value="Uang" {{ (old('bentuk_zakat', $zakatKeluar->bentuk_zakat) == 'Uang') ? 'selected' : '' }}>Uang</option>
@@ -134,7 +134,7 @@
                                 <div class="col-md-6 mb-3" id="nominal_section">
                                     <label for="nominal" class="form-label fw-bold text-dark">
                                         <i class="bi bi-cash-coin me-2 text-warning"></i>
-                                        Nominal (Rp)
+                                        Nominal (Rp)<span class="text-danger"> *</span>
                                     </label>
                                     <input type="text" name="nominal" id="nominal" class="form-control"
                                         value="{{ old('nominal', $zakatKeluar->nominal) }}">
@@ -151,7 +151,7 @@
                                 <div class="col-md-6 mb-3" id="jumlah_section">
                                     <label for="jumlah" class="form-label fw-bold text-dark">
                                         <i class="fas fa-scale-balanced me-2 text-warning"></i>
-                                        Jumlah (Kg)
+                                        Jumlah (Kg)<span class="text-danger"> *</span>
                                     </label>
                                     <input type="number" name="jumlah" id="jumlah" class="form-control"
                                         value="{{ old('jumlah', rtrim(rtrim(number_format($zakatKeluar->jumlah, 2, '.', ''), '0'), '.')) }}">
@@ -165,7 +165,7 @@
                                 <div class="mb-3">
                                     <label for="keterangan" class="form-label fw-bold text-dark">
                                         <i class="bi bi-card-text me-2 text-warning"></i>
-                                        Keterangan
+                                        Keterangan<span class="text-danger"> *</span>
                                     </label>
                                     <textarea name="keterangan" id="keterangan" class="form-control" rows="3">{{ old('keterangan', $zakatKeluar->keterangan) }}</textarea>
                                     @error('keterangan')

@@ -53,7 +53,7 @@
                         <div class="mb-3">
                             <label for="nama" class="form-label fw-bold text-dark">
                                 <i class="fas fa-user me-2 text-warning"></i>
-                                Nama
+                                Nama<span class="text-danger"> *</span>
                             </label>
                             <input type="text" id="nama" name="nama" value="{{ $user->nama }}" class="form-control" required>
                             @error('nama')
@@ -63,7 +63,7 @@
                         <div class="mb-3">
                             <label for="nomor_telepon" class="form-label fw-bold text-dark">
                                 <i class="fas fa-phone me-2 text-warning"></i>
-                                Nomor Telepon
+                                Nomor Telepon<span class="text-danger"> *</span>
                             </label>
                             <input type="text"
                                 id="nomor_telepon"
@@ -80,7 +80,7 @@
                         <div class="mb-3">
                             <label for="role" class="form-label fw-bold text-dark">
                                 <i class="fas fa-shield me-2 text-warning"></i>
-                                Role
+                                Role<span class="text-danger"> *</span>
                             </label>
                             <select name="role" id="role" class="form-select" required>
                                 <option value="" disabled {{ old('role', $user->role) == '' ? 'selected' : '' }}>Pilih Role</option>
@@ -96,7 +96,7 @@
                         <div class="mb-3">
                             <label for="username" class="form-label fw-bold text-dark">
                                 <i class="fas fa-circle-user me-2 text-warning"></i>
-                                Username
+                                Username<span class="text-danger"> *</span>
                             </label>
                             <input type="text" id="username" name="username" value="{{ $user->username }}" class="form-control" required>
                             @error('username')

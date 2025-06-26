@@ -75,7 +75,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="tanggal" class="form-label fw-bold text-dark">
                                 <i class="bi bi-calendar2-range-fill me-2 text-warning"></i>
-                                Tanggal
+                                Tanggal<span class="text-danger"> *</span>
                             </label>
                             <input type="date" name="tanggal" id="tanggal" class="form-control" required value="{{ old('tanggal', $infakKeluar->tanggal) }}">
                             @error('tanggal')
@@ -100,7 +100,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="nominal" class="form-label fw-bold text-dark">
                                 <i class="bi bi-cash-coin me-2 text-warning"></i>
-                                Nominal (Rp)
+                                Nominal (Rp)<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="nominal" id="nominal" class="form-control"
                                 value="{{ old('nominal', ($infakKeluar->nominal)) }}">
@@ -116,7 +116,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="barang" class="form-label fw-bold text-dark">
                                 <i class="bi bi-box-seam-fill me-2 text-warning"></i>
-                                Barang
+                                Barang<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="barang" id="barang" class="form-control" value="{{ old('barang', $infakKeluar->barang) }}">
                             @error('barang')
@@ -126,7 +126,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="bukti_infak_keluar" class="form-label fw-bold text-dark">
                                 <i class="fas fa-receipt me-2 text-warning"></i>
-                                Bukti Infak Keluar
+                                Bukti Infak Keluar<span class="text-danger"> *</span>
                             </label>
 
                             <input type="file" name="bukti_infak_keluar" id="bukti_infak_keluar" class="form-control"
@@ -149,7 +149,7 @@
                     <div class="mb-3">
                         <label for="keterangan" class="form-label fw-bold text-dark">
                             <i class="bi bi-card-text me-2 text-warning"></i>
-                            Keterangan
+                            Keterangan<span class="text-danger"> *</span>
                         </label>
                         <textarea name="keterangan" id="keterangan" class="form-control" rows="3">{{ old('keterangan', $infakKeluar->keterangan) }}</textarea>
                         @error('keterangan')

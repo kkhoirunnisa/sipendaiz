@@ -51,14 +51,14 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label fw-bold text-dark">
-                                <i class="bi bi-person-fill me-2 text-warning"></i>Nama
+                                <i class="bi bi-person-fill me-2 text-warning"></i>Nama<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="nama" class="form-control bg-light" id="nama" value="{{ $profil->nama }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-bold text-dark">
-                                <i class="bi bi-person-badge-fill me-2 text-warning"></i>Username
+                                <i class="bi bi-person-badge-fill me-2 text-warning"></i>Username<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="username" class="form-control bg-light" id="username" value="{{ $profil->username }}" required>
                         </div>
