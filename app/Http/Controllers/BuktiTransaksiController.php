@@ -7,56 +7,55 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
-use App\Models\BuktiTransaksi;
 use App\Models\InfakMasukModel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\BuktiTransaksiModel;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
 class BuktiTransaksiController extends Controller
 {
-    // Menampilkan daftar bukti transaksi
+    // Menampilkan daftar semua bukti transaksi dengan fitur pencarian dan paginasi
     public function index(Request $request)
     {
         $search = $request->input('search');
-
+        // Filter pencarian berdasarkan beberapa kolom
         $buktiTransaksi = BuktiTransaksiModel::when($search, function ($query, $search) {
             return $query->where(function ($q) use ($search) {
                 $q->where('donatur', 'like', "%{$search}%")
                     ->orWhere('jenis_infak', 'like', "%{$search}%")
                     ->orWhere('tanggal_infak', 'like', "%{$search}%")
                     ->orWhere('nominal', 'like', "%{$search}%")
+                    ->orWhere('kategori', 'like', "%{$search}%")
                     ->orWhere('metode', 'like', "%{$search}%")
                     ->orWhere('barang', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%")
                 ;
             });
         })
-            ->orderBy('updated_at', 'desc')
-            ->paginate(10); //menampilkan data 10 pada tabel
+            ->orderBy('updated_at', 'desc') //besar ke kecil
+            ->paginate(10); //menampilkan 10 data
 
-        return view('bukti_transaksi.index_bukti_transaksi', compact('buktiTransaksi'));
+        return view('bukti_transaksi.index_bukti_transaksi', compact('buktiTransaksi')); //mengirim data ke view
     }
 
 
-    // Menampilkan form tambah bukti transaksi
+    // menampilkan form tambah bukti transaksi
     public function create()
     {
-        $user = Auth::user(); // Ambil data user untuk dropdown
+        $user = Auth::user(); // ambil data user yg login saat ini
         return view('bukti_transaksi.tambah_bukti_transaksi', compact('user'));
     }
 
-    // Menyimpan bukti transaksi
+    // menyimpan bukti transaksi baru
     public function store(Request $request)
     {
         try {
             $user = Auth::user();
-            // Validasi input
+
+            // validasi input dari form
             $validated = $request->validate([
-                // 'id_users' => 'required|exists:users,id',
                 'donatur' => 'required|string|max:50',
                 'alamat' => 'nullable|string|max:30',
                 'nomor_telepon' => 'nullable|numeric|digits_between:10,14',
@@ -71,10 +70,10 @@ class BuktiTransaksiController extends Controller
                 'keterangan' => 'required|string|max:100',
             ]);
 
-            // Upload file bukti
+            // upload file ke storage/app/public/bukti
             $buktiPath = $request->file('bukti_transaksi')->store('bukti', 'public');
 
-            // Simpan secara eksplisit
+            // simpan data ke database
             BuktiTransaksiModel::create([
                 'id_users' => $user->id,
                 'donatur' => $request->donatur,
@@ -84,7 +83,7 @@ class BuktiTransaksiController extends Controller
                 'kategori' => $request->kategori,
                 'sumber' => $request->sumber,
                 'jenis_infak' => $request->jenis_infak,
-                'nominal' => $request->filled('nominal') ? $request->nominal : null,
+                'nominal' => $request->filled('nominal') ? $request->nominal : null, //jika nominal diisi disimpan nominal, jika nominal kosong diisi null
                 'barang' => $request->barang,
                 'metode' => $request->metode,
                 'bukti_transaksi' => $buktiPath,
@@ -92,10 +91,9 @@ class BuktiTransaksiController extends Controller
                 'status' => 'Pending',
             ]);
 
-
-            $client = new Client();
+            // kirim notifikasi ke bendahara
+            $client = new Client(); //permintaan HTTP ke API eksternal u/ mengirim notif WA lewat fonnte
             $bendaharas = UserModel::where('role', 'Bendahara')->whereNotNull('nomor_telepon')->get();
-
             $message = "*BUKTI TRANSAKSI BARU MASUK*\n\n";
             $message .= "Ada transaksi infak yang perlu dikonfirmasi:\n";
             $message .= "*Nama Donatur:* {$validated['donatur']}\n";
@@ -110,17 +108,20 @@ class BuktiTransaksiController extends Controller
                 $message .= "-";
             }
             $message .= "\n";
-            $message .= "*Tanggal:* " . \Carbon\Carbon::parse($validated['tanggal_infak'])->format('d-m-Y') . "\n";
+            $message .= "*Tanggal:* " . Carbon::parse($validated['tanggal_infak'])->format('d-m-Y') . "\n"; //mengubah tanggal menjadi format yang diinginkan
+            // d = tgl 01 - 31, m = bulan 01 - 12. Y = thn 4 digit
             $message .= "*Status:* Pending\n\n";
             $message .= "Silakan buka halaman *Konfirmasi Transaksi* untuk meninjau.";
 
+            // kirim pesan ke masing2 bendahara
             foreach ($bendaharas as $bendahara) {
                 $client->post('https://api.fonnte.com/send', [
                     'headers' => [
-                        'Authorization' => env('FONNTE_TOKEN'),
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json',
+                        'Authorization' => env('FONNTE_TOKEN'), // fonnte butuh tau siapa yg mengirim permintaan post melalui token yg diberikan pd setiap akun fonnte
+                        'Accept' => 'application/json', // aku ingin respon json
+                        'Content-Type' => 'application/json', // data yg dikirim format json
                     ],
+                    //data json yg akan dikirim ke API
                     'json' => [
                         'target' => $bendahara->nomor_telepon,
                         'message' => $message,
@@ -134,15 +135,15 @@ class BuktiTransaksiController extends Controller
         }
     }
 
-    // Menampilkan form edit bukti transaksi
+    // menampilkan form edit
     public function edit($id)
     {
         $buktiTransaksi = BuktiTransaksiModel::findOrFail($id);
-        $user = Auth::user(); // Ambil data user
+        $user = Auth::user();
         return view('bukti_transaksi.edit_bukti_transaksi', compact('buktiTransaksi', 'user'));
     }
 
-    // Mengupdate bukti transaksi
+    // memperbarui data bukti transaksi
     public function update(Request $request, $id)
     {
         try {
@@ -164,14 +165,12 @@ class BuktiTransaksiController extends Controller
             ]);
 
             $buktiTransaksi = BuktiTransaksiModel::findOrFail($id);
-            // $buktiTransaksi->fill($validated);
-
+            //jika file baru diupload, ganti file lama
             if ($request->hasFile('bukti_transaksi')) {
                 // Hapus file lama
                 if ($buktiTransaksi->bukti_transaksi) {
                     Storage::delete($buktiTransaksi->bukti_transaksi);
                 }
-
                 // Simpan file baru
                 $validated['bukti_transaksi'] = $request->file('bukti_transaksi')->store('bukti', 'public');
             } else {
@@ -179,7 +178,7 @@ class BuktiTransaksiController extends Controller
                 $validated['bukti_transaksi'] = $buktiTransaksi->bukti_transaksi;
             }
 
-            // Isi data ke model
+            // Isi data baru dan simpan
             $buktiTransaksi->fill($validated);
             // Set nominal menjadi null jika kosong
             $buktiTransaksi->nominal = $request->nominal ?: null;
@@ -192,7 +191,7 @@ class BuktiTransaksiController extends Controller
         }
     }
 
-    // Menghapus bukti transaksi
+    // menghapus bukti transaksi
     public function destroy($id)
     {
         try {
@@ -212,7 +211,7 @@ class BuktiTransaksiController extends Controller
         }
     }
 
-    // KONFIRMASI TRANSAKSI
+    // menampilkan daftar konfirmasi transaksi dengan status pending
     public function konfirmasiIndex(Request $request)
     {
         $search = $request->input('search');
@@ -223,6 +222,7 @@ class BuktiTransaksiController extends Controller
                     $q->where('donatur', 'like', "%{$search}%")
                         ->orWhere('tanggal_infak', 'like', "%{$search}%")
                         ->orWhere('jenis_infak', 'like', "%{$search}%")
+                        ->orWhere('kategori', 'like', "%{$search}%")
                         ->orWhere('metode', 'like', "%{$search}%")
                         ->orWhere('barang', 'like', "%{$search}%")
                         ->orWhere('nominal', 'like', "%{$search}%")
@@ -230,41 +230,48 @@ class BuktiTransaksiController extends Controller
                 });
             })
             ->orderBy('updated_at', 'desc')
-            ->paginate(10); //menampilkan data 10 pada tabel
+            ->paginate(10);
 
         return view('bukti_transaksi.konfirmasi_transaksi', compact('buktiTransaksi'));
     }
 
+    // verifikasi data bukti transaksi, kirim kuitansi dan notif WA
     public function verifikasi($id)
     {
         try {
+            // ambil data bukti transaksi dan relasi user
             $bukti = BuktiTransaksiModel::with('user')->findOrFail($id);
+            // ubah status menjadi terverifikasi
             $bukti->status = 'Terverifikasi';
             $bukti->save();
 
+            //simpan ke tabel infak masuk
             $infakMasuk = InfakMasukModel::create([
                 'id_bukti_transaksi' => $bukti->id,
                 'tanggal_konfirmasi' => Carbon::now()->toDateString(),
             ]);
 
+            // buat kuitansi pdf dengan DOMPDF
             $infak = $infakMasuk;
             $pdf = Pdf::loadView('infak_masuk.kuitansi', compact('infak'))
                 ->setPaper('a4', 'landscape');
 
+            // nama file kuitansi tanpa karakter khusus
+            // ^ kecuali, \w semua huruf angka underscore _, \s spasi tab newline, - karakter strip -
             $namaDonatur = preg_replace('/[^\w\s-]/', '', $infakMasuk->buktiTransaksi->donatur);
             $namaFile = 'Kuitansi Infak - ' . $namaDonatur . '.pdf';
 
-            // Simpan file PDF ke folder public/storage/kuitansi
+            // Simpan file kuitansi pdf ke folder public/storage/kuitansi
             $path = public_path('storage/kuitansi/' . $namaFile);
-            if (!file_exists(public_path('storage/kuitansi'))) {
-                mkdir(public_path('storage/kuitansi'), 0755, true);
+            if (!file_exists(public_path('storage/kuitansi'))) { // apakah file ada? jk blm dibuatkan dgn mkdir
+                mkdir(public_path('storage/kuitansi'), 0755, true); //0755 permission folder
             }
             $pdf->save($path);
 
             // Buat URL publik untuk akses kuitansi
             $urlKuitansi = asset('storage/kuitansi/' . rawurlencode($namaFile));
 
-            // Pesan WhatsApp
+            //  Kirim WA ke donatur
             $message = "*Terima kasih, transaksi infak Anda telah diverifikasi.*\n\n";
             $message .= "*Nama:* {$bukti->donatur}\n";
             $message .= "*Kategori:* {$bukti->kategori}\n";
@@ -287,7 +294,6 @@ class BuktiTransaksiController extends Controller
 
             $client = new Client();
 
-            // Kirim WA ke donatur
             if ($bukti->nomor_telepon) {
                 try {
                     $client->post('https://api.fonnte.com/send', [
@@ -306,7 +312,7 @@ class BuktiTransaksiController extends Controller
                 }
             }
 
-            // Kirim WA ke user yang input bukti transaksi
+            // Kirim WA ke user yang input bukti transaksi jika ada user nya dan nomornya
             if ($bukti->user && $bukti->user->nomor_telepon) {
                 $msgUser = "*KONFIRMASI INFAK TERVERIFIKASI* \n";
                 $msgUser .= "\n";
@@ -352,10 +358,12 @@ class BuktiTransaksiController extends Controller
         }
     }
 
+    // menolak transaksi
     public function tolak($id)
     {
         try {
             $transaksi = BuktiTransaksiModel::with('user')->findOrFail($id);
+            // status berubah jd ditolak
             $transaksi->status = 'Ditolak';
             $transaksi->save();
 

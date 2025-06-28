@@ -8,18 +8,22 @@ use App\Models\InfakKeluarModel;
 use App\Models\ZakatMasukModel;
 use App\Models\ZakatKeluarModel;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    // menampilkan data pada dashboard
     public function index()
     {
-        // Get today's date
+        // mendapatkan tgl hari ini YYYY-MM-DD
         $today = Carbon::today()->toDateString();
+
+        // mendapatkan tgl awal bulan saat ini
         $currentMonth = Carbon::now()->startOfMonth()->toDateString();
+
+        // mendapatkan tgl akhir bulan saat ini
         $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
 
-        // Total Infak Pembangunan
+        // total infak pembangunan
         $totalInfakPembangunan = InfakMasukModel::with('buktiTransaksi')
             ->whereHas('buktiTransaksi', fn($q) => $q->where('kategori', 'Pembangunan'))
             ->get()
