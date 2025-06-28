@@ -206,6 +206,12 @@
                     </div>
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm p-3 h-100">
+                            <small class="fw-semibold"><i class="bi bi-person-fill-check me-1"></i> Alamat Mustahik</small>
+                            <h6 class="text-dark mt-1">{{ $zk->mustahik->alamat ?? '-' }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm p-3 h-100">
                             <small class="fw-semibold"><i class="bi bi-calendar3 me-1"></i> Tanggal</small>
                             <h6 class="text-dark mt-1">{{ $formatTanggal }}</h6>
                         </div>

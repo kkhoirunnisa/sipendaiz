@@ -32,12 +32,13 @@ class LaporanInfakController extends Controller
         $kategori = $request->kategori;
 
         $infakMasuk = InfakMasukModel::with('buktiTransaksi')
-            ->whereHas('buktiTransaksi', function ($query) use ($startDate, $endDate, $kategori) {
-                $query->where('kategori', $kategori)
-                    ->whereBetween('tanggal_konfirmasi', [$startDate, $endDate]);
+            ->whereBetween('tanggal_konfirmasi', [$startDate, $endDate])
+            ->whereHas('buktiTransaksi', function ($query) use ($kategori) {
+                $query->where('kategori', $kategori);
             })
             ->orderBy('tanggal_konfirmasi', 'asc')
             ->get();
+
 
         $infakKeluar = InfakKeluarModel::where('kategori', $kategori)
             ->whereBetween('tanggal', [$startDate, $endDate])

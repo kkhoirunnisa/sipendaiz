@@ -85,8 +85,8 @@
                                     </label>
                                     <select name="jenis_zakat" id="jenis_zakat" class="form-select" required>
                                         <option value="" disabled>Pilih Jenis Zakat</option>
-                                        <option value="Fitrah" {{ old('jenis_zakat', $zakatMasuk->jenis_zakat) == 'fitrah' ? 'selected' : '' }}>Fitrah</option>
-                                        <option value="Maal" {{ old('jenis_zakat', $zakatMasuk->jenis_zakat) == 'maal' ? 'selected' : '' }}>Maal</option>
+                                        <option value="Fitrah" {{ old('jenis_zakat', $zakatMasuk->jenis_zakat) == 'Fitrah' ? 'selected' : '' }}>Fitrah</option>
+                                        <option value="Maal" {{ old('jenis_zakat', $zakatMasuk->jenis_zakat) == 'Maal' ? 'selected' : '' }}>Maal</option>
                                     </select>
                                     @error('jenis_zakat')
                                     <div class="text-danger">{{ $message }}</div>
