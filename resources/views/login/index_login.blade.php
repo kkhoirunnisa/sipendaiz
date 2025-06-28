@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Masjid Jami' Al Munawwarah - Login</title>
-
+    <title>SIPENDAIZ</title>
+    <link rel="icon" href="/gambar/logo1.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -214,7 +214,7 @@
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
-         
+
             border: none;
             border-radius: 15px;
             padding: 0.75rem 2rem;
@@ -518,22 +518,22 @@
                 html: errorMsg.replace(/\n/g, '<br>'),
                 confirmButtonColor: '#2d7d32',
             });
-        } 
+        }
     });
 </script>
 
 <!-- Notifikasi Sukses -->
 @if (session('success'))
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: '{{ session("success") }}',
-            showConfirmButton: true,
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#2d7d32',
-            timer: 4000,
-            timerProgressBar: true,
-        });
-    </script>
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session("success") }}',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#2d7d32',
+        timer: 4000,
+        timerProgressBar: true,
+    });
+</script>
 @endif

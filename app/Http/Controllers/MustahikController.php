@@ -43,19 +43,6 @@ class MustahikController extends Controller
     // Menyimpan mustahik baru
     public function store(Request $request)
     {
-        // try {
-        //     $request->validate([
-        //         'nama' => 'required|string|max:50',
-        //         'alamat' => 'required|string|max:30',
-        //         'kategori' => 'required|string|max:26',
-        //     ]);
-
-        //     MustahikModel::create($request->all()); // Menyimpan data mustahik
-        //     return redirect()->route('mustahik.index')->with('success', 'Mustahik berhasil ditambahkan!');
-        // } catch (Exception $e) {
-        //     return redirect()->back()->withInput()->with('error', 'Gagal menambahkan data: ' . $e->getMessage());
-        // }
-
         try {
             $request->validate([
                 'nama' => 'required|string|max:50',

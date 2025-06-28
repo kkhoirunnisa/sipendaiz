@@ -91,7 +91,7 @@ class DashboardController extends Controller
         // Transaksi Pending yang memerlukan konfirmasi
         $transaksiPending = BuktiTransaksiModel::where('status', 'Pending')
             ->orderBy('updated_at', 'desc')
-            ->limit(10)
+            ->limit(5)
             ->get();
 
         $totalPendingTransaksi = BuktiTransaksiModel::where('status', 'Pending')->count();

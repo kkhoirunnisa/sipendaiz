@@ -68,7 +68,7 @@ class BuktiTransaksiController extends Controller
                 'barang' => 'nullable|string|max:20',
                 'metode' => 'required|string|max:17',
                 'bukti_transaksi' => 'required|file|mimes:jpg,png,jpeg|max:10240',
-                'keterangan' => 'required|string|max:50',
+                'keterangan' => 'required|string|max:100',
             ]);
 
 
@@ -170,7 +170,7 @@ class BuktiTransaksiController extends Controller
                 'barang' => 'nullable|string|max:20',
                 'metode' => 'required|string|max:17',
                 'bukti_transaksi' => 'nullable|file|mimes:jpg,png,jpeg|max:10240',
-                'keterangan' => 'required|string|max:50',
+                'keterangan' => 'required|string|max:100',
             ]);
 
             $buktiTransaksi = BuktiTransaksiModel::findOrFail($id);
@@ -188,12 +188,6 @@ class BuktiTransaksiController extends Controller
                 // Gunakan gambar lama jika tidak diganti
                 $validated['bukti_transaksi'] = $buktiTransaksi->bukti_transaksi;
             }
-
-            // Pastikan nominal menjadi null jika kosong
-            // $validated['nominal'] = $request->filled('nominal') ? $request->nominal : null;
-
-            // langsung update
-            // $buktiTransaksi->update($validated);
 
             // Isi data ke model
             $buktiTransaksi->fill($validated);
@@ -213,13 +207,7 @@ class BuktiTransaksiController extends Controller
     {
         try {
             $buktiTransaksi = BuktiTransaksiModel::findOrFail($id);
-            // $file_name = "bukti/" . $buktiTransaksi->bukti_transaksi;
-            // $file_path = public_path($file_name);
-            // unlink($file_path);
-            // // Hapus file bukti transaksi jika ada
-            // if ($buktiTransaksi->bukti) {
-            //     Storage::delete('public/bukti/' . $buktiTransaksi->bukti);
-            // }
+
             // Hapus file dari storage
             if ($buktiTransaksi->bukti_transaksi && Storage::disk('public')->exists($buktiTransaksi->bukti_transaksi)) {
                 Storage::disk('public')->delete($buktiTransaksi->bukti_transaksi);
