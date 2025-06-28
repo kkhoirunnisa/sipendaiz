@@ -71,11 +71,6 @@ class BuktiTransaksiController extends Controller
                 'keterangan' => 'required|string|max:100',
             ]);
 
-
-            // if ($request->hasFile('bukti_transaksi')) {
-            //     $validated['bukti_transaksi'] = $request->file('bukti_transaksi')->store('bukti', 'public');
-            // }
-
             // Upload file bukti
             $buktiPath = $request->file('bukti_transaksi')->store('bukti', 'public');
 
@@ -96,11 +91,6 @@ class BuktiTransaksiController extends Controller
                 'keterangan' => $request->keterangan,
                 'status' => 'Pending',
             ]);
-
-            // $validated['status'] = 'Pending';
-            // Pastikan nominal menjadi null jika kosong
-            // $validated['nominal'] = $request->filled('nominal') ? $request->nominal : null;
-            // BuktiTransaksiModel::create($validated);
 
 
             $client = new Client();
@@ -277,6 +267,7 @@ class BuktiTransaksiController extends Controller
             // Pesan WhatsApp
             $message = "*Terima kasih, transaksi infak Anda telah diverifikasi.*\n\n";
             $message .= "*Nama:* {$bukti->donatur}\n";
+            $message .= "*Kategori:* {$bukti->kategori}\n";
             $message .= "*Alamat:* {$bukti->alamat}\n";
             $message .= "*Infak:* ";
             if (!empty($bukti['nominal'])) {
@@ -323,6 +314,7 @@ class BuktiTransaksiController extends Controller
                 $msgUser .= "Transaksi Infak yang Anda masukkan pada: \n";
                 $msgUser .= "*Tanggal Infak:* " . Carbon::parse($bukti->tanggal_infak)->format('d-m-Y') . "\n";
                 $msgUser .= "*Nama:* {$bukti->donatur}\n";
+                $message .= "*Kategori:* {$bukti->kategori}\n";
                 $msgUser .= "*Alamat:* {$bukti->alamat}\n";
                 $msgUser .= "*Infak:* ";
                 if (!empty($bukti['nominal'])) {
@@ -377,6 +369,7 @@ class BuktiTransaksiController extends Controller
                 $msgUser .= "Transaksi Infak yang Anda masukkan pada: \n";
                 $msgUser .= "*Tanggal Infak:* " . Carbon::parse($transaksi->tanggal_infak)->format('d-m-Y') . "\n";
                 $msgUser .= "*Nama:* {$transaksi->donatur}\n";
+                $msgUser .= "*Kategori:* {$transaksi->kategori}\n";
                 $msgUser .= "*Alamat:* {$transaksi->alamat}\n";
                 $msgUser .= "*Infak:* ";
                 if (!empty($transaksi['nominal'])) {
