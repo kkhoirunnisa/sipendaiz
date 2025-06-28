@@ -71,7 +71,7 @@
                         </button>
                         <!-- download -->
                         <a href="{{ route('laporan_infak.download', ['tanggal_awal' => $startDate, 'tanggal_akhir' => $endDate, 'kategori' => $kategori]) }}"
-                            target="_blank" class="btn btn-outline-danger">
+                            class="btn btn-outline-danger">
                             <i class="bi bi-download me-1"></i>Unduh PDF
                         </a>
 
