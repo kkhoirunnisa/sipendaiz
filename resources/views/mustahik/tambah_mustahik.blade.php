@@ -90,12 +90,25 @@
                                 <i class="fas fa-map-marker-alt me-2 text-primary"></i>
                                 Alamat Penerima<span class="text-danger"> *</span>
                             </label>
-                            <input type="text" name="alamat" id="alamat" class="form-control" placeholder="Masukkan alamat mustahik, contoh : Jalan Sawo - DK 1"
-                                required value="{{ old('alamat') }}">
+                            <select name="alamat" id="alamat" class="form-select" required>
+                                <option value="" disabled selected>Pilih Daerah Kerja</option>
+                                <option value="Jl. Melati Selatan s/d Wates Timur Utara - DK1" {{ old('alamat') == 'Jl. Melati Selatan s/d Wates Timur Utara - DK1' ? 'selected' : '' }}>Jl. Melati Selatan s/d Wates Timur Utara - DK1</option>
+                                <option value="Jl. Nusa Indah Selatan s/d Melati utara - DK2" {{ old('alamat') == 'Jl. Nusa Indah Selatan s/d Melati utara - DK2' ? 'selected' : '' }}>Jl. Nusa Indah Selatan s/d Melati utara - DK2</option>
+                                <option value="JL. Nusa indah Utara s/d Kantil Selatan - DK3" {{ old('alamat') == 'JL. Nusa indah Utara s/d Kantil Selatan - DK3' ? 'selected' : '' }}>JL. Nusa indah Utara s/d Kantil Selatan - DK3</option>
+                                <option value="JL. Kantil Utara s/d Kenanga - DK4" {{ old('alamat') == 'JL. Kantil Utara s/d Kenanga - DK4' ? 'selected' : '' }}>JL. Kantil Utara s/d Kenanga - DK4</option>
+                                <option value="JL. Anggrek, Cempaka - DK5" {{ old('alamat') == 'JL. Anggrek, Cempaka - DK5' ? 'selected' : '' }}>JL. Anggrek, Cempaka - DK5</option>
+                                <option value="JL. Asem Utara s/d Cerme - DK6" {{ old('alamat') == 'JL. Asem Utara s/d Cerme - DK6' ? 'selected' : '' }}>JL. Asem Utara s/d Cerme - DK6</option>
+                                <option value="JL. Jambu Utara dan Asem Selatan - DK7" {{ old('alamat') == 'JL. Jambu Utara dan Asem Selatan - DK7' ? 'selected' : '' }}>JL. Jambu Utara dan Asem Selatan - DK7</option>
+                                <option value="Jl. Jambu Selatan s/d Mangga Utara - DK8" {{ old('alamat') == 'Jl. Jambu Selatan s/d Mangga Utara - DK8' ? 'selected' : '' }}>Jl. Jambu Selatan s/d Mangga Utara - DK8</option>
+                                <option value="Jl. Mangga Selatan s/d Sawo Utara - DK9" {{ old('alamat') == 'Jl. Mangga Selatan s/d Sawo Utara - DK9' ? 'selected' : '' }}>Jl. Mangga Selatan s/d Sawo Utara - DK9</option>
+                                <option value="Jl. Sawo Selatan s/d Wates Barat Utara - DK10" {{ old('alamat') == 'Jl. Sawo Selatan s/d Wates Barat Utara - DK10' ? 'selected' : '' }}>Jl. Sawo Selatan s/d Wates Barat Utara - DK10</option>
+                                <option value="DK Khusus" {{ old('alamat') == 'DK Khusus' ? 'selected' : '' }}>DK Khusus</option>
+                            </select>
                             @error('alamat')
                             <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
+
 
                         <div class="text-end">
                             <button type="button" class="btn btn-primary" onclick="konfirmasiTambah()">
