@@ -314,7 +314,7 @@ class BuktiTransaksiController extends Controller
                 $msgUser .= "Transaksi Infak yang Anda masukkan pada: \n";
                 $msgUser .= "*Tanggal Infak:* " . Carbon::parse($bukti->tanggal_infak)->format('d-m-Y') . "\n";
                 $msgUser .= "*Nama:* {$bukti->donatur}\n";
-                $message .= "*Kategori:* {$bukti->kategori}\n";
+                $msgUser .= "*Kategori:* {$bukti->kategori}\n";
                 $msgUser .= "*Alamat:* {$bukti->alamat}\n";
                 $msgUser .= "*Infak:* ";
                 if (!empty($bukti['nominal'])) {
