@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use App\Models\BuktiTransaksiModel;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -31,5 +33,8 @@ class AppServiceProvider extends ServiceProvider
             $jumlahPending = BuktiTransaksiModel::where('status', 'Pending')->count();
             $view->with('jumlahPending', $jumlahPending);
         });
+
+        Carbon::setLocale('id');
+        App::setLocale('id');
     }
 }

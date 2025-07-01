@@ -28,15 +28,20 @@ class InfakMasukController extends Controller
                             ->orWhere('metode', 'like', "%{$search}%")
                             ->orWhere('donatur', 'like', "%{$search}%")
                             ->orWhere('barang', 'like', "%{$search}%")
-                            ->orWhere('nominal', 'like', "%{$search}%");
+                            ->orWhere('nominal', 'like', "%{$search}%")
+                            ->orWhereHas('user', function ($userQuery) use ($search) {
+                                $userQuery->where('nama', 'like', "%{$search}%");
+                            });
                     });
                 }
             })
-            ->orderBy('updated_at', 'desc') // urutkan dr besar ke kecil
-            ->paginate(10); // menampilkan 10 data
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10);
 
-        return view('infak_masuk.index_infak_masuk', compact('infakMasuk', 'kategori'));
+        return view('infak_masuk.index_infak_masuk', compact('infakMasuk', 'kategori', 'search'));
     }
+
+
 
     // menampilkan halaman kuitansi dr infak berdasarkan id
     public function kuitansi($id)

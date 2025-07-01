@@ -190,7 +190,7 @@
                                     {{ $buktiTransaksi->firstItem() + $loop->index }}
                                 </span>
                             </td>
-                             <td class="text-center">{{ $bt->kategori }}</td>
+                            <td class="text-center">{{ $bt->kategori }}</td>
                             <td class="text-center">{{ $bt->donatur }}</td>
                             <td class="text-center">{{ \Carbon\Carbon::parse($bt->tanggal_infak)->format('d-m-Y') }}</td>
                             <td class="text-center">{{ $bt->metode }}</td>
@@ -446,7 +446,12 @@
                                         <label class="form-label small mb-1 fw-semibold">Dikelola Oleh</label>
                                         <div class="d-flex align-items-center">
                                             <i class="fas fa-user text-primary me-2"></i>
-                                            <span class="">{{ $bt->user->nama ?? $bt->nama }}</span>
+                                             <span class="">
+                                                {!! $search
+                                                ? str_ireplace($search, '<span class="bg-warning text-dark">'.$search.'</span>', $bt->user->nama ?? $bt->nama)
+                                                : ($bt->user->nama ?? $bt->nama)
+                                                !!}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>

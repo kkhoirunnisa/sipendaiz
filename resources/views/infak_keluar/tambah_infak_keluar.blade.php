@@ -127,6 +127,7 @@
                                 Bukti Infak Keluar<span class="text-danger"> *</span>
                             </label>
                             <input type="file" name="bukti_infak_keluar" id="bukti_infak_keluar" class="form-control">
+                            <small class="text-muted"> Bukti jpg,png,jpeg max:10240 </small>
                             <div class="mt-2">
                                 <img id="preview-gambar" src="#" alt="Preview Gambar" class="img-thumbnail d-none" style="max-height: 93px;">
                             </div>

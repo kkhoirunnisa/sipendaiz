@@ -220,7 +220,14 @@
                     <div class="col-12">
                         <div class="card border-0 shadow-sm p-3">
                             <small class="fw-semibold"><i class="bi bi-chat-text me-1"></i> Keterangan (Muzaki)</small>
-                            <p class="mt-2 mb-0 text-dark">{!! $zm->keterangan !!}</p>
+                            <p class="mt-2 mb-0 text-dark keterangan-highlight">
+                                {!! <!-- ditampilkan bukan teks biasa tp ada warnanya -->
+                                $search
+                                ? str_ireplace <!-- seacrh tdk memperhatikan huruf besar kecil -->
+                                ($search, '<span class="bg-warning text-dark">'.$search.'</span>', $zm->keterangan)
+                                : $zm->keterangan
+                                !!}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -242,7 +249,6 @@
 </div>
 @endforeach
 @endif
-
 
 <!-- Konfirmasi Hapus -->
 <script>

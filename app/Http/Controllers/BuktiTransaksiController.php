@@ -31,13 +31,15 @@ class BuktiTransaksiController extends Controller
                     ->orWhere('metode', 'like', "%{$search}%")
                     ->orWhere('barang', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%")
-                ;
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('nama', 'like', "%{$search}%");
+                    });
             });
         })
-            ->orderBy('updated_at', 'desc') //besar ke kecil
-            ->paginate(10); //menampilkan 10 data
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10);
 
-        return view('bukti_transaksi.index_bukti_transaksi', compact('buktiTransaksi')); //mengirim data ke view
+        return view('bukti_transaksi.index_bukti_transaksi', compact('buktiTransaksi', 'search'));
     }
 
 
@@ -226,7 +228,10 @@ class BuktiTransaksiController extends Controller
                         ->orWhere('metode', 'like', "%{$search}%")
                         ->orWhere('barang', 'like', "%{$search}%")
                         ->orWhere('nominal', 'like', "%{$search}%")
-                        ->orWhere('status', 'like', "%{$search}%");
+                        ->orWhere('status', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('nama', 'like', "%{$search}%");
+                        });
                 });
             })
             ->orderBy('updated_at', 'desc')

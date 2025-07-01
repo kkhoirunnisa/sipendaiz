@@ -136,7 +136,7 @@
         @endif
 
         <div class="tanggal" style="color: green;">
-            Maos, {{ \Carbon\Carbon::parse($infak->tanggal_konfirmasi)->translatedFormat('d F Y') }}
+            Maos, {{ \Carbon\Carbon::parse($infak->tanggal_konfirmasi)->locale('id')->translatedFormat('d F Y') }}
         </div>
 
         <table style="width: 100%; margin-top: 40px; font-size: 17px; text-align: center; color: green;">

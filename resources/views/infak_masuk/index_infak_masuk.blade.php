@@ -445,7 +445,16 @@
                                         <label class="form-label small mb-1 fw-semibold">Dikelola Oleh</label>
                                         <div class="d-flex align-items-center">
                                             <i class="fas fa-user text-primary me-2"></i>
-                                            <span class="">{{ $im->buktiTransaksi->user->nama ?? $im->buktiTransaksi->nama }}</span>
+                                            <span class="">
+                                                {!! $search
+                                                ? str_ireplace(
+                                                $search,
+                                                '<span class="bg-warning text-dark">'.$search.'</span>',
+                                                $im->buktiTransaksi->user->nama ?? $im->buktiTransaksi->nama
+                                                )
+                                                : ($im->buktiTransaksi->user->nama ?? $im->buktiTransaksi->nama)
+                                                !!}
+                                            </span>
                                         </div>
                                     </div>
 

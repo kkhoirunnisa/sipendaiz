@@ -23,7 +23,8 @@ class ZakatMasukController extends Controller
                         ->orWhere('jenis_zakat', 'like', "%{$search}%")
                         ->orWhere('bentuk_zakat', 'like', "%{$search}%")
                         ->orWhere('nominal', 'like', "%{$search}%")
-                        ->orWhere('jumlah', 'like', "%{$search}%");
+                        ->orWhere('jumlah', 'like', "%{$search}%")
+                        ->orWhere('keterangan', 'like', "%{$search}%");
                 });
             })
             ->orderBy('updated_at', 'desc')
