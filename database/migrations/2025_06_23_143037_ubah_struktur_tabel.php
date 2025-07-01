@@ -14,6 +14,8 @@ return new class extends Migration
          Schema::table('bukti_transaksi', function (Blueprint $table) {
             $table->string('keterangan', 100)->change(); // dari 50 ke 100 karakter
         });
+
+         
     }
 
     /**
@@ -24,5 +26,7 @@ return new class extends Migration
         Schema::table('bukti_transaksi', function (Blueprint $table) {
             $table->string('keterangan', 50)->change(); // kembalikan ke 50
         });
+
+       
     }
 };

@@ -23,7 +23,7 @@ class DashboardController extends Controller
         // mendapatkan tgl akhir bulan saat ini
         $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
 
-        // total infak pembangunan
+        // total pemasukan infak pembangunan
         $totalInfakPembangunan = InfakMasukModel::with('buktiTransaksi')
             ->whereHas('buktiTransaksi', fn($q) => $q->where('kategori', 'Pembangunan'))
             ->get()
@@ -31,20 +31,17 @@ class DashboardController extends Controller
 
         // Pemasukan Infak Pembangunan Hari Ini
         $pemasukanInfakPembangunanHariIni = InfakMasukModel::with('buktiTransaksi')
-            ->whereHas(
-                'buktiTransaksi',
-                fn($q) =>
-                $q->where('kategori', 'Pembangunan')->whereDate('tanggal_infak', $today)
-            )
+            ->whereHas('buktiTransaksi', fn($q) => $q->where('kategori', 'Pembangunan')
+                ->whereDate('tanggal_infak', $today))
             ->get()
-            ->sum(fn($i) => $i->buktiTransaksi->nominal ?? 0);
+            ->sum(fn($i) => $i->buktiTransaksi->nominal ?? 0); // i hasil get
 
         // Pemasukan Infak Pembangunan 7 Hari Terakhir
-        $sevenDaysAgo = Carbon::now()->subDays(6)->startOfDay(); // termasuk hari ini
+        $sevenDaysAgo = Carbon::now()->subDays(6)->startOfDay(); // mengurangi 6 hari kebelakang -> mengatur awal hari jd jam 00
         $pemasukanInfakPembangunan7Hari = InfakMasukModel::with('buktiTransaksi')
             ->whereHas('buktiTransaksi', function ($q) use ($sevenDaysAgo) {
                 $q->where('kategori', 'Pembangunan')
-                    ->whereDate('tanggal_infak', '>=', $sevenDaysAgo);
+                    ->whereDate('tanggal_infak', '>=', $sevenDaysAgo); // tgl min 7 hari kebelakang
             })
             ->get()
             ->sum(fn($i) => $i->buktiTransaksi->nominal ?? 0);
@@ -62,7 +59,7 @@ class DashboardController extends Controller
             ->whereDate('tanggal', '>=', $sevenDaysAgo)
             ->sum('nominal');
 
-        // Total Infak Takmir
+        // total pemasukan infak takmir
         $totalInfakTakmir = InfakMasukModel::with('buktiTransaksi')
             ->whereHas('buktiTransaksi', fn($q) => $q->where('kategori', 'Takmir'))
             ->get()
@@ -72,8 +69,8 @@ class DashboardController extends Controller
         $pemasukanInfakTakmirBulanIni = InfakMasukModel::with('buktiTransaksi')
             ->whereHas(
                 'buktiTransaksi',
-                fn($q) =>
-                $q->where('kategori', 'Takmir')->whereBetween('tanggal_infak', [$currentMonth, $endOfMonth])
+                fn($q) => $q->where('kategori', 'Takmir')
+                    ->whereBetween('tanggal_infak', [$currentMonth, $endOfMonth])
             )
             ->get()
             ->sum(fn($i) => $i->buktiTransaksi->nominal ?? 0);
@@ -83,7 +80,7 @@ class DashboardController extends Controller
             ->whereBetween('tanggal', [$currentMonth, $endOfMonth])
             ->sum('nominal');
 
-        // Total pengeluaran infak takmir
+        //  pengeluaran infak takmir
         $totalPengeluaranInfakTakmir = InfakKeluarModel::where('kategori', 'takmir')->sum('nominal');
 
         // Total saldo infak pembangunan = pemasukan - pengeluaran
@@ -98,89 +95,107 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // jumlah total konfirmasi bukti transaksi pemasukan
         $totalPendingTransaksi = BuktiTransaksiModel::where('status', 'Pending')->count();
 
-        // ==== Zakat Uang Fitrah & Maal ====
+        // ZAKAT UANG
+        // total pemasukan zakat uang fitrah
         $totalZakatUangFitrah = ZakatMasukModel::where('bentuk_zakat', 'Uang')
             ->where('jenis_zakat', 'Fitrah')
             ->sum('nominal');
 
+        // total pemasukan zakat uang maal
         $totalZakatUangMaal = ZakatMasukModel::where('bentuk_zakat', 'Uang')
             ->where('jenis_zakat', 'Maal')
             ->sum('nominal');
 
+        // pemasukan zakat uang fitrah bulan ini
         $pemasukanZakatUangFitrahBulanIni = ZakatMasukModel::where('bentuk_zakat', 'Uang')
             ->where('jenis_zakat', 'Fitrah')
             ->whereBetween('tanggal', [$currentMonth, $endOfMonth])
             ->sum('nominal');
 
+        // pemasukan zakat uang maal bulan ini
         $pemasukanZakatUangMaalBulanIni = ZakatMasukModel::where('bentuk_zakat', 'Uang')
             ->where('jenis_zakat', 'Maal')
             ->whereBetween('tanggal', [$currentMonth, $endOfMonth])
             ->sum('nominal');
 
+        //pengeluaran zakat uang fitrah bulan ini
         $pengeluaranZakatUangFitrahBulanIni = ZakatKeluarModel::where('bentuk_zakat', 'Uang')
             ->where('jenis_zakat', 'Fitrah')
             ->whereBetween('tanggal', [$currentMonth, $endOfMonth])
             ->sum('nominal');
 
+        //pengeluaran zakat uang maal bulan ini
         $pengeluaranZakatUangMaalBulanIni = ZakatKeluarModel::where('bentuk_zakat', 'Uang')
             ->where('jenis_zakat', 'Maal')
             ->whereBetween('tanggal', [$currentMonth, $endOfMonth])
             ->sum('nominal');
 
+        //  pengeluaran zakat uang fitrah
         $totalPengeluaranZakatUangFitrah = ZakatKeluarModel::where('bentuk_zakat', 'Uang')
             ->where('jenis_zakat', 'Fitrah')
             ->sum('nominal');
 
+        //  pengeluaran zakat uang maal
         $totalPengeluaranZakatUangMaal = ZakatKeluarModel::where('bentuk_zakat', 'Uang')
             ->where('jenis_zakat', 'Maal')
             ->sum('nominal');
 
-        // ==== Zakat Beras Fitrah & Maal ====
+        // ZAKAT BERAS
+        // total pemasukan zakat beras fitrah
         $totalZakatBerasFitrah = ZakatMasukModel::where('bentuk_zakat', 'Beras')
             ->where('jenis_zakat', 'Fitrah')
             ->sum('jumlah');
 
+        // total pemasukan zakat beras maal
         $totalZakatBerasMaal = ZakatMasukModel::where('bentuk_zakat', 'Beras')
             ->where('jenis_zakat', 'Maal')
             ->sum('jumlah');
 
+        //  pemasukan beras fitrah bulan ini
         $pemasukanZakatBerasFitrahBulanIni = ZakatMasukModel::where('bentuk_zakat', 'Beras')
             ->where('jenis_zakat', 'Fitrah')
             ->whereBetween('tanggal', [$currentMonth, $endOfMonth])
             ->sum('jumlah');
 
+        //  pemasukan beras maal bulan ini
         $pemasukanZakatBerasMaalBulanIni = ZakatMasukModel::where('bentuk_zakat', 'Beras')
             ->where('jenis_zakat', 'Maal')
             ->whereBetween('tanggal', [$currentMonth, $endOfMonth])
             ->sum('jumlah');
 
+        //  pengeluaran beras fitrah bulan ini
         $pengeluaranZakatBerasFitrahBulanIni = ZakatKeluarModel::where('bentuk_zakat', 'Beras')
             ->where('jenis_zakat', 'Fitrah')
             ->whereBetween('tanggal', [$currentMonth, $endOfMonth])
             ->sum('jumlah');
 
+        //  pengeluaran beras maal bulan ini
         $pengeluaranZakatBerasMaalBulanIni = ZakatKeluarModel::where('bentuk_zakat', 'Beras')
             ->where('jenis_zakat', 'Maal')
             ->whereBetween('tanggal', [$currentMonth, $endOfMonth])
             ->sum('jumlah');
 
+        //  total pengeluaran beras fitrah bulan ini
         $totalPengeluaranZakatBerasFitrah = ZakatKeluarModel::where('bentuk_zakat', 'Beras')
             ->where('jenis_zakat', 'Fitrah')
             ->sum('jumlah');
 
+        // total pengeluaran beras maal bulan ini
         $totalPengeluaranZakatBerasMaal = ZakatKeluarModel::where('bentuk_zakat', 'Beras')
             ->where('jenis_zakat', 'Maal')
             ->sum('jumlah');
 
-        // ==== Sisa Zakat per jenis ====
+        // sisa zakat fitrah maal
         $sisaZakatUangFitrah = $totalZakatUangFitrah - $totalPengeluaranZakatUangFitrah;
         $sisaZakatUangMaal = $totalZakatUangMaal - $totalPengeluaranZakatUangMaal;
         $sisaZakatBerasFitrah = $totalZakatBerasFitrah - $totalPengeluaranZakatBerasFitrah;
         $sisaZakatBerasMaal =  $totalZakatBerasMaal - $totalPengeluaranZakatBerasMaal;
 
         return view('dashboard.index_dashboard', compact(
+            // infak pembangunan
             'totalInfakPembangunan',
             'pemasukanInfakPembangunanHariIni',
             'pemasukanInfakPembangunan7Hari',
@@ -189,15 +204,18 @@ class DashboardController extends Controller
             'totalPengeluaranInfakPembangunan',
             'saldoInfakPembangunan',
 
+            // infak takmir
             'totalInfakTakmir',
             'pemasukanInfakTakmirBulanIni',
             'pengeluaranInfakTakmirBulanIni',
             'totalPengeluaranInfakTakmir',
             'saldoInfakTakmir',
 
+            // konfirmasi transaksi
             'transaksiPending',
             'totalPendingTransaksi',
 
+            // zakat uang
             'totalZakatUangFitrah',
             'totalZakatUangMaal',
             'pemasukanZakatUangFitrahBulanIni',
@@ -207,6 +225,7 @@ class DashboardController extends Controller
             'totalPengeluaranZakatUangFitrah',
             'totalPengeluaranZakatUangMaal',
 
+            // zakat beras
             'totalZakatBerasFitrah',
             'totalZakatBerasMaal',
             'pemasukanZakatBerasFitrahBulanIni',
@@ -216,6 +235,7 @@ class DashboardController extends Controller
             'totalPengeluaranZakatBerasFitrah',
             'totalPengeluaranZakatBerasMaal',
 
+            // sisa zakat
             'sisaZakatUangFitrah',
             'sisaZakatUangMaal',
             'sisaZakatBerasFitrah',

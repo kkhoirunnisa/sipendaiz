@@ -11,16 +11,17 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class LaporanInfakController extends Controller
 {
+    // menampilkan halaman laporan infak
     public function index(Request $request)
     {
         $kategori = $request->kategori;
-
         return view('laporan.laporan_infak', compact('kategori'));
     }
 
-
+    // menghasilkan laporan infak berdasarkan input tgl
     public function generateReport(Request $request)
     {
+        // validasi input
         $request->validate([
             'tanggal_awal' => 'required|date',
             'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal',
@@ -31,15 +32,16 @@ class LaporanInfakController extends Controller
         $endDate = $request->tanggal_akhir;
         $kategori = $request->kategori;
 
+        // ambil data infak sesuai tanggal dan kategori
         $infakMasuk = InfakMasukModel::with('buktiTransaksi')
             ->whereBetween('tanggal_konfirmasi', [$startDate, $endDate])
             ->whereHas('buktiTransaksi', function ($query) use ($kategori) {
                 $query->where('kategori', $kategori);
             })
-            ->orderBy('tanggal_konfirmasi', 'asc')
+            ->orderBy('tanggal_konfirmasi', 'asc') // urutkan dr kecil ke besar
             ->get();
 
-
+        // ambil infak keluar sesuai tgl dan kategori
         $infakKeluar = InfakKeluarModel::where('kategori', $kategori)
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->orderBy('tanggal', 'asc')
@@ -47,12 +49,11 @@ class LaporanInfakController extends Controller
 
         $transactions = [];
 
-        // Gabung semua transaksi pemasukan
+        // gabung semua transaksi pemasukan ke array transaksi
         foreach ($infakMasuk as $item) {
             $transactions[] = [
                 'donatur' => $item->buktiTransaksi->donatur,
                 'tanggal' => $item->buktiTransaksi->tanggal_infak,
-                // 'keterangan' => $item->buktiTransaksi->keterangan ?: 'Infak masuk',
                 'alamat' => $item->buktiTransaksi->alamat,
                 'jenis_transaksi' => 'Pemasukan',
                 'jenis_barang' => $item->buktiTransaksi->barang ?: 'Uang',
@@ -62,7 +63,7 @@ class LaporanInfakController extends Controller
             ];
         }
 
-        // Gabung semua transaksi pengeluaran
+        // gabung semua transaksi pengeluaran
         foreach ($infakKeluar as $item) {
             $transactions[] = [
                 'tanggal' => $item->tanggal,
@@ -76,42 +77,47 @@ class LaporanInfakController extends Controller
             ];
         }
 
-        // Urutkan berdasarkan tanggal
+        // urutkan transaksi berdasarkan tanggal
         usort($transactions, fn($a, $b) => strtotime($a['tanggal']) <=> strtotime($b['tanggal']));
 
-        // Hitung saldo berdasarkan urutan tanggal
+        // hitung saldo berdasarkan urutan tanggal
         $saldo = 0;
         foreach ($transactions as $i => &$item) {
             $saldo += $item['masuk'];
             $saldo -= $item['keluar'];
             $item['saldo'] = $saldo;
-            $item['no'] = $i + 1;
+            $item['no'] = $i + 1; // penomoran transaksi
         }
-        unset($item); // Hindari reference bug
+        unset($item); // hindari reference bug
 
+        // hitung saldo akhir
         $totalSaldo = $saldo;
+
+        // hitung pemasukan
         $totalMasuk = array_sum(array_column($transactions, 'masuk'));
+
+        // hitung pengeluaran
         $totalKeluar = abs(array_sum(array_column($transactions, 'keluar')));
 
-        // Manual pagination
+        // manual pagination
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
         $perPage = 10;
         $offset = ($currentPage - 1) * $perPage;
 
-        // Slice array transaksi untuk halaman saat ini
+        // ambil data untuk halaman saat ini
         $currentPageItems = array_slice($transactions, $offset, $perPage);
 
-        // Buat paginator instance
+        // buat paginator instance laravel
         $paginatedTransactions = new LengthAwarePaginator(
-            $currentPageItems,
-            count($transactions),
-            $perPage,
-            $currentPage,
+            $currentPageItems, // data yg ditampilkan
+            count($transactions), // semua total data
+            $perPage, // jml per halaman
+            $currentPage, // halaman saat ini
             ['path' => request()->url(), 'query' => request()->query()]
         );
 
+        // kirim data ke view
         return view('laporan.laporan_infak', [
-            // 'transactions' => $transactions,
             'transactions' => $paginatedTransactions,
             'startDate' => $startDate,
             'endDate' => $endDate,

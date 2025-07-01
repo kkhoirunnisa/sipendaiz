@@ -60,7 +60,7 @@ class UserController extends Controller
                 'role' => $request->role,
                 'nama' => $request->nama,
                 'username' => $request->username,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($request->password), // bcrypt secara default
                 'nomor_telepon' => $request->nomor_telepon,
             ]);
 

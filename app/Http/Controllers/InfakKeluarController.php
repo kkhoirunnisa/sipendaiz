@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
-use App\Models\InfakMasukModel;
 use App\Models\InfakKeluarModel;
 use App\Models\BuktiTransaksiModel;
 use Illuminate\Support\Facades\Auth;
@@ -12,13 +11,15 @@ use Illuminate\Support\Facades\Storage;
 
 class InfakKeluarController extends Controller
 {
-    // Tampilkan semua data
+    // Tampilkan semua data infak berdasarkan kategori
     public function index($kategori, Request $request)
     {
         $search = $request->input('search');
 
         $infakKeluar = InfakKeluarModel::with('user')
             ->where('kategori', $kategori)
+
+            // search
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->whereHas('user', function ($q2) use ($search) {
@@ -30,35 +31,39 @@ class InfakKeluarController extends Controller
                         ->orWhere('keterangan', 'like', "%{$search}%");
                 });
             })
-            ->orderBy('updated_at', 'desc')
-            ->paginate(10); //menampilkan data 10 pada tabel
+            ->orderBy('updated_at', 'desc') // diurutkan dr besar ke kecil
+            ->paginate(10); //menampilkan 10 data
         return view('infak_keluar.index_infak_keluar', compact('infakKeluar', 'kategori'));
     }
 
-    // Form tambah data
+    // form tambah data
     public function create($kategori)
     {
         $user = Auth::user();
-        // Hitung sisa saldo
+
+        // hitung total infak masuk kategori tertentu
         $totalMasuk = BuktiTransaksiModel::where('kategori', $kategori)
             ->whereIn('id', function ($query) {
-                $query->select('id_bukti_transaksi')->from('infak_masuk');
+                $query->select('id_bukti_transaksi')->from('infak_masuk'); // hanya yg sudah ada di infak masuk
             })
             ->sum('nominal');
 
+        // hitung total infak keluar
         $totalKeluar = InfakKeluarModel::where('kategori', $kategori)->sum('nominal');
 
+        // hitung sisa saldo
         $sisaSaldo = $totalMasuk - $totalKeluar;
         return view('infak_keluar.tambah_infak_keluar', compact('user', 'kategori', 'sisaSaldo'));
     }
 
 
-    // Simpan data baru
+    // simpan data baru infak keluar
     public function store(Request $request)
     {
         try {
             $user = Auth::user();
 
+            // validasi input form
             $validated = $request->validate([
                 'tanggal' => 'required|date',
                 'kategori' => 'required|string|max:17',
@@ -70,7 +75,7 @@ class InfakKeluarController extends Controller
 
             $kategori = $request->kategori;
 
-            // Total infak masuk untuk kategori tertentu, hanya yang sudah konfirmasi (ada di tabel infak_masuk)
+            // total infak masuk untuk kategori tertentu, hanya yang sudah konfirmasi (ada di tabel infak_masuk)
             $totalMasuk = BuktiTransaksiModel::where('kategori', $kategori)
                 ->whereIn('id', function ($query) {
                     $query->select('id_bukti_transaksi')
@@ -78,24 +83,26 @@ class InfakKeluarController extends Controller
                 })
                 ->sum('nominal');
 
-            // Total infak keluar untuk kategori yang sama
+            // total infak keluar untuk kategori
             $totalKeluar = InfakKeluarModel::where('kategori', $kategori)->sum('nominal');
 
+            // hitung sisa saldo
             $sisaSaldo = $totalMasuk - $totalKeluar;
 
+            // mengecek apakah nominal > sisa saldo
             if ($request->nominal > $sisaSaldo) {
                 return back()->withInput()->with('error', 'Nominal infak keluar melebihi sisa saldo sebesar Rp ' . number_format($sisaSaldo, 0, ',', '.'));
             }
 
-            // Tambahkan user id ke data yang akan disimpan
+            // tambahkan user id ke data yang akan disimpan
             $validated['id_users'] = $user->id;
 
-            // Simpan bukti jika ada
+            // simpan bukti infak keluar
             if ($request->hasFile('bukti_infak_keluar')) {
                 $validated['bukti_infak_keluar'] = $request->file('bukti_infak_keluar')->store('bukti', 'public');
             }
 
-            // Simpan data infak keluar
+            // simpan data infak keluar
             InfakKeluarModel::create($validated);
 
             return redirect()->route('infak_keluar.index', ['kategori' => $kategori])
@@ -105,18 +112,21 @@ class InfakKeluarController extends Controller
         }
     }
 
-    // Form edit data
+    // form edit data
     public function edit(Request $request, $id)
     {
         $infakKeluar = InfakKeluarModel::findOrFail($id);
         $user = Auth::user();
-        $kategori = $infakKeluar->kategori; // Ambil kategori dari model yang sedang diedit
-        // Jika ada kategori dikirim dari form, override
+
+        // Ambil kategori dari model yang sedang diedit
+        $kategori = $infakKeluar->kategori;
+
+        // Jika ada kategori dikirim dari form, override kategori bawaan
         if ($request->has('kategori')) {
             $kategori = $request->kategori;
         }
 
-        // Total infak masuk yang sudah dikonfirmasi
+        // total infak masuk yang sudah dikonfirmasi (ada di tabel infak masuk)
         $totalMasuk = BuktiTransaksiModel::where('kategori', $kategori)
             ->whereIn('id', function ($query) {
                 $query->select('id_bukti_transaksi')
@@ -124,11 +134,13 @@ class InfakKeluarController extends Controller
             })
             ->sum('nominal');
 
-        // Total infak keluar untuk kategori sama
+        // total infak keluar untuk kategori sama
         $totalKeluar = InfakKeluarModel::where('kategori', $kategori)->sum('nominal');
 
+        // hitung sisa saldo
         $sisaSaldo = $totalMasuk - $totalKeluar;
 
+        // merubah nominal > saldo maka error
         if ($request->filled('nominal') && $request->nominal > $sisaSaldo) {
             return back()->withInput()->with('error', 'Nominal infak keluar melebihi sisa saldo sebesar Rp ' . number_format($sisaSaldo, 0, ',', '.'));
         }
@@ -136,12 +148,13 @@ class InfakKeluarController extends Controller
         return view('infak_keluar.edit_infak_keluar', compact('infakKeluar', 'user', 'kategori', 'sisaSaldo'));
     }
 
-    // Update data
+    // menyimpan hasil update data
     public function update(Request $request, $id)
     {
         try {
             $infakKeluar = InfakKeluarModel::findOrFail($id);
 
+            // validasi input
             $validated = $request->validate([
                 'id_users' => 'required|exists:users,id',
                 'tanggal' => 'required|date',
@@ -153,7 +166,7 @@ class InfakKeluarController extends Controller
             ]);
             $kategori = $request->kategori;
 
-            // Total infak masuk untuk kategori tertentu, hanya yang sudah konfirmasi (ada di tabel infak_masuk)
+            // total infak masuk untuk kategori tertentu, hanya yang sudah konfirmasi (ada di tabel infak_masuk)
             $totalMasuk = BuktiTransaksiModel::where('kategori', $kategori)
                 ->whereIn('id', function ($query) {
                     $query->select('id_bukti_transaksi')
@@ -161,29 +174,33 @@ class InfakKeluarController extends Controller
                 })
                 ->sum('nominal');
 
-            // Total infak keluar untuk kategori yang sama
+            // total infak keluar untuk kategori yang sama
             $totalKeluar = InfakKeluarModel::where('kategori', $kategori)->sum('nominal');
 
+            // hitung sisa saldo
             $sisaSaldo = $totalMasuk - $totalKeluar;
 
+            // mengecek jika nominal > sisa saldo
             if ($request->nominal > $sisaSaldo) {
                 return back()->withInput()->with('error', 'Nominal infak keluar melebihi sisa saldo sebesar Rp ' . number_format($sisaSaldo, 0, ',', '.'));
             }
 
-            // Cek apakah ada file baru
+            // cek apakah ada file baru
             if ($request->hasFile('bukti_infak_keluar')) {
-                // Hapus file lama jika ada
+
+                // hapus file lama jika ada
                 if ($infakKeluar->bukti_infak_keluar && Storage::disk('public')->exists($infakKeluar->bukti_infak_keluar)) {
                     Storage::disk('public')->delete($infakKeluar->bukti_infak_keluar);
                 }
 
-                // Simpan file baru
+                // simpan file baru
                 $validated['bukti_infak_keluar'] = $request->file('bukti_infak_keluar')->store('bukti', 'public');
             } else {
-                // Gunakan file lama jika tidak diganti
+                // gunakan file lama jika tidak diganti
                 $validated['bukti_infak_keluar'] = $infakKeluar->bukti_infak_keluar;
             }
 
+            // update data
             $infakKeluar->update($validated);
 
             return redirect()->route('infak_keluar.index', ['kategori' => $infakKeluar->kategori])->with('success', 'Data infak keluar berhasil diupdate');
@@ -192,14 +209,18 @@ class InfakKeluarController extends Controller
         }
     }
 
-    // Hapus data
+    // hapus data
     public function destroy($id)
     {
         try {
             $infakKeluar = InfakKeluarModel::findOrFail($id);
+
+            // hapus file bukti pengeluaran
             if ($infakKeluar->bukti_infak_keluar && Storage::disk('public')->exists($infakKeluar->bukti_infak_keluar)) {
                 Storage::disk('public')->delete($infakKeluar->bukti_infak_keluar);
             }
+
+            // hapus data dr database
             $infakKeluar->delete();
 
             return redirect()->route('infak_keluar.index', ['kategori' => $infakKeluar->kategori])->with('success', 'Data infak keluar berhasil dihapus');

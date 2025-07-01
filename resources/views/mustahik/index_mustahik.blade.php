@@ -49,7 +49,7 @@
                     <!-- Tombol PDF -->
                     <a class="btn btn-outline-danger btn-sm shadow-sm d-flex align-items-center justify-content-center gap-2 w-100"
                         href="{{ route('mustahik.pdf', ['search' => request('search')]) }}"
-                        target="_blank" title="Unduh Data Mustahik">
+                        title="Unduh Data Mustahik">
                         <i class="bi bi-file-earmark-arrow-down-fill"></i>
                         <span>Unduh PDF</span>
                     </a>

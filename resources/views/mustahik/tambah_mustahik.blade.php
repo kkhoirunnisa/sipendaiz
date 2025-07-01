@@ -91,7 +91,7 @@
                                 Alamat Penerima<span class="text-danger"> *</span>
                             </label>
                             <select name="alamat" id="alamat" class="form-select" required>
-                                <option value="" disabled selected>Pilih Daerah Kerja</option>
+                                <option value="" disabled selected>Pilih Alamat</option>
                                 <option value="Jl. Melati Selatan s/d Wates Timur Utara - DK1" {{ old('alamat') == 'Jl. Melati Selatan s/d Wates Timur Utara - DK1' ? 'selected' : '' }}>Jl. Melati Selatan s/d Wates Timur Utara - DK1</option>
                                 <option value="Jl. Nusa Indah Selatan s/d Melati utara - DK2" {{ old('alamat') == 'Jl. Nusa Indah Selatan s/d Melati utara - DK2' ? 'selected' : '' }}>Jl. Nusa Indah Selatan s/d Melati utara - DK2</option>
                                 <option value="JL. Nusa indah Utara s/d Kantil Selatan - DK3" {{ old('alamat') == 'JL. Nusa indah Utara s/d Kantil Selatan - DK3' ? 'selected' : '' }}>JL. Nusa indah Utara s/d Kantil Selatan - DK3</option>

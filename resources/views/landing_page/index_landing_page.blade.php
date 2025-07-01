@@ -817,22 +817,7 @@
                             </table>
                         </div>
 
-                        <!-- Mustahik Table
-                        <div class="row mt-4">
-                            <div class="table-responsive mb-4">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="fw-bold mb-0">Mustahik</h6>
-                                    <span class="badge bg-success">Terbaru</span>
-                                </div>
-                                <ul class="list-group list-group-numbered shadow-sm rounded" id="mustahikList">
-                                    @foreach($listMustahik as $nama)
-                                    <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
-                                        <span class="mx-auto text-dark">{{ $nama }}</span>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div> -->
+                        
 
                     </div>
                 </div>
