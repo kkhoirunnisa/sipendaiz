@@ -50,24 +50,30 @@ class MustahikController extends Controller
                 'kategori' => 'required|string|max:26',
             ]);
 
+            // Cek apakah kombinasi nama dan alamat sudah ada
+            $cekDuplikat = MustahikModel::where('nama', $request->nama)
+                ->where('alamat', $request->alamat)
+                ->exists();
+
+            if ($cekDuplikat) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Data mustahik dengan nama dan alamat yang sama sudah ada.');
+            }
+
             MustahikModel::create($request->all());
             return redirect()->route('mustahik.index')->with('success', 'Mustahik berhasil ditambahkan!');
         } catch (ValidationException $e) {
-            // Tangkap validation error dan kirim sebagai session error
             $errorMessages = [];
-            foreach ($e->errors() as $field => $messages) {
+            foreach ($e->errors() as $messages) {
                 foreach ($messages as $message) {
                     $errorMessages[] = $message;
                 }
             }
 
-            return redirect()->back()
-                ->withInput()
-                ->with('error', implode('. ', $errorMessages));
-        } catch (Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Gagal menambahkan data: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', implode('. ', $errorMessages));
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan data: ' . $e->getMessage());
         }
     }
     // Menampilkan form untuk mengedit mustahik
@@ -87,11 +93,32 @@ class MustahikController extends Controller
                 'kategori' => 'required|string|max:26',
             ]);
 
-            $mustahik = MustahikModel::findOrFail($id); // Mencari data mustahik berdasarkan ID
-            $mustahik->update($request->all()); // Menyimpan perubahan data mustahik
+            // Cek apakah kombinasi nama dan alamat sudah dimiliki mustahik lain
+            $cekDuplikat = MustahikModel::where('id', '!=', $id)
+                ->where('nama', $request->nama)
+                ->where('alamat', $request->alamat)
+                ->exists();
+
+            if ($cekDuplikat) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Data mustahik dengan nama dan alamat tersebut sudah ada.');
+            }
+
+            $mustahik = MustahikModel::findOrFail($id);
+            $mustahik->update($request->all());
 
             return redirect()->route('mustahik.index')->with('success', 'Mustahik berhasil diperbarui!');
-        } catch (Exception $e) {
+        } catch (ValidationException $e) {
+            $errorMessages = [];
+            foreach ($e->errors() as $messages) {
+                foreach ($messages as $message) {
+                    $errorMessages[] = $message;
+                }
+            }
+
+            return redirect()->back()->withInput()->with('error', implode('. ', $errorMessages));
+        } catch (\Exception $e) {
             return redirect()->back()->withInput()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }

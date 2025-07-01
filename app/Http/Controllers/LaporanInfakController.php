@@ -36,7 +36,7 @@ class LaporanInfakController extends Controller
         // ambil data infak sesuai tanggal dan kategori
         $infakMasuk = InfakMasukModel::with('buktiTransaksi')
             ->whereBetween('tanggal_konfirmasi', [$startDate, $endDate])
-            ->whereHas('buktiTransaksi', function ($query) use ($kategori) {
+            ->whereHas('buktiTransaksi', function ($query) use ($kategori) { //memastikan hanya data infak masuk yg relasinya bukti transaksi memiliki kategori tertentu
                 $query->where('kategori', $kategori);
             })
             ->orderBy('tanggal_konfirmasi', 'asc') // urutkan dr kecil ke besar
@@ -48,7 +48,7 @@ class LaporanInfakController extends Controller
             ->orderBy('tanggal', 'asc')
             ->get();
 
-        $transactions = [];
+        $transactions = []; // arrary menampung semua transaksi
 
         // gabung semua transaksi pemasukan ke array transaksi
         foreach ($infakMasuk as $item) {
@@ -59,8 +59,8 @@ class LaporanInfakController extends Controller
                 'jenis_transaksi' => 'Pemasukan',
                 'jenis_barang' => $item->buktiTransaksi->barang ?: 'Uang',
                 'masuk' => $item->buktiTransaksi->nominal,
-                'keluar' => 0,
-                'saldo' => 0, // akan dihitung ulang nanti
+                'keluar' => 0, //tidak ada
+                'saldo' => 0, // akan dihitung nanti diakhir
             ];
         }
 
@@ -78,7 +78,7 @@ class LaporanInfakController extends Controller
             ];
         }
 
-        // urutkan transaksi berdasarkan tanggal
+        // urutkan transaksi masukkeluar berdasarkan tanggal
         usort($transactions, fn($a, $b) => strtotime($a['tanggal']) <=> strtotime($b['tanggal']));
 
         // hitung saldo berdasarkan urutan tanggal
