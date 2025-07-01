@@ -569,7 +569,7 @@
 @endif
 
 <!-- Live Search Script -->
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('search');
         let timeout = null;
@@ -590,10 +590,10 @@
                             oldRows.innerHTML = newRows.innerHTML;
                         }
                     });
-            }, 300); // debounce delay
+            }, 300); // delay
         });
     });
-</script>
+</script> -->
 
 <!-- latar belakang modal agar terhapus -->
 <script>

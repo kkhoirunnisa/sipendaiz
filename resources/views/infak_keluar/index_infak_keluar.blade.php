@@ -220,30 +220,4 @@
 </script>
 @endif
 
-<!-- Live Search Script -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('search');
-        let timeout = null;
-
-        searchInput.addEventListener('input', function() {
-            clearTimeout(timeout);
-            timeout = setTimeout(function() {
-                const keyword = searchInput.value;
-
-                fetch(`?search=${encodeURIComponent(keyword)}`)
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const newRows = doc.querySelector('#infak');
-                        const oldRows = document.querySelector('#infak');
-                        if (newRows && oldRows) {
-                            oldRows.innerHTML = newRows.innerHTML;
-                        }
-                    });
-            }, 300); // debounce delay
-        });
-    });
-</script>
 @endsection
