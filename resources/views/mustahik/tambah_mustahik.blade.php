@@ -57,7 +57,8 @@
                                 <i class="fas fa-user me-2 text-primary"></i>
                                 Nama<span class="text-danger"> *</span>
                             </label>
-                            <input type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama mustahik" required value="{{ old('nama') }}">
+                             <!-- Semua karakter selain huruf (a-z, A-Z) dan spasi akan dihapus (''). -->
+                            <input oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"  type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama mustahik" required value="{{ old('nama') }}">
                             @error('nama')
                             <div class="text-danger small">{{ $message }}</div>
                             @enderror

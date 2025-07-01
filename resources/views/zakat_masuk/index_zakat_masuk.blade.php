@@ -221,9 +221,11 @@
                         <div class="card border-0 shadow-sm p-3">
                             <small class="fw-semibold"><i class="bi bi-chat-text me-1"></i> Keterangan (Muzaki)</small>
                             <p class="mt-2 mb-0 text-dark keterangan-highlight">
-                                {!! <!-- ditampilkan bukan teks biasa tp ada warnanya -->
+                                <!-- ditampilkan bukan teks biasa tp ada warnanya -->
+                                <!-- seacrh tdk memperhatikan huruf besar kecil -->
+                                {!!
                                 $search
-                                ? str_ireplace <!-- seacrh tdk memperhatikan huruf besar kecil -->
+                                ? str_ireplace
                                 ($search, '<span class="bg-warning text-dark">'.$search.'</span>', $zm->keterangan)
                                 : $zm->keterangan
                                 !!}

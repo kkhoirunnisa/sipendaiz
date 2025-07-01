@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\ZakatMasukModel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ZakatKeluarModel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class LaporanZakatController extends Controller
@@ -130,6 +131,7 @@ class LaporanZakatController extends Controller
 
         $startDate = $request->tanggal_awal;
         $endDate = $request->tanggal_akhir;
+        $user = Auth::user();
 
         $zakatMasuk = ZakatMasukModel::whereBetween('tanggal', [$startDate, $endDate])->get();
         $zakatKeluar = ZakatKeluarModel::with('mustahik')->whereBetween('tanggal', [$startDate, $endDate])->get();
@@ -204,7 +206,8 @@ class LaporanZakatController extends Controller
             'pemasukanUang' => $pemasukanUang,
             'pengeluaranUang' => $pengeluaranUang,
             'pengeluaranBeras' => $pengeluaranBeras,
-            'pemasukanBeras' => $pemasukanBeras, // Tambahan untuk PDF
+            'pemasukanBeras' => $pemasukanBeras,
+            'user' => $user,
         ];
 
         $pdf = PDF::loadView('laporan.unduh_laporan_zakat', $data)

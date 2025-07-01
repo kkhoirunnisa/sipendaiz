@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\InfakMasukModel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\InfakKeluarModel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class LaporanInfakController extends Controller
@@ -139,6 +140,7 @@ class LaporanInfakController extends Controller
         $startDate = $request->tanggal_awal;
         $endDate = $request->tanggal_akhir;
         $kategori = $request->kategori;
+        $user = Auth::user();
 
         $infakMasuk = InfakMasukModel::with('buktiTransaksi')
             ->whereHas('buktiTransaksi', function ($query) use ($startDate, $endDate, $kategori) {
@@ -227,7 +229,7 @@ class LaporanInfakController extends Controller
             'formattedEndDate' => $formattedEndDate,
             'ketua' => $ketua,
             'bendahara' => $bendahara,
-
+            'user' => $user,
         ])->setPaper('A4', 'landscape');
 
         // return $pdf->stream("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");

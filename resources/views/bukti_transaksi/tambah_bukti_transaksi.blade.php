@@ -84,7 +84,8 @@
                                 <i class="bi bi-person-circle me-2 text-primary"></i>
                                 Donatur<span class="text-danger"> *</span>
                             </label>
-                            <input  oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" type="text" name="donatur" class="form-control" id="donatur" placeholder="Masukkan nama orang yang infak (donatur)" value="{{ old('donatur') }}" required>
+                            <!-- Semua karakter selain huruf (a-z, A-Z) dan spasi akan dihapus (''). -->
+                            <input oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" type="text" name="donatur" class="form-control" id="donatur" placeholder="Masukkan nama orang yang infak (donatur)" value="{{ old('donatur') }}" required>
                             @error('donatur')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror

@@ -106,6 +106,12 @@
             Cetak: {{ \Carbon\Carbon::now('Asia/Jakarta')->format('d-m-Y H:i') }} WIB
         </div>
 
+        <!-- user yg mengunduh -->
+        <div style="text-align: right; font-size: 11px;">
+            Diunduh oleh: {{ $user->nama }}
+            <!-- ({{ $user->role }}) -->
+        </div>
+        
         <!-- TABEL DATA -->
         <table>
             <thead>
