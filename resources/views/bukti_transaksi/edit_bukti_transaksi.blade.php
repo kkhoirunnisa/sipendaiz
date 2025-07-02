@@ -84,7 +84,6 @@
                                 <i class="bi bi-person-circle me-2 text-warning"></i>
                                 Donatur<span class="text-danger"> *</span>
                             </label>
-                             <!-- Semua karakter selain huruf (a-z, A-Z) dan spasi akan dihapus (''). -->
                             <input oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" type="text" name="donatur" class="form-control" id="donatur" value="{{ $buktiTransaksi->donatur }}" required>
                             @error('donatur')
                             <div class="text-danger">{{ $message }}</div>

@@ -930,7 +930,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="text-dark text-center">Beni</td>
+                                        <td class="text-dark text-center">Khandar</td>
                                         <td class="text-dark text-center">082193847566</td>
                                     </tr>
                                     <tr>

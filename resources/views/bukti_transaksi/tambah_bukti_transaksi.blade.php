@@ -108,12 +108,14 @@
                                 <i class="fas fa-phone me-2 text-primary"></i>
                                 Nomor HP
                             </label>
+                            <!-- menampilkan input angka dari 0-9 
+                            validasi setiap karakter yang bukan angka (0–9) akan otomatis dihapus -->
                             <input type="text"
                                 name="nomor_telepon"
                                 class="form-control"
                                 id="nomor_telepon"
                                 placeholder="Masukkan nomor telepon donatur maks 12 angka"
-                                inputmode="numeric"
+                                inputmode="numeric" 
                                 pattern="[0-9]+"
                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 value="{{ old('nomor_telepon') }}" required>

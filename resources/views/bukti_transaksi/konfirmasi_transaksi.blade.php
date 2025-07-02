@@ -190,7 +190,7 @@
                                     {{ $buktiTransaksi->firstItem() + $loop->index }}
                                 </span>
                             </td>
-                            <td class="text-center">{{ $bt->kategori }}</td>
+                             <td class="text-center">{{ $bt->kategori }}</td>
                             <td class="text-center">{{ $bt->donatur }}</td>
                             <td class="text-center">{{ \Carbon\Carbon::parse($bt->tanggal_infak)->format('d-m-Y') }}</td>
                             <td class="text-center">{{ $bt->metode }}</td>

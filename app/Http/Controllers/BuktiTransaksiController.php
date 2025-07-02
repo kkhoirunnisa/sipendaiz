@@ -86,6 +86,7 @@ class BuktiTransaksiController extends Controller
                 'sumber' => $request->sumber,
                 'jenis_infak' => $request->jenis_infak,
                 'nominal' => $request->filled('nominal') ? $request->nominal : null, //jika nominal diisi disimpan nominal, jika nominal kosong diisi null
+
                 'barang' => $request->barang,
                 'metode' => $request->metode,
                 'bukti_transaksi' => $buktiPath,
@@ -237,7 +238,7 @@ class BuktiTransaksiController extends Controller
             ->orderBy('updated_at', 'desc')
             ->paginate(10);
 
-        return view('bukti_transaksi.konfirmasi_transaksi', compact('buktiTransaksi'));
+        return view('bukti_transaksi.konfirmasi_transaksi', compact('buktiTransaksi', 'search'));
     }
 
     // verifikasi data bukti transaksi, kirim kuitansi dan notif WA
