@@ -100,7 +100,7 @@
                                         </div>
                                         <div>
                                             <h6 class="text-muted mb-1">Total Pemasukan</h6>
-                                            <h4 class="text-success mb-0 fw-bold">Rp {{ number_format($totalMasuk, 0, ',', '.') }}</h4>
+                                            <h4 class="text-success mb-0 fw-bold">Rp {{ number_format($totalMasuk, 2, ',', '.') }}</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -115,7 +115,7 @@
                                         </div>
                                         <div>
                                             <h6 class="text-muted mb-1">Total Pengeluaran</h6>
-                                            <h4 class="text-danger mb-0 fw-bold">Rp {{ number_format($totalKeluar, 0, ',', '.') }}</h4>
+                                            <h4 class="text-danger mb-0 fw-bold">Rp {{ number_format($totalKeluar, 2, ',', '.') }}</h4>
                                         </div>
                                     </div>
                                 </div>

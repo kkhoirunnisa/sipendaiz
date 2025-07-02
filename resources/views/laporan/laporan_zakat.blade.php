@@ -97,7 +97,7 @@
                                         </div>
                                         <div>
                                             <h6 class="text-muted mb-1">Total Pemasukan Uang</h6>
-                                            <h4 class="text-success mb-0 fw-bold">Rp {{ number_format($pemasukanUang, 0, ',', '.') }}</h4>
+                                            <h4 class="text-success mb-0 fw-bold">Rp {{ number_format($pemasukanUang, 2, ',', '.') }}</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -133,7 +133,7 @@
                                         </div>
                                         <div>
                                             <h6 class="text-muted mb-1">Total Saldo Uang Saat Ini</h6>
-                                            <h4 class="text-primary mb-0 fw-bold">Rp {{ number_format($totalUang, 0, ',', '.') }}</h4>
+                                            <h4 class="text-primary mb-0 fw-bold">Rp {{ number_format($totalUang, 2, ',', '.') }}</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -169,7 +169,7 @@
                                         </div>
                                         <div>
                                             <h6 class="text-muted mb-1">Total Pengeluaran Uang</h6>
-                                            <h4 class="text-danger mb-0 fw-bold">Rp {{ number_format($pengeluaranUang, 0, ',', '.') }}</h4>
+                                            <h4 class="text-danger mb-0 fw-bold">Rp {{ number_format($pengeluaranUang, 2, ',', '.') }}</h4>
                                         </div>
                                     </div>
                                 </div>
