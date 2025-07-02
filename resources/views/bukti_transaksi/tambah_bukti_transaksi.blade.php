@@ -389,7 +389,7 @@
         const nominalInput = new AutoNumeric('#nominal', {
             digitGroupSeparator: '.',
             decimalCharacter: ',',
-            decimalPlaces: 0,
+            decimalPlaces: 2,
             modifyValueOnWheel: false,
             unformatOnSubmit: true
         });

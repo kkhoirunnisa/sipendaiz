@@ -199,7 +199,7 @@
                                 @if($bt->jenis_infak == 'Barang')
                                 {{ $bt->barang }}
                                 @else
-                                {{ number_format($bt->nominal, 0, ',', '.') }}
+                                {{ number_format($bt->nominal, 2, ',', '.') }}
                                 @endif
                             </td>
                             <td class="text-center">

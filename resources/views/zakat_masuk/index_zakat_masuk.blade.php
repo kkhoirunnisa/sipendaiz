@@ -85,7 +85,7 @@
                                 @if($zm->bentuk_zakat == 'Beras')
                                 {{ $zm->jumlah == 0 ? '-' : rtrim(rtrim(number_format($zm->jumlah, 2, ',', '.'), '0'), ',') . ' Kg' }}
                                 @else
-                                {{ $zm->nominal == 0 ? '-' : 'Rp ' . number_format($zm->nominal, 0, ',', '.') }}
+                                {{ $zm->nominal == 0 ? '-' : 'Rp ' . number_format($zm->nominal, 2, ',', '.') }}
                                 @endif
                             </td>
                             <!-- <td class="text-center">{!! $zm->keterangan !!}</td> -->

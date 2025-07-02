@@ -86,7 +86,6 @@ class BuktiTransaksiController extends Controller
                 'sumber' => $request->sumber,
                 'jenis_infak' => $request->jenis_infak,
                 'nominal' => $request->filled('nominal') ? $request->nominal : null, //jika nominal diisi disimpan nominal, jika nominal kosong diisi null
-
                 'barang' => $request->barang,
                 'metode' => $request->metode,
                 'bukti_transaksi' => $buktiPath,

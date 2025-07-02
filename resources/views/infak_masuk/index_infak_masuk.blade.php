@@ -393,7 +393,7 @@
                                             @if($im->buktiTransaksi->nominal == 0)
                                             <span class="text-muted">-</span>
                                             @else
-                                            Rp {{ number_format($im->buktiTransaksi->nominal, 0, ',', '.') }}
+                                            Rp {{ number_format($im->buktiTransaksi->nominal, 2, ',', '.') }}
                                             @endif
                                         </p>
                                     </div>

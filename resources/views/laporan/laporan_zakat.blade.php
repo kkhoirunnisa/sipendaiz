@@ -265,9 +265,9 @@
                                                 @endif
                                             <td class="text-end py-3">
                                                 @if($trx['nominal'] > 0)
-                                                <span class="fw-semibold text-success">Rp {{ number_format($trx['nominal'], 0, ',', '.') }}</span>
+                                                <span class="fw-semibold text-success">Rp {{ number_format($trx['nominal'], 2, ',', '.') }}</span>
                                                 @elseif($trx['nominal'] < 0)
-                                                    <span class="fw-semibold text-danger">Rp -{{ number_format(abs($trx['nominal']), 0, ',', '.') }}</span>
+                                                    <span class="fw-semibold text-danger">Rp -{{ number_format(abs($trx['nominal']), 2, ',', '.') }}</span>
                                                     @else
                                                     <span class="text-muted">-</span>
                                                     @endif
@@ -284,7 +284,7 @@
                                             </td>
                                             </td>
                                             <td class="text-end py-3">
-                                                <span class="fw-bold text-dark">Rp {{ number_format($trx['saldo'], 0, ',', '.') }}</span>
+                                                <span class="fw-bold text-dark">Rp {{ number_format($trx['saldo'], 2, ',', '.') }}</span>
                                             </td>
                                             <td class="text-end py-3">
                                                 <span class="fw-bold text-dark">
@@ -308,7 +308,7 @@
                                                 </td>
                                                 <td class="text-end border-0">
                                                     <div class="text-primary fw-bold">
-                                                        Rp {{ number_format($totalUang, 0, ',', '.') }}
+                                                        Rp {{ number_format($totalUang, 2, ',', '.') }}
                                                     </div>
                                                     <small class="text-muted">Total Saldo Uang</small>
                                                 </td>

@@ -211,19 +211,19 @@
                                                 @if ($trx['masuk'] == 0)
                                                 <span class="text-muted">-</span>
                                                 @else
-                                                <span class="text-success fw-semibold">Rp {{ number_format($trx['masuk'], 0, ',', '.') }}</span>
+                                                <span class="text-success fw-semibold">Rp {{ number_format($trx['masuk'], 2, ',', '.') }}</span>
                                                 @endif
                                             </td>
                                             <td class="text-end py-3">
                                                 @if ($trx['keluar'] == 0)
                                                 <span class="text-muted">-</span>
                                                 @else
-                                                <span class="text-danger fw-semibold">Rp {{ number_format($trx['keluar'], 0, ',', '.') }}</span>
+                                                <span class="text-danger fw-semibold">Rp {{ number_format($trx['keluar'], 2, ',', '.') }}</span>
                                                 @endif
                                             </td>
 
                                             <td class="text-end py-3">
-                                                <span class="fw-bold">Rp {{ number_format($trx['saldo'], 0, ',', '.') }}</span>
+                                                <span class="fw-bold">Rp {{ number_format($trx['saldo'], 2, ',', '.') }}</span>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -242,19 +242,19 @@
                                                 </td>
                                                 <td class="text-end border-0">
                                                     <div class="text-success fw-bold">
-                                                        Rp {{ number_format($totalMasuk, 0, ',', '.') }}
+                                                        Rp {{ number_format($totalMasuk, 2, ',', '.') }}
                                                     </div>
                                                     <small class="text-muted">Total Masuk</small>
                                                 </td>
                                                 <td class="text-end border-0">
                                                     <div class="text-danger fw-bold">
-                                                        Rp {{ number_format($totalKeluar, 0, ',', '.') }}
+                                                        Rp {{ number_format($totalKeluar, 2, ',', '.') }}
                                                     </div>
                                                     <small class="text-muted">Total Keluar</small>
                                                 </td>
                                                 <td class="text-end border-0">
                                                     <div class="fw-bold text-primary">
-                                                        Rp {{ number_format($totalSaldo, 0, ',', '.') }}
+                                                        Rp {{ number_format($totalSaldo, 2, ',', '.') }}
                                                     </div>
                                                     <small class="text-muted">Saldo Akhir</small>
                                                 </td>

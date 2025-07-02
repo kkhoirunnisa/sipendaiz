@@ -94,7 +94,7 @@
                             </td>
                             <td class="text-center">{{ \Carbon\Carbon::parse($ik->tanggal)->format('d-m-Y') }}</td>
                             <td class="text-center">{{ ucfirst($ik->kategori) }}</td>
-                            <td class="text-center">{{ number_format($ik->nominal, 0, ',', '.') }}</td>
+                            <td class="text-center">{{ number_format($ik->nominal, 2, ',', '.') }}</td>
                             <td class="text-center">{{ $ik->barang }}</td>
                             <td class="text-center">{{ $ik->keterangan }}</td>
                             <td class="text-center">
