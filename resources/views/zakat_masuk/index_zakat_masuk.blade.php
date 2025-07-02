@@ -202,7 +202,7 @@
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm p-3 h-100">
                             <small class="fw-semibold"><i class="bi bi-cash-stack me-1"></i> Nominal (Rp)</small>
-                            <h6 class=" text-dark mt-1">{{ $zm->nominal == 0 ? '-' : 'Rp ' . number_format($zm->nominal, 0, ',', '.') }}</h6>
+                            <h6 class=" text-dark mt-1">{{ $zm->nominal == 0 ? '-' : 'Rp ' . number_format($zm->nominal, 2, ',', '.') }}</h6>
                         </div>
                     </div>
                     <div class="col-md-6">

@@ -92,7 +92,7 @@
                                 @if($zk->bentuk_zakat == 'Beras')
                                 {{ $zk->jumlah == 0 ? '-' : rtrim(rtrim(number_format($zk->jumlah, 2, ',', '.'), '0'), ',') . ' Kg' }}
                                 @else
-                                {{ $zk->nominal == 0 ? '-' : 'Rp ' . number_format($zk->nominal, 0, ',', '.') }}
+                                {{ $zk->nominal == 0 ? '-' : 'Rp ' . number_format($zk->nominal, 2, ',', '.') }}
                                 @endif
                             </td>
                             <!-- <td class="text-center">

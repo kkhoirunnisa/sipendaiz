@@ -207,7 +207,7 @@
                                 @if($im->buktiTransaksi->nominal == 0)
                                 -
                                 @else
-                                {{ number_format($im->buktiTransaksi->nominal, 0, ',', '.') }}
+                                {{ number_format($im->buktiTransaksi->nominal, 2, ',', '.') }}
                                 @endif
                                 @endif
                             </td>
