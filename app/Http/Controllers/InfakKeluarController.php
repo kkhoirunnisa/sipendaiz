@@ -69,7 +69,7 @@ class InfakKeluarController extends Controller
                 'kategori' => 'required|string|max:17',
                 'nominal' => 'required|numeric',
                 'barang' => 'required|string|max:20',
-                'keterangan' => 'required|string|max:50',
+                'keterangan' => 'required|string|max:100',
                 'bukti_infak_keluar' => 'required|file|mimes:jpg,png,jpeg|max:10240',
             ]);
 
@@ -161,7 +161,7 @@ class InfakKeluarController extends Controller
                 'kategori' => 'required|string|max:17',
                 'nominal' => 'required|numeric',
                 'barang' => 'required|string|max:20',
-                'keterangan' => 'required|string|max:50',
+                'keterangan' => 'required|string|max:100',
                 'bukti_infak_keluar' => 'nullable|file|mimes:jpg,png,jpeg|max:10240',
             ]);
             $kategori = $request->kategori;
