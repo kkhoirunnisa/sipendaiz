@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use App\Models\InfakMasukModel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\PejabatService;
 
 class InfakMasukController extends Controller
 {
@@ -44,37 +45,48 @@ class InfakMasukController extends Controller
 
 
     // menampilkan halaman kuitansi dr infak berdasarkan id
+
+    // Method kuitansi yang diperbaiki
     public function kuitansi($id)
     {
         try {
-
-            // ambil data infak berdasarkan id
+            // Ambil data infak berdasarkan id
             $infak = InfakMasukModel::with('buktiTransaksi')->findOrFail($id);
 
-            // menampilkan view kuitansi
-            return view('infak_masuk.kuitansi', compact('infak'));
+            // ✅ SOLUSI: Ambil data pejabat berdasarkan tanggal konfirmasi
+            $pejabatData = PejabatService::getPejabatUntukKuitansi($infak->tanggal_konfirmasi);
+
+            // Ekstrak data pejabat
+            $ketua = $pejabatData['ketua'];
+            $bendahara = $pejabatData['bendahara'];
+
+            // Kirim semua data ke view
+            return view('infak_masuk.kuitansi', compact('infak', 'ketua', 'bendahara'));
         } catch (Exception $e) {
             return back()->with('error', 'Data kuitansi tidak ditemukan atau terjadi kesalahan.');
         }
     }
 
-    // mencetak kuitansi
+    // Method cetakKuitansiPdf yang diperbaiki
     public function cetakKuitansiPdf($id)
     {
         try {
             $infak = InfakMasukModel::with('buktiTransaksi')->findOrFail($id);
 
-            // load view kuitansi ke pdf
-            $pdf = Pdf::loadView('infak_masuk.kuitansi', compact('infak'))
+            // ✅ SOLUSI: Ambil data pejabat untuk PDF juga
+            $pejabatData = PejabatService::getPejabatUntukKuitansi($infak->tanggal_konfirmasi);
+            $ketua = $pejabatData['ketua'];
+            $bendahara = $pejabatData['bendahara'];
+
+            // Load view kuitansi ke pdf dengan data pejabat
+            $pdf = Pdf::loadView('infak_masuk.kuitansi', compact('infak', 'ketua', 'bendahara'))
                 ->setPaper('a4', 'landscape');
 
-            // hilangkan nama donatur dr karakter khusus
-            // ^ kecuali, \w semua huruf angka underscore _, \s spasi tab newline, - karakter strip -
+            // Hilangkan nama donatur dari karakter khusus
             $namaDonatur = preg_replace('/[^\w\s-]/', '', $infak->buktiTransaksi->donatur);
             $namaFile = 'Kuitansi Infak - ' . $namaDonatur . '.pdf';
 
-            // return $pdf->stream($namaFile); // menampilkan
-            return $pdf->download($namaFile); // unduh
+            return $pdf->stream($namaFile);
         } catch (Exception $e) {
             return back()->with('error', 'Gagal mencetak kuitansi: ' . $e->getMessage());
         }

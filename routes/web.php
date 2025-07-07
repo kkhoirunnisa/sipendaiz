@@ -1,21 +1,22 @@
 <?php
 
-use App\Http\Controllers\BuktiTransaksiController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\MustahikController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\InfakKeluarController;
+use App\Http\Controllers\PengelolaController;
 use App\Http\Controllers\InfakMasukController;
+use App\Http\Controllers\ZakatMasukController;
+use App\Http\Controllers\InfakKeluarController;
 use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\ZakatKeluarController;
 use App\Http\Controllers\LaporanInfakController;
 use App\Http\Controllers\LaporanZakatController;
-use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LupaPasswordController;
-use App\Http\Controllers\MustahikController;
-use App\Http\Controllers\PengelolaController;
-use App\Http\Controllers\ProfilController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ZakatKeluarController;
-use App\Http\Controllers\ZakatMasukController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PejabatMasjidController;
+use App\Http\Controllers\BuktiTransaksiController;
 
 // LOGIN
 Route::get('/login', [LoginController::class, 'index'])->name('login');
@@ -24,6 +25,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // LANDING PAGE
 Route::get('/', [LandingPageController::class, 'index'])->name('landing.index');
+Route::get('/pengeluaran/infak/takmir', [LandingPageController::class, 'detailPengeluaranTakmir'])->name('pengeluaran.takmir');
+Route::get('/pengeluaran/infak/pembangunan', [LandingPageController::class, 'detailPengeluaranPembangunan'])->name('pengeluaran.pembangunan');
 
 
 //KODE OTP
@@ -54,6 +57,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/bukti-transaksi/konfirmasi', [BuktiTransaksiController::class, 'konfirmasiIndex'])->name('bukti_transaksi.konfirmasi');
         Route::post('/bukti-transaksi/konfirmasi/{id}/verifikasi', [BuktiTransaksiController::class, 'verifikasi'])->name('bukti_transaksi.verifikasi');
         Route::post('/bukti-transaksi/konfirmasi/{id}/tolak', [BuktiTransaksiController::class, 'tolak'])->name('bukti_transaksi.tolak');
+
+        // PEJABAT MASJID
+        Route::get('pejabat', [PejabatMasjidController::class, 'index'])->name('pejabat.index'); // menampilkan daftar pejabat
+        Route::get('pejabat/create', [PejabatMasjidController::class, 'create'])->name('pejabat.create'); // form tambah
+        Route::post('pejabat', [PejabatMasjidController::class, 'store'])->name('pejabat.store'); // menyimpan data
+        Route::get('pejabat/{id}/edit', [PejabatMasjidController::class, 'edit'])->name('pejabat.edit'); // form edit
+        Route::put('pejabat/{id}', [PejabatMasjidController::class, 'update'])->name('pejabat.update'); // update data
+        Route::delete('pejabat/{id}', [PejabatMasjidController::class, 'destroy'])->name('pejabat.destroy'); // hapus data
+        Route::get('pejabat/riwayat/{jabatan}', [PejabatMasjidController::class, 'riwayat'])->name('pejabat.riwayat'); // riwayat jabatan
+
     });
 
     Route::middleware('role:Petugas')->group(function () {

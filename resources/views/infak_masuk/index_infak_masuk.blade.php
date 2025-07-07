@@ -223,14 +223,7 @@
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
                                 </span>
-                                <!-- @if(in_array(auth()->user()->role, ['Bendahara', 'Petugas']))
-                                <a href="{{ route('infak.kuitansi.pdf', $im->id) }}"
-                                    class="btn btn-sm btn-danger"
-                                    title="Lihat Kuitansi PDF"
-                                    target="_blank">
-                                    <i class="bi bi-file-earmark-pdf-fill"></i>
-                                </a>
-                                @endif -->
+                               
                             </td>
                         </tr>
                         @endforeach

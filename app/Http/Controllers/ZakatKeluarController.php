@@ -29,8 +29,8 @@ class ZakatKeluarController extends Controller
                 });
             })
             ->orderBy('updated_at', 'desc')
-            ->paginate(10);//menampilkan data 10 pada tabel
- 
+            ->paginate(10); //menampilkan data 10 pada tabel
+
 
         return view('zakat_keluar.index_zakat_keluar', compact('zakatKeluar'));
     }
@@ -66,18 +66,30 @@ class ZakatKeluarController extends Controller
         try {
             $user = Auth::user();
             $request->validate([
-                'id_mustahik' => 'required|exists:mustahik,id',
+                'id_mustahik' => 'required|array|min:1',
+                'id_mustahik.*' => 'exists:mustahik,id',
                 'tanggal' => 'required|date',
                 'jenis_zakat' => 'required|string|max:10',
                 'bentuk_zakat' => 'required|string|max:10',
-                'nominal' => 'nullable|numeric',
-                'jumlah' => 'nullable',
                 'keterangan' => 'required|string|max:255',
             ]);
 
             $jenis = $request->jenis_zakat;
             $bentuk = $request->bentuk_zakat;
 
+            // Jumlah total yang akan dikeluarkan
+            $totalNominal = 0;
+            $totalJumlah = 0;
+
+            if ($bentuk === 'Uang') {
+                $request->validate(['nominal' => 'required|array']);
+                $totalNominal = array_sum($request->nominal);
+            } else {
+                $request->validate(['jumlah' => 'required|array']);
+                $totalJumlah = array_sum($request->jumlah);
+            }
+
+            // Cek saldo
             $masuk = ZakatMasukModel::where('jenis_zakat', $jenis)
                 ->where('bentuk_zakat', $bentuk)
                 ->sum($bentuk === 'Uang' ? 'nominal' : 'jumlah');
@@ -88,31 +100,34 @@ class ZakatKeluarController extends Controller
 
             $sisa = $masuk - $keluar;
 
-            if ($bentuk === 'Uang' && $request->nominal > $sisa) {
+            if ($bentuk === 'Uang' && $totalNominal > $sisa) {
                 return back()->withInput()->with('error', 'Nominal zakat keluar melebihi sisa saldo untuk Zakat ' . $jenis . ' sebesar Rp ' . number_format($sisa, 0, ',', '.'));
             }
 
-            if ($bentuk === 'Beras' && $request->jumlah > $sisa) {
+            if ($bentuk === 'Beras' && $totalJumlah > $sisa) {
                 return back()->withInput()->with('error', 'Jumlah beras zakat keluar melebihi sisa stok untuk Zakat ' . $jenis . ' sebesar ' . number_format($sisa, 0, ',', '.') . ' Kg');
             }
 
-            // Simpan data zakat keluar
-            ZakatKeluarModel::create([
-                'id_users' => $user->id,
-                'id_mustahik' => $request->id_mustahik,
-                'tanggal' => $request->tanggal,
-                'jenis_zakat' => $request->jenis_zakat,
-                'bentuk_zakat' => $request->bentuk_zakat,
-                'nominal' => $request->nominal ?: null,
-                'jumlah' => $request->jumlah,
-                'keterangan' => $request->keterangan,
-            ]);
+            // Simpan per mustahik
+            foreach ($request->id_mustahik as $index => $id_mustahik) {
+                ZakatKeluarModel::create([
+                    'id_users' => $user->id,
+                    'id_mustahik' => $id_mustahik,
+                    'tanggal' => $request->tanggal,
+                    'jenis_zakat' => $jenis,
+                    'bentuk_zakat' => $bentuk,
+                    'nominal' => $bentuk === 'Uang' ? $request->nominal[$index] : null,
+                    'jumlah' => $bentuk === 'Beras' ? $request->jumlah[$index] : null,
+                    'keterangan' => $request->keterangan,
+                ]);
+            }
 
-            return redirect()->route('zakat_keluar.index')->with('success', 'Data zakat keluar berhasil ditambahkan.');
-        } catch (Exception $e) {
+            return redirect()->route('zakat_keluar.index')->with('success', 'Data zakat keluar berhasil ditambahkan.')->withInput();
+        } catch (\Exception $e) {
             return redirect()->back()->withInput()->with('error', 'Gagal menambahkan data: ' . $e->getMessage());
         }
     }
+
 
     public function edit($id)
     {

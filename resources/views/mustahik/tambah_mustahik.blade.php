@@ -57,8 +57,8 @@
                                 <i class="fas fa-user me-2 text-primary"></i>
                                 Nama<span class="text-danger"> *</span>
                             </label>
-                             <!-- Semua karakter selain huruf (a-z, A-Z) dan spasi akan dihapus (''). -->
-                            <input oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"  type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama mustahik" required value="{{ old('nama') }}">
+                            <!-- Semua karakter selain huruf (a-z, A-Z) dan spasi akan dihapus (''). -->
+                            <input oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama mustahik" required value="{{ old('nama') }}">
                             @error('nama')
                             <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -139,40 +139,50 @@
             }
         });
     }
-    // Update progress bar
-    // Definisi fungsi
-    function updateProgress() {
-        let filledFields = 0;
-        const totalFields = fields.length;
 
+    // update progress bar
+    // definisi fungsi untuk memperbarui progress bar
+    function updateProgress() {
+        let filledFields = 0; // hitung jumlah field yang terisi
+        const totalFields = fields.length; // total jumlah field dalam form
+
+        // looping untuk mengecek apakah field terisi
         fields.forEach(field => {
             if (field.value && field.value.trim() !== '') {
-                filledFields++;
+                filledFields++; // tambah jika field tidak kosong (bukan spasi saja)
             }
         });
 
+        // hitung persentase progress dari field yang terisi
         const progress = (filledFields / totalFields) * 100;
+
+        // atur lebar progress bar sesuai dengan persentase
         progressBar.style.width = progress + '%';
+
+        // tampilkan persentase progress dalam bentuk angka bulat
         progressText.textContent = Math.round(progress) + '%';
     }
 
-
-    // Inisialisasi elemen & event listener
+    // inisialisasi elemen form dan elemen progress bar
     const fields = [
         document.getElementById('nama'),
         document.getElementById('kategori'),
         document.getElementById('alamat')
     ];
-    const progressBar = document.getElementById('form-progress');
-    const progressText = document.getElementById('progress-text');
 
+    const progressBar = document.getElementById('form-progress'); // elemen batang progress bar
+    const progressText = document.getElementById('progress-text'); // elemen teks persentase progress
+
+    // Ttmbahkan event listener pada setiap field untuk memicu update progress saat input berubah
     fields.forEach(field => {
-        field.addEventListener('input', updateProgress);
-        field.addEventListener('change', updateProgress); // untuk <select>
+        field.addEventListener('input', updateProgress); // saat user mengetik
+        field.addEventListener('change', updateProgress); // untuk elemen <select> atau perubahan lainnya
     });
 
+    // jalankan updateProgress saat halaman selesai dimuat (untuk menghitung field yg sudah terisi sebelumnya)
     document.addEventListener('DOMContentLoaded', updateProgress);
 </script>
+
 <!-- Notifikasi Error -->
 @if (session('error'))
 <script>

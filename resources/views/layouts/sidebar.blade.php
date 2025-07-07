@@ -151,7 +151,7 @@
             @endif
 
             <!-- LAPORAN (bendahara dan ketua) -->
-        
+
             <li class="text-muted small mt-4">LAPORAN</li>
 
             <li class="nav-item">
@@ -186,7 +186,7 @@
                     <i class="bi bi-archive-fill me-2"></i> <span>Zakat</span>
                 </a>
             </li>
-    
+
 
 
             <!-- USERS (hanya bendahara)  -->
@@ -196,6 +196,12 @@
             <li class="nav-item">
                 <a href="{{ route('user.index') }}" class="nav-link d-flex align-items-center">
                     <i class="fas fa-user-plus me-2"></i> <span>User</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('pejabat.index') }}" class="nav-link d-flex align-items-center">
+                    <i class="fas fa-user-plus me-2"></i> <span>Pengurus</span>
                 </a>
             </li>
             @endif

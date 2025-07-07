@@ -137,22 +137,31 @@
 
         <div class="tanggal" style="color: green;">
             Maos, {{ \Carbon\Carbon::parse($infak->tanggal_konfirmasi)->locale('id')->translatedFormat('d F Y') }}
+
         </div>
 
         <table style="width: 100%; margin-top: 40px; font-size: 17px; text-align: center; color: green;">
             <tr>
                 <td style="width: 50%;">
                     Ketua<br><br>
-                    <img src="{{ public_path('gambar/ttd_ketua.png') }}" alt="Ttd Ketua" style="width: 170px;  ">
+                    @if($ketua?->foto_ttd)
+                    <img src="{{ public_path('storage/' . $ketua->foto_ttd) }}" alt="Ttd Ketua" style="width: 180px;">
+                    @else
+                    <br><br><br>
+                    @endif
                     <div style="margin-top: 30px; border-top: 1px solid black; width: 250px; margin: 0 auto; padding-top: 5px; font-style: italic; font-size: 17px;">
-                        (Agus Tisngadi, SE., M.Si.)
+                        ({{ $ketua?->nama ?? '....................................' }})
                     </div>
                 </td>
                 <td style="width: 50%;">
                     Bendahara<br><br>
-                    <img src="{{ public_path('gambar/ttd_bendahara.png') }}" alt="Ttd Bendahara" style="width: 68px;  ">
+                    @if($bendahara?->foto_ttd)
+                    <img src="{{ public_path('storage/' . $bendahara->foto_ttd) }}" alt="Ttd Bendahara" style="width: 100px;">
+                    @else
+                    <br><br><br>
+                    @endif
                     <div style="margin-top: 30px; border-top: 1px solid black; width: 250px; margin: 0 auto; padding-top: 5px; font-style: italic; font-size: 17px;">
-                        (Benny Hermanto)
+                        ({{ $bendahara?->nama ?? '....................................' }})
                     </div>
                 </td>
             </tr>

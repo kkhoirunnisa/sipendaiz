@@ -588,152 +588,168 @@
                                     <i class="fas fa-receipt fs-2 text-danger"></i>
                                 </div>
                             </div>
-                        </div>
-                        <div class="expense-card-sisa">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p class="mb-1 text-muted">
-                                        <i class="fas fa-chart-line me-2"></i>Sisa Saldo Infak Pembangunan
-                                    </p>
-                                    <div class="expense-amount-sisa">Rp {{ number_format($saldoInfakPembangunan, 0, ',', '.') }}</div>
-                                </div>
-                                <div>
-                                    <i class="fas fa-receipt fs-2 text-success"></i>
-                                </div>
+                            <!-- Tambahan tombol lihat detail -->
+                            <div class="mt-3 text-end">
+                                <a href="{{ route('pengeluaran.pembangunan') }}" class="btn btn-sm btn-outline-primary">
+                                    Lihat Detail
+                                    <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-
-                <!-- Infak Takmir Card -->
-                <div class="col-lg-6 mb-4" data-aos="fade-left">
-                    <div class="stats-card">
-                        <div class="card-header-custom">
+                    <div class="expense-card-sisa">
+                        <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h2 class="card-title">Dana Infak Takmir Masjid</h2>
-                                <p class="text-muted mb-0">Operasional & Kegiatan Masjid</p>
-                                <span class="badge bg-success">Total Infak</span>
+                                <p class="mb-1 text-muted">
+                                    <i class="fas fa-chart-line me-2"></i>Sisa Saldo Infak Pembangunan
+                                </p>
+                                <div class="expense-amount-sisa">Rp {{ number_format($saldoInfakPembangunan, 0, ',', '.') }}</div>
                             </div>
-
-                        </div>
-
-                        <div class="amount-display">
-                            Rp {{ number_format($totalInfakTakmir, 0, ',', '.') }}
-                        </div>
-
-                        <h6 class="mb-3 fw-bold">
-                            <i class="fas fa-list me-2"></i>Pendapatan Terkini
-                        </h6>
-                        <div class="table-responsive">
-                            <table class="table table-custom mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="text-dark">
-                                            <i class="fas fa-user me-2 text-dark"></i>Sumber
-                                        </th>
-                                        <th class="text-dark">
-                                            <i class="fas fa-money-bill me-2 text-dark"></i>Infak
-                                        </th>
-                                        <th class="text-dark">
-                                            <i class="fas fa-calendar me-2 text-dark"></i>Tanggal
-                                        </th>
-                                    </tr>
-
-                                </thead>
-                                <tbody>
-                                    @php $recentInfak = $pendapatantakmirterkini->take(3); @endphp
-                                    @forelse($recentInfak as $infak)
-                                    <tr>
-                                        <td>{{ $infak->buktiTransaksi->donatur }}</td>
-                                        <td class="text-success">
-                                            @if(isset($infak->buktiTransaksi->barang) && !empty($infak->buktiTransaksi->barang))
-                                            {{ $infak->buktiTransaksi->barang }}
-                                            @elseif($infak->buktiTransaksi->nominal == 0)
-                                            Barang Infak
-                                            @else
-                                            Rp {{ number_format($infak->buktiTransaksi->nominal, 0, ',', '.') }}
-                                            @endif
-                                        </td>
-                                        <td>{{ \Carbon\Carbon::parse($infak->buktiTransaksi->tanggal_infak)->format('d-m-Y') }}</td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="3" class="text-center text-muted">Belum ada data infak terkini</td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-
-                            </table>
-                        </div>
-
-                        <div class="expense-card">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p class="mb-1 text-muted">
-                                        <i class="fas fa-arrow-down me-2"></i>Total Pengeluaran Takmir
-                                    </p>
-                                    <div class="expense-amount"> Rp {{ number_format($totalPengeluaranInfakTakmir, 0, ',', '.') }}</div>
-                                </div>
-                                <div>
-                                    <i class="fas fa-calculator fs-2 text-danger"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="expense-card-sisa">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p class="mb-1 text-muted">
-                                        <i class="fas fa-chart-line me-2"></i>Sisa Saldo Infak Takmir
-                                    </p>
-                                    <div class="expense-amount-sisa">Rp {{ number_format($saldoInfakTakmir, 0, ',', '.') }}</div>
-                                </div>
-                                <div>
-                                    <i class="fas fa-receipt fs-2 text-success"></i>
-                                </div>
+                            <div>
+                                <i class="fas fa-receipt fs-2 text-success"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Summary Statistics -->
-            <div class="row mt-5" data-aos="fade-up">
-                <div class="col-12">
-                    <div class="stats-card">
-                        <div class="row text-center justify-content-center">
-                            <div class="col-md-3 mb-3">
-                                <div class="card-icon mx-auto mb-3">
-                                    <i class="fas fa-mosque text-white fs-3"></i>
-                                </div>
-                                <h3 class="fw-bold text-success">1</h3>
-                                <p class="text-muted">Masjid Dikelola</p>
+
+            <!-- Infak Takmir Card -->
+            <div class="col-lg-6 mb-4" data-aos="fade-left">
+                <div class="stats-card">
+                    <div class="card-header-custom">
+                        <div>
+                            <h2 class="card-title">Dana Infak Takmir Masjid</h2>
+                            <p class="text-muted mb-0">Operasional & Kegiatan Masjid</p>
+                            <span class="badge bg-success">Total Infak</span>
+                        </div>
+
+                    </div>
+
+                    <div class="amount-display">
+                        Rp {{ number_format($totalInfakTakmir, 0, ',', '.') }}
+                    </div>
+
+                    <h6 class="mb-3 fw-bold">
+                        <i class="fas fa-list me-2"></i>Pendapatan Terkini
+                    </h6>
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-dark">
+                                        <i class="fas fa-user me-2 text-dark"></i>Sumber
+                                    </th>
+                                    <th class="text-dark">
+                                        <i class="fas fa-money-bill me-2 text-dark"></i>Infak
+                                    </th>
+                                    <th class="text-dark">
+                                        <i class="fas fa-calendar me-2 text-dark"></i>Tanggal
+                                    </th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                @php $recentInfak = $pendapatantakmirterkini->take(3); @endphp
+                                @forelse($recentInfak as $infak)
+                                <tr>
+                                    <td>{{ $infak->buktiTransaksi->donatur }}</td>
+                                    <td class="text-success">
+                                        @if(isset($infak->buktiTransaksi->barang) && !empty($infak->buktiTransaksi->barang))
+                                        {{ $infak->buktiTransaksi->barang }}
+                                        @elseif($infak->buktiTransaksi->nominal == 0)
+                                        Barang Infak
+                                        @else
+                                        Rp {{ number_format($infak->buktiTransaksi->nominal, 0, ',', '.') }}
+                                        @endif
+                                    </td>
+                                    <td>{{ \Carbon\Carbon::parse($infak->buktiTransaksi->tanggal_infak)->format('d-m-Y') }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">Belum ada data infak terkini</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <div class="expense-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-1 text-muted">
+                                    <i class="fas fa-arrow-down me-2"></i>Total Pengeluaran Takmir
+                                </p>
+                                <div class="expense-amount">Rp {{ number_format($totalPengeluaranInfakTakmir, 0, ',', '.') }}</div>
                             </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="card-icon mx-auto mb-3">
-                                    <i class="fas fa-users text-white fs-3"></i>
-                                </div>
-                                <h3 class="fw-bold text-success">{{ number_format($jumlahDonatur) }}</h3>
-                                <p class="text-muted">Donatur Aktif</p>
+                            <div>
+                                <i class="fas fa-calculator fs-2 text-danger"></i>
                             </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="card-icon mx-auto mb-3">
-                                    <i class="fas fa-chart-line text-white fs-3"></i>
-                                </div>
-                                <h3 class="fw-bold text-success">{{ number_format($jumlahTransaksiInfak) }}</h3>
-                                <p class="text-muted">Total Transaksi</p>
+                        </div>
+
+                        <!-- Tambahan tombol lihat detail -->
+                        <div class="mt-3 text-end">
+                            <a href="{{ route('pengeluaran.takmir') }}" class="btn btn-sm btn-outline-primary">
+                                Lihat Detail
+                                <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="expense-card-sisa">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-1 text-muted">
+                                    <i class="fas fa-chart-line me-2"></i>Sisa Saldo Infak Takmir
+                                </p>
+                                <div class="expense-amount-sisa">Rp {{ number_format($saldoInfakTakmir, 0, ',', '.') }}</div>
                             </div>
-                            <!-- <div class="col-md-3 mb-3">
+                            <div>
+                                <i class="fas fa-receipt fs-2 text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div class="row mt-5" data-aos="fade-up">
+            <div class="col-12">
+                <div class="stats-card">
+                    <div class="row text-center justify-content-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="card-icon mx-auto mb-3">
+                                <i class="fas fa-mosque text-white fs-3"></i>
+                            </div>
+                            <h3 class="fw-bold text-success">1</h3>
+                            <p class="text-muted">Masjid Dikelola</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card-icon mx-auto mb-3">
+                                <i class="fas fa-users text-white fs-3"></i>
+                            </div>
+                            <h3 class="fw-bold text-success">{{ number_format($jumlahDonatur) }}</h3>
+                            <p class="text-muted">Donatur Aktif</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card-icon mx-auto mb-3">
+                                <i class="fas fa-chart-line text-white fs-3"></i>
+                            </div>
+                            <h3 class="fw-bold text-success">{{ number_format($jumlahTransaksiInfak) }}</h3>
+                            <p class="text-muted">Total Transaksi</p>
+                        </div>
+                        <!-- <div class="col-md-3 mb-3">
                                 <div class="card-icon mx-auto mb-3">
                                     <i class="fas fa-hand-holding-usd text-white fs-3"></i>
                                 </div>
                                 <h3 class="fw-bold text-success">Rp {{ number_format($totalInfak, 0, ',', '.') }}</h3>
                                 <p class="text-muted">Total Dana Terkumpul</p>
                             </div> -->
-                        </div>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 
@@ -817,7 +833,7 @@
                             </table>
                         </div>
 
-                        
+
 
                     </div>
                 </div>

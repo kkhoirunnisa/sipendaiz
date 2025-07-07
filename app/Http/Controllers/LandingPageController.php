@@ -146,6 +146,11 @@ class LandingPageController extends Controller
         $sisaZakatBerasFitrah = $totalZakatBerasFitrah - $totalPengeluaranZakatBerasFitrah;
         $sisaZakatBerasMaal =  $totalZakatBerasMaal - $totalPengeluaranZakatBerasMaal;
 
+        // Pengeluaran infak terkini
+        $pengeluaranInfakTakmir = InfakKeluarModel::where('kategori', 'takmir')->orderBy('tanggal', 'desc')->get();
+        $pengeluaranInfakPembangunan = InfakKeluarModel::where('kategori', 'pembangunan')->orderBy('tanggal', 'desc')->get();
+
+
         return view('landing_page.index_landing_page', compact(
             // pembangunan
             'totalInfakPembangunan',
@@ -153,12 +158,14 @@ class LandingPageController extends Controller
             'donaturTerkini',
             'totalPengeluaranInfakPembangunan',
             'saldoInfakPembangunan',
+            'pengeluaranInfakPembangunan',
 
             // takmir
             'totalInfakTakmir',
             'pendapatantakmirterkini',
             'totalPengeluaranInfakTakmir',
             'saldoInfakTakmir',
+            'pengeluaranInfakTakmir',
 
             'jumlahDonatur',
             'jumlahTransaksiInfak',
@@ -183,5 +190,22 @@ class LandingPageController extends Controller
             'sisaZakatBerasFitrah',
             'sisaZakatBerasMaal'
         ));
+    }
+    public function detailPengeluaranTakmir()
+    {
+        $pengeluaranTakmir = InfakKeluarModel::where('kategori', 'takmir')
+            ->orderBy('tanggal', 'desc')
+            ->paginate(10);
+         
+
+        return view('landing_page.detail_pengeluaran_takmir', compact('pengeluaranTakmir'));
+    }
+    public function detailPengeluaranPembangunan()
+    {
+        $pengeluaranPembangunan = InfakKeluarModel::where('kategori', 'pembangunan')
+            ->orderBy('tanggal', 'desc')
+            ->paginate(10);
+
+        return view('landing_page.detail_pengeluaran_pembangunan', compact('pengeluaranPembangunan'));
     }
 }

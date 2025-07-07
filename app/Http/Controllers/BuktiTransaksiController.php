@@ -9,6 +9,7 @@ use App\Models\UserModel;
 use Illuminate\Http\Request;
 use App\Models\InfakMasukModel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\PejabatService;
 use App\Models\BuktiTransaksiModel;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -258,7 +259,13 @@ class BuktiTransaksiController extends Controller
 
             // buat kuitansi pdf dengan DOMPDF
             $infak = $infakMasuk;
-            $pdf = Pdf::loadView('infak_masuk.kuitansi', compact('infak'))
+
+            // ✅ ambil data pejabat yang sesuai tanggal konfirmasi
+            $pejabatData = PejabatService::getPejabatUntukKuitansi($infakMasuk->tanggal_konfirmasi);
+            $ketua = $pejabatData['ketua'];
+            $bendahara = $pejabatData['bendahara'];
+
+            $pdf = Pdf::loadView('infak_masuk.kuitansi', compact('infak', 'ketua', 'bendahara'))
                 ->setPaper('a4', 'landscape');
 
             // nama file kuitansi tanpa karakter khusus

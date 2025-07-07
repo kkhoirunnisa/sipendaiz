@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\InfakMasukModel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\InfakKeluarModel;
+use App\Services\PejabatService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -205,17 +206,13 @@ class LaporanInfakController extends Controller
         $formattedStartDate = Carbon::parse($startDate)->format('d-m-Y');
         $formattedEndDate = Carbon::parse($endDate)->format('d-m-Y');
 
-        // Tentukan nama ketua dan bendahara berdasarkan kategori
-        if (strtolower($kategori) === 'pembangunan') {
-            $ketua = 'Agus Tisngadi, SE., M.Si.';
-            $bendahara = 'Benny Hermanto';
-        } elseif (strtolower($kategori) === 'takmir') {
-            $ketua = 'Mukhasan, S.Ag.';
-            $bendahara = 'Suparno';
-        } else {
-            $ketua = '-';
-            $bendahara = '-';
-        }
+        // Ambil tanggal saat laporan diunduh
+        // $tanggalCetak = now(); // atau Carbon::now()
+
+        $pejabat = PejabatService::getPejabatUntukLaporanInfak($kategori, $endDate);
+        $ketua = $pejabat['ketua']?->nama ?? '-';
+        $bendahara = $pejabat['bendahara']?->nama ?? '-';
+
 
         $pdf = Pdf::loadView('laporan.unduh_laporan_infak', [
             'transactions' => $transactions,
@@ -230,9 +227,10 @@ class LaporanInfakController extends Controller
             'ketua' => $ketua,
             'bendahara' => $bendahara,
             'user' => $user,
+            // 'tanggalCetak' => $tanggalCetak,
         ])->setPaper('A4', 'landscape');
 
-        // return $pdf->stream("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
-        return $pdf->download("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
+        return $pdf->stream("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
+        // return $pdf->download("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
     }
 }

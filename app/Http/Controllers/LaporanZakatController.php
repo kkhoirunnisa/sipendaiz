@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\ZakatMasukModel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ZakatKeluarModel;
+use App\Services\PejabatService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -196,6 +197,12 @@ class LaporanZakatController extends Controller
             $item['no'] = $i + 1;
         }
 
+        // Ambil ketua dan bendahara untuk laporan zakat
+        // $tanggalCetak = now(); // atau Carbon::now()
+        $pejabat = PejabatService::getPejabatUntukLaporanZakat($endDate);
+        $ketua = $pejabat['ketua']?->nama ?? '-';
+        $bendahara = $pejabat['bendahara']?->nama ?? '-';
+
         $data = [
             'transactions' => $transactions,
             'startDate' => $startDate,
@@ -208,12 +215,14 @@ class LaporanZakatController extends Controller
             'pengeluaranBeras' => $pengeluaranBeras,
             'pemasukanBeras' => $pemasukanBeras,
             'user' => $user,
+            'ketua' => $ketua,
+            'bendahara' => $bendahara,
         ];
 
         $pdf = PDF::loadView('laporan.unduh_laporan_zakat', $data)
             ->setPaper('A4', 'landscape');
 
-        return $pdf->download('laporan_zakat_' . date('Ymd') . '.pdf');
-        //  return $pdf->stream('laporan_zakat_' . date('Ymd') . '.pdf');
+        // return $pdf->download('laporan_zakat_' . date('Ymd') . '.pdf');
+        return $pdf->stream('laporan_zakat_' . date('Ymd') . '.pdf');
     }
 }
