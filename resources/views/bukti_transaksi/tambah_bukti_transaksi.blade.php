@@ -115,7 +115,7 @@
                                 class="form-control"
                                 id="nomor_telepon"
                                 placeholder="Masukkan nomor telepon donatur maks 12 angka"
-                                inputmode="numeric" 
+                                inputmode="numeric"
                                 pattern="[0-9]+"
                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 value="{{ old('nomor_telepon') }}" required>
@@ -209,17 +209,37 @@
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="bukti_transaksi" class="form-labe fw-bold text-dark">
+                            <label for="bukti_transaksi" class="form-label fw-bold text-dark">
                                 <i class="fas fa-receipt me-2 text-primary"></i>
                                 Bukti Transaksi Pemasukan<span class="text-danger"> *</span>
                             </label>
-                            <input type="file" name="bukti_transaksi" id="bukti_transaksi_pemasukan" class="form-control">
-                            <small class="text-muted"> Bukti jpg,png,jpeg max:10240 </small>
-                            <div class="mt-2">
-                                <img id="preview-gambar" src="#" alt="Preview Gambar" class="img-thumbnail d-none" style="max-height: 93px;">
+                            <input type="file" name="bukti_transaksi" id="bukti_transaksi_pemasukan"
+                                class="form-control @error('bukti_transaksi') is-invalid @enderror"
+                                accept="image/*">
+                            <small class="text-muted">Bukti jpg, png, jpeg maksimal 10240</small>
+
+                            {{-- Jika ada bukti sementara di session --}}
+                            @if($buktiSementara)
+                            <div class="mt-2" id="temp-bukti-preview">
+                                <img src="{{ $buktiSementara }}"
+                                    alt="Preview Bukti Transaksi"
+                                    style="max-height: 100px;" class="border rounded">
+                                <div class="mt-1">
+                                    <small class="text-warning">File yang sudah dipilih sebelumnya, harap upload ulang bukti</small>
+                                    <!-- <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="hapusBuktiTemp()">
+                                        <i class="bi bi-trash"></i> Hapus
+                                    </button> -->
+                                </div>
                             </div>
+                            @endif
+
+                            {{-- Preview baru (jika user ganti gambar) --}}
+                            <div class="mt-2">
+                                <img id="preview-gambar" src="#" alt="Preview Gambar" class="img-thumbnail d-none" style="max-height: 100px;">
+                            </div>
+
                             @error('bukti_transaksi')
-                            <div class="text-danger">{{ $message }}</div>
+                            <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
@@ -230,7 +250,7 @@
                                 <i class="bi bi-card-text me-2 text-primary"></i>
                                 Keterangan<span class="text-danger"> *</span>
                             </label>
-                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Keterangan infak">{{ old('keterangan') }}</textarea>
+                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Keterangan infak" required>{{ old('keterangan') }}</textarea>
                             @error('keterangan')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -242,6 +262,7 @@
                             Simpan
                         </button>
                     </div>
+                </div>
             </form>
         </div>
     </div>
@@ -270,20 +291,7 @@
             }
         });
     }
-    // Update otomatis isi textarea keterangan saat donatur diisi
-    // document.querySelector('input[name="donatur"]').addEventListener('input', function() {
-    //     const namaDonatur = this.value.trim();
-    //     const keteranganField = document.getElementById('keterangan');
 
-    //     if (namaDonatur !== '') {
-    //         keteranganField.value = 'Infak atas nama ' + namaDonatur;
-    //     } else {
-    //         keteranganField.value = '';
-    //     }
-    //     updateProgress();
-    // });
-
-    // Update progress bar
     // Inisialisasi elemen global
     const fields = [
         document.getElementById('nama_user'),
@@ -317,6 +325,11 @@
 
             if (id === 'nomor_telepon') {
                 if (/^\d+$/.test(value) && value.length >= 10) { //minimal 10 digit
+                    filledFields++;
+                }
+            } else if (id === 'bukti_transaksi_pemasukan') {
+                // Cek apakah ada file yang dipilih atau ada preview temporary
+                if (field.files.length > 0 || document.getElementById('temp-bukti-preview')) {
                     filledFields++;
                 }
             } else if (value !== '') {
@@ -359,32 +372,7 @@
         toggleFields();
         updateProgress();
         jenisInfak.addEventListener('change', toggleFields);
-    });
-</script>
-
-<!-- menampilkan gambar -->
-<script>
-    // Preview gambar saat dipilih
-    document.getElementById("bukti_transaksi_pemasukan").addEventListener("change", function(event) {
-        const file = event.target.files[0];
-        const preview = document.getElementById("preview-gambar");
-
-        if (file && file.type.startsWith("image/")) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.classList.remove("d-none");
-            };
-            reader.readAsDataURL(file);
-        } else {
-            preview.src = "#";
-            preview.classList.add("d-none");
-        }
-    });
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+        
         // Inisialisasi AutoNumeric untuk input nominal
         const nominalInput = new AutoNumeric('#nominal', {
             digitGroupSeparator: '.',
@@ -394,6 +382,63 @@
             unformatOnSubmit: true
         });
     });
+
+    // Preview gambar saat dipilih
+    document.getElementById("bukti_transaksi_pemasukan").addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById("preview-gambar");
+        const tempPreview = document.getElementById("temp-bukti-preview");
+
+        if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove("d-none");
+                
+                // Sembunyikan preview temporary jika user upload file baru
+                if (tempPreview) {
+                    tempPreview.style.display = 'none';
+                }
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "#";
+            preview.classList.add("d-none");
+            
+            // Tampilkan kembali preview temporary jika ada
+            if (tempPreview) {
+                tempPreview.style.display = 'block';
+            }
+        }
+        
+        // Update progress setiap kali file berubah
+        updateProgress();
+    });
+
+    function hapusBuktiTemp() {
+        const temp = document.getElementById("temp-bukti-preview");
+        if (temp) {
+            temp.remove();
+        }
+
+        // Kosongkan input file agar bisa upload ulang
+        document.getElementById("bukti_transaksi_pemasukan").value = "";
+        
+        // Update progress
+        updateProgress();
+        
+        // Kirim AJAX request untuk menghapus file temporary di server
+        fetch('/hapus-temp-bukti', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'hapus_temp_bukti'
+            })
+        });
+    }
 </script>
 
 <!-- Notifikasi Error -->
@@ -409,4 +454,21 @@
     });
 </script>
 @endif
+
+<!-- Notifikasi Error Validasi -->
+@if ($errors->any())
+<script>
+    let errorMessages = '';
+
+    Swal.fire({
+        icon: 'error',
+        title: 'Error Validasi!',
+        html: errorMessages.replace(/\n/g, '<br>'),
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#dc3545',
+    });
+</script>
+@endif
+
 @endsection

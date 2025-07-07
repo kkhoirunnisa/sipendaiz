@@ -142,4 +142,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/infak/laporan', [LaporanInfakController::class, 'index'])->name('laporan_infak.index');
     Route::get('/infak/laporan/generate', [LaporanInfakController::class, 'generateReport'])->name('laporan_infak.generate');
     Route::get('/infak/laporan/download', [LaporanInfakController::class, 'downloadReport'])->name('laporan_infak.download');
+
+    Route::post('/upload-temp-gambar', [InfakKeluarController::class, 'uploadTempGambar'])->name('upload.temp.gambar');
+
 });

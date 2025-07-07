@@ -142,16 +142,19 @@
         });
     }
 </script>
+
 <!-- Notifikasi Error -->
-@if (session('error'))
+@if ($errors->any())
 <script>
+    let errorMessages = '';
+
     Swal.fire({
         icon: 'error',
-        title: 'Gagal!',
-        text: '{{ session("error") }}',
+        title: 'Error Validasi!',
+        html: errorMessages.replace(/\n/g, '<br>'),
         showConfirmButton: true,
         confirmButtonText: 'OK',
-        confirmButtonColor: '#2d7d32',
+        confirmButtonColor: '#dc3545',
     });
 </script>
 @endif

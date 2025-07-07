@@ -11,13 +11,24 @@ use Illuminate\Support\Facades\Storage;
 class PejabatMasjidController extends Controller
 {
     // menampilkan daftar pejabat masjid
-    public function index()
+    public function index(Request $request)
     {
         try {
-            // ambil semua pejabat masjid, urutkan berdasarkan tanggal mulai terbaru
-            $pejabat = PejabatMasjidModel::orderBy('tanggal_mulai', 'desc')->get();
+            $search = $request->input('search');
 
-            return view('pejabat.index_pejabat', compact('pejabat'));
+            // ambil data pejabat masjid dengan filter pencarian jika ada
+            $pejabat = PejabatMasjidModel::when($search, function ($query, $search) {
+                return $query->where('nama', 'like', "%{$search}%")
+                    ->orWhere('jabatan', 'like', "%{$search}%")
+                    ->orWhere('tanggal_selesai', 'like', "%{$search}%")
+                    ->orWhere('aktif', 'like', "%{$search}%")
+                    ->orWhere('tanggal_mulai', 'like', "%{$search}%");
+            })
+                ->orderBy('tanggal_mulai', 'desc')
+                ->paginate(10)
+                ->withQueryString(); // agar keyword tetap saat pindah halaman
+
+            return view('pejabat.index_pejabat', compact('pejabat', 'search'));
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal memuat data pejabat: ' . $e->getMessage());
         }
@@ -27,7 +38,10 @@ class PejabatMasjidController extends Controller
     public function create()
     {
         $user = Auth::user(); // ambil user login
-
+        // Jika user baru masuk form (tidak dari redirect withInput)
+        if (!old()) {
+            session()->forget('temp_foto_ttd');
+        }
         return view('pejabat.create_pejabat', compact('user'));
     }
 
@@ -57,17 +71,43 @@ class PejabatMasjidController extends Controller
             $data = $request->only(['jabatan', 'nama', 'tanggal_mulai']);
             $data['id_users'] = Auth::id(); // simpan ID user yang membuat data
 
-            // simpan tanda tangan pejabat jika ada
+            // Simpan file tanda tangan jika ada
             if ($request->hasFile('foto_ttd')) {
                 $path = $request->file('foto_ttd')->store('ttd_pejabat', 'public');
                 $data['foto_ttd'] = $path;
+            } elseif ($request->filled('foto_ttd_temp')) {
+                $pathTemp = $request->input('foto_ttd_temp');
+                $newPath = 'ttd_pejabat/' . basename($pathTemp);
+                Storage::disk('public')->move($pathTemp, $newPath);
+                $data['foto_ttd'] = $newPath;
             }
 
             // simpan ke database
             PejabatMasjidModel::create($data);
 
+            // hapus file sementara jika ada
+            if ($request->filled('foto_ttd_temp')) {
+                Storage::disk('public')->delete($request->input('foto_ttd_temp'));
+            }
+            session()->forget('temp_foto_ttd');
+
             return redirect()->route('pejabat.index')->with('success', 'Pejabat berhasil ditambahkan');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Jika ada file yang diupload, simpan sementara
+            if ($request->hasFile('foto_ttd')) {
+                $tempPath = $request->file('foto_ttd')->store('temp_ttd', 'public');
+                session(['temp_foto_ttd' => $tempPath]);
+            }
+
+            // Kembali dengan error validasi
+            return back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
+            // Jika ada file yang diupload, simpan sementara
+            if ($request->hasFile('foto_ttd')) {
+                $tempPath = $request->file('foto_ttd')->store('temp_ttd', 'public');
+                session(['temp_foto_ttd' => $tempPath]);
+            }
+
             return back()->withInput()->with('error', 'Gagal menambahkan pejabat: ' . $e->getMessage());
         }
     }
@@ -110,6 +150,15 @@ class PejabatMasjidController extends Controller
                 // simpan foto tanda tangan baru
                 $path = $request->file('foto_ttd')->store('ttd_pejabat', 'public');
                 $data['foto_ttd'] = $path;
+            } elseif ($request->filled('foto_ttd_temp')) {
+                if ($pejabat->foto_ttd && Storage::disk('public')->exists($pejabat->foto_ttd)) {
+                    Storage::disk('public')->delete($pejabat->foto_ttd);
+                }
+
+                $pathTemp = $request->input('foto_ttd_temp');
+                $newPath = 'ttd_pejabat/' . basename($pathTemp);
+                Storage::disk('public')->move($pathTemp, $newPath);
+                $data['foto_ttd'] = $newPath;
             }
 
             // jika tanggal selesai diisi dan sudah lewat, set aktif ke false nonaktif
@@ -120,8 +169,28 @@ class PejabatMasjidController extends Controller
             // simpan perubahan
             $pejabat->update($data);
 
+            // hapus file sementara jika ada
+            if ($request->filled('foto_ttd_temp')) {
+                Storage::disk('public')->delete($request->input('foto_ttd_temp'));
+            }
+            session()->forget('temp_foto_ttd');
+
             return redirect()->route('pejabat.index')->with('success', 'Pejabat berhasil diperbarui');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Jika ada file yang diupload, simpan sementara
+            if ($request->hasFile('foto_ttd')) {
+                $tempPath = $request->file('foto_ttd')->store('temp_ttd', 'public');
+                session(['temp_foto_ttd' => $tempPath]);
+            }
+
+            return back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
+            // Jika ada file yang diupload, simpan sementara
+            if ($request->hasFile('foto_ttd')) {
+                $tempPath = $request->file('foto_ttd')->store('temp_ttd', 'public');
+                session(['temp_foto_ttd' => $tempPath]);
+            }
+
             return back()->withInput()->with('error', 'Gagal memperbarui pejabat: ' . $e->getMessage());
         }
     }
@@ -157,6 +226,18 @@ class PejabatMasjidController extends Controller
             return view('pejabat.riwayat_pejabat', compact('riwayat', 'jabatan'));
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal memuat riwayat pejabat: ' . $e->getMessage());
+        }
+    }
+
+    // Method untuk membersihkan file temporary (optional - bisa dipanggil via scheduled job)
+    public function cleanTempFiles()
+    {
+        $tempFiles = Storage::disk('public')->files('temp_ttd');
+        foreach ($tempFiles as $file) {
+            // Hapus file yang lebih dari 1 jam
+            if (Storage::disk('public')->lastModified($file) < now()->subHour()->timestamp) {
+                Storage::disk('public')->delete($file);
+            }
         }
     }
 }

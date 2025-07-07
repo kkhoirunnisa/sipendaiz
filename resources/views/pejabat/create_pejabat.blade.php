@@ -26,7 +26,7 @@
     <div class="card shadow-sm">
         <div class="card-body">
             <h4 class="text-dark mb-1 fw-bold">Tambah Pengurus Baru</h4>
-            <p class="text-dark-50 mb-3 small">Lengkapi form di bawah untuk menambahkan pejabat masjid</p>
+            <p class="text-dark-50 mb-3 small">Lengkapi form di bawah untuk menambahkan pengurus masjid</p>
 
             <a class="btn btn-success align-items-center gap-2 mb-2" href="{{ route('pejabat.index') }}">
                 <i class="bi bi-arrow-left-circle-fill"></i> Kembali
@@ -81,8 +81,28 @@
 
                         <div class="mb-3">
                             <label for="foto_ttd" class="form-label fw-bold text-dark">Tanda Tangan (Opsional)</label>
-                            <input type="file" name="foto_ttd" id="foto_ttd" class="form-control @error('foto_ttd') is-invalid @enderror" accept="image/*">
+                            <input type="file" name="foto_ttd" id="foto_ttd"
+                                class="form-control @error('foto_ttd') is-invalid @enderror" accept="image/*">
+
+                            {{-- Preview gambar dari session temporary --}}
+                            @if (session('temp_foto_ttd'))
+                            <div class="mt-2" id="temp-preview">
+                                <img src="{{ asset('storage/' . session('temp_foto_ttd')) }}" alt="Preview TTD"
+                                    style="max-height: 100px;" class="border rounded">
+                                <input type="hidden" name="foto_ttd_temp" value="{{ session('temp_foto_ttd') }}">
+                                <div class="mt-1">
+                                    <small class="text-muted">File yang sudah dipilih sebelumnya</small>
+                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="hapusGambarTemp()">
+                                        <i class="bi bi-trash"></i> Hapus
+                                    </button>
+                                </div>
+                            </div>
+                            @endif
+
                             <div class="form-text">Format PNG, JPG, JPEG. Maksimal 2MB</div>
+                            <div class="mt-2">
+                                <img id="preview-gambar" src="#" alt="Preview Gambar" class="img-thumbnail d-none" style="max-height: 93px;">
+                            </div>
                             @error('foto_ttd')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -98,7 +118,7 @@
 
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
-                            Jika ada pejabat aktif sebelumnya untuk jabatan yang sama, maka akan otomatis dinonaktifkan.
+                            Jika ada pengurus aktif sebelumnya untuk jabatan yang sama, maka akan otomatis dinonaktifkan.
                         </div>
 
                         <div class="text-end">
@@ -113,11 +133,12 @@
         </div>
     </div>
 </div>
+
 <script>
     function konfirmasiTambah() {
         Swal.fire({
             title: "Simpan Pengurus Masjid?",
-            text: "Apakah Anda yakin ingin menyimpan data pejabat masjid ini?",
+            text: "Apakah Anda yakin ingin menyimpan data pengurus masjid ini?",
             icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#0d6efd",
@@ -130,8 +151,36 @@
             }
         });
     }
+
+    function hapusGambarTemp() {
+        // Hapus preview temporary
+        const tempPreview = document.getElementById('temp-preview');
+        if (tempPreview) {
+            tempPreview.remove();
+        }
+
+        // Reset input file
+        document.getElementById('foto_ttd').value = '';
+
+        // Hapus preview gambar baru jika ada
+        const preview = document.getElementById('preview-gambar');
+        preview.classList.add('d-none');
+
+        // Kirim request untuk menghapus file temporary dari server
+        fetch('{{ route("pejabat.index") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                action: 'delete_temp_file'
+            })
+        });
+    }
 </script>
-<!-- Notifikasi Error -->
+
+<!-- Notifikasi Error dan Success -->
 @if (session('error'))
 <script>
     Swal.fire({
@@ -140,8 +189,76 @@
         text: '{{ session("error") }}',
         showConfirmButton: true,
         confirmButtonText: 'OK',
-        confirmButtonColor: '#2d7d32',
+        confirmButtonColor: '#dc3545',
     });
 </script>
 @endif
+
+@if (session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session("success") }}',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#198754',
+    });
+</script>
+@endif
+
+<!-- Notifikasi Error Validasi -->
+@if ($errors->any())
+<script>
+    let errorMessages = '';
+
+    Swal.fire({
+        icon: 'error',
+        title: 'Error Validasi!',
+        html: errorMessages.replace(/\n/g, '<br>'),
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#dc3545',
+    });
+</script>
+@endif
+
+<script>
+    // Preview gambar saat dipilih
+    document.getElementById("foto_ttd").addEventListener("change", function(event) {
+        const input = event.target;
+        const preview = document.getElementById("preview-gambar");
+        const tempPreview = document.getElementById("temp-preview");
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove("d-none");
+
+                // Sembunyikan preview temporary jika ada
+                if (tempPreview) {
+                    tempPreview.style.display = 'none';
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.classList.add("d-none");
+
+            // Tampilkan kembali preview temporary jika ada
+            if (tempPreview) {
+                tempPreview.style.display = 'block';
+            }
+        }
+    });
+
+    // Jika ada file temporary, tampilkan preview
+    document.addEventListener('DOMContentLoaded', function() {
+        const tempPreview = document.getElementById('temp-preview');
+        if (tempPreview) {
+            tempPreview.style.display = 'block';
+        }
+    });
+</script>
+
 @endsection

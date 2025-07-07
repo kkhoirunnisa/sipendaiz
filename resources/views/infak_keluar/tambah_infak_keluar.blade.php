@@ -126,15 +126,31 @@
                                 <i class="fas fa-receipt me-2 text-primary"></i>
                                 Bukti Infak Keluar<span class="text-danger"> *</span>
                             </label>
+
                             <input type="file" name="bukti_infak_keluar" id="bukti_infak_keluar" class="form-control">
-                            <small class="text-muted"> Bukti jpg,png,jpeg max:10240 </small>
-                            <div class="mt-2">
-                                <img id="preview-gambar" src="#" alt="Preview Gambar" class="img-thumbnail d-none" style="max-height: 93px;">
+                            <small class="text-muted">Bukti jpg, png, jpeg (maks. 10MB)</small>
+
+                            {{-- Jika sebelumnya gagal simpan, munculkan pesan upload ulang --}}
+                            @if(session('temp_image_path'))
+                            <div class="text-warning small mt-1">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Upload ulang bukti pengeluaran infak
                             </div>
+                            @endif
+
+                            {{-- Preview Gambar --}}
+                            <div class="mt-2">
+                                <img id="preview-gambar"
+                                    src="{{ session('temp_image_path') ? Storage::url(session('temp_image_path')) : '#' }}"
+                                    alt="Preview Gambar"
+                                    class="img-thumbnail {{ session('temp_image_path') ? '' : 'd-none' }}"
+                                    style="max-height: 93px;">
+                            </div>
+
                             @error('bukti_infak_keluar')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
+
                     </div>
 
                     <div class="mb-3">
@@ -268,4 +284,28 @@
     });
 </script>
 @endif
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const preview = document.getElementById("preview-gambar");
+        const fileInput = document.getElementById("bukti_infak_keluar");
+
+        fileInput.addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove("d-none");
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "#";
+                preview.classList.add("d-none");
+            }
+        });
+    });
+</script>
+
+
 @endsection

@@ -3,12 +3,12 @@
 @section('content')
 <style>
     .nav-tabs .nav-link.active {
-    background:  linear-gradient(135deg, #ffd700, #ffb300) !important;
-    color: #212529 !important; /* teks tetap gelap */
-    font-weight: bold;
-    border-color:rgb(255, 255, 255) !important;
-}
-
+        background: linear-gradient(135deg, #ffd700, #ffb300) !important;
+        color: #212529 !important;
+        /* teks tetap gelap */
+        font-weight: bold;
+        border-color: rgb(255, 255, 255) !important;
+    }
 </style>
 
 <div class="px-3">
@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div>
-                <h3 class="mb-0 fw-bold text-dark">Manajemen Pengurus Masjid</h3>
+                <h3 class="mb-0 fw-bold text-dark">Pengurus</h3>
                 <div class="d-flex align-items-center d-none d-md-flex">
                     <span class="text-muted">Users</span>
                     <i class="bi bi-chevron-right mx-2 text-muted small"></i>
@@ -54,6 +54,16 @@
                     </button>
                 </li>
             </ul>
+
+            <form method="GET" action="{{ route('pejabat.index') }}" class="mb-3 mt-3">
+                <div class="input-group">
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                        placeholder="Cari pengurus">
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
 
             <div class="tab-content mt-3 ">
                 <div class="tab-pane fade show active " id="aktif">
@@ -123,6 +133,7 @@
                         <table class="table table-bordered table-hover align-items-center mb-0" style="min-width: 800px;">
                             <thead class="table-gradient text-white">
                                 <tr>
+                                    <th class="text-center">No</th>
                                     <th class="text-center">Jabatan</th>
                                     <th class="text-center">Nama</th>
                                     <th class="text-center">Periode</th>
@@ -133,6 +144,11 @@
                             <tbody>
                                 @forelse($pejabat as $p)
                                 <tr>
+                                    <td class="text-center fw-semibold text-muted">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            {{ $pejabat->firstItem() + $loop->index }}
+                                        </span>
+                                    </td>
                                     <td class="text-center">{{ ucwords(str_replace('_', ' ', $p->jabatan)) }}</td>
                                     <td class="text-center">{{ $p->nama }}</td>
                                     <td class="text-center">
@@ -183,6 +199,47 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- PAGINATION -->
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap px-2">
+                        <!-- Pagination Info -->
+                        <div class="d-flex align-items-center">
+                            <div class="badge bg-success text-white rounded-pill px-3 py-2 fw-normal">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Menampilkan {{ $pejabat->firstItem() }} - {{ $pejabat->lastItem() }} dari {{ $pejabat->total() }} data
+                            </div>
+                        </div>
+
+                        <!-- Pagination Navigation -->
+                        <div class="d-flex align-items-center">
+                            <div class="badge bg-success text-white rounded-pill px-3 py-2 fw-normal">
+                                {{-- Previous button --}}
+                                @if ($pejabat->onFirstPage())
+                                <span class="btn-sm text-white opacity-50">
+                                    <i class="bi bi-chevron-left"></i> Previous
+                                </span>
+                                @else
+                                <a href="{{ $pejabat->previousPageUrl() }}" class="btn-sm text-white">
+                                    <i class="bi bi-chevron-left"></i> Previous
+                                </a>
+                                @endif
+
+                                <span class="mx-2">Halaman {{ $pejabat->currentPage() }} dari {{ $pejabat->lastPage() }}</span>
+
+                                {{-- Next button --}}
+                                @if ($pejabat->hasMorePages())
+                                <a href="{{ $pejabat->nextPageUrl() }}" class="btn-sm text-white">
+                                    Next <i class="bi bi-chevron-right"></i>
+                                </a>
+                                @else
+                                <span class="btn-sm text-white opacity-50">
+                                    Next <i class="bi bi-chevron-right"></i>
+                                </span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
