@@ -198,7 +198,7 @@
                         <tr>
                             <td class="text-center fw-semibold text-muted">
                                 <span class="badge bg-success bg-opacity-10 text-success">
-                                    {{ $pengeluaranTakmir->firstItem() + $index }}
+                                    {{ $pengeluaranPembangunan->firstItem() + $index }}
                                 </span>
                             </td>
                             <td class="text-center">{{ ucfirst($item->kategori) }}</td>
@@ -231,7 +231,7 @@
                         @if ($pengeluaranPembangunan->onFirstPage())
                         <span class="btn-sm text-white opacity-50"><i class="bi bi-chevron-left"></i> Previous</span>
                         @else
-                        <a href="{{ $pengeluaranTakmir->previousPageUrl() }}" class="btn-sm text-white">
+                        <a href="{{ $pengeluaranPembangunan->previousPageUrl() }}" class="btn-sm text-white">
                             <i class="bi bi-chevron-left"></i> Previous
                         </a>
                         @endif
@@ -239,7 +239,7 @@
                         <span class="mx-2">Page {{ $pengeluaranPembangunan->currentPage() }} of {{ $pengeluaranPembangunan->lastPage() }}</span>
 
                         @if ($pengeluaranPembangunan->hasMorePages())
-                        <a href="{{ $pengeluaranTakmir->nextPageUrl() }}" class="btn-sm text-white">
+                        <a href="{{ $pengeluaranPembangunan->nextPageUrl() }}" class="btn-sm text-white">
                             Next <i class="bi bi-chevron-right"></i>
                         </a>
                         @else
