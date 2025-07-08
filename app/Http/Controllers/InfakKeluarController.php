@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use App\Models\InfakKeluarModel;
 use App\Models\BuktiTransaksiModel;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -54,10 +55,11 @@ class InfakKeluarController extends Controller
         // hitung sisa saldo
         $sisaSaldo = $totalMasuk - $totalKeluar;
 
-        // Cek apakah ada temporary file dari session (untuk preview gambar)
-        $tempImagePath = session('temp_image_path');
-        
-        return view('infak_keluar.tambah_infak_keluar', compact('user', 'kategori', 'sisaSaldo', 'tempImagePath'));
+        if (!old()) {
+            session()->forget('temp_bukti_infak_keluar');
+        }
+
+        return view('infak_keluar.tambah_infak_keluar', compact('user', 'kategori', 'sisaSaldo'));
     }
 
     // simpan data baru infak keluar
@@ -73,7 +75,7 @@ class InfakKeluarController extends Controller
                 'nominal' => 'required|numeric',
                 'barang' => 'required|string|max:20',
                 'keterangan' => 'required|string|max:100',
-                'bukti_infak_keluar' => 'required|file|mimes:jpg,png,jpeg|max:10240',
+                'bukti_infak_keluar' => 'nullable|file|mimes:jpg,png,jpeg|max:10240',
             ]);
 
             $kategori = $request->kategori;
@@ -96,10 +98,10 @@ class InfakKeluarController extends Controller
             if ($request->nominal > $sisaSaldo) {
                 // Simpan file sementara untuk preview
                 if ($request->hasFile('bukti_infak_keluar')) {
-                    $tempPath = $this->saveTempImage($request->file('bukti_infak_keluar'));
-                    session(['temp_image_path' => $tempPath]);
+                    $tempPath = $request->file('bukti_infak_keluar')->store('temp_ttd', 'public');
+                    session(['temp_bukti_infak_keluar' => $tempPath]);
                 }
-                
+
                 return back()->withInput()->with('error', 'Nominal infak keluar melebihi sisa saldo sebesar Rp ' . number_format($sisaSaldo, 0, ',', '.'));
             }
 
@@ -107,8 +109,19 @@ class InfakKeluarController extends Controller
             $validated['id_users'] = $user->id;
 
             // simpan bukti infak keluar
+            // if ($request->hasFile('bukti_infak_keluar')) {
+            //     $validated['bukti_infak_keluar'] = $request->file('bukti_infak_keluar')->store('bukti', 'public');
+            // }
+            // Simpan file tanda tangan jika ada
             if ($request->hasFile('bukti_infak_keluar')) {
-                $validated['bukti_infak_keluar'] = $request->file('bukti_infak_keluar')->store('bukti', 'public');
+                $path = $request->file('bukti_infak_keluar')->store('bukti', 'public');
+                $validated['bukti_infak_keluar'] = $path;
+            } elseif ($request->input('temp_bukti_infak_keluar')) {
+                Log::info($request->input('temp_bukti_infak_keluar'));
+                $pathTemp = $request->input('temp_bukti_infak_keluar');
+                $newPath = 'bukti/' . basename($pathTemp);
+                Storage::disk('public')->move($pathTemp, $newPath);
+                $validated['bukti_infak_keluar'] = $newPath;
             }
 
             // simpan data infak keluar
@@ -122,41 +135,29 @@ class InfakKeluarController extends Controller
         } catch (Exception $e) {
             // Simpan file sementara untuk preview saat terjadi error
             if ($request->hasFile('bukti_infak_keluar')) {
-                $tempPath = $this->saveTempImage($request->file('bukti_infak_keluar'));
-                session(['temp_image_path' => $tempPath]);
+                $tempPath = $request->file('bukti_infak_keluar')->store('temp_ttd', 'public');
+                session(['temp_bukti_infak_keluar' => $tempPath]);
             }
-            
+
             return back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Simpan file gambar sementara untuk preview
-     */
-    private function saveTempImage($file)
-    {
-        // Buat nama file unik dengan timestamp
-        $fileName = 'temp_' . time() . '_' . $file->getClientOriginalName();
-        
-        // Simpan ke folder temporary
-        $tempPath = $file->storeAs('temp', $fileName, 'public');
-        
-        return $tempPath;
-    }
+
 
     /**
      * Bersihkan file gambar sementara
      */
     private function cleanupTempImage()
     {
-        $tempPath = session('temp_image_path');
-        
+        $tempPath = session('temp_bukti_infak_keluar');
+
         if ($tempPath && Storage::disk('public')->exists($tempPath)) {
             Storage::disk('public')->delete($tempPath);
         }
-        
+
         // Hapus dari session
-        session()->forget('temp_image_path');
+        session()->forget('temp_bukti_infak_keluar');
     }
 
     // form edit data
@@ -193,7 +194,7 @@ class InfakKeluarController extends Controller
         }
 
         // Cek apakah ada temporary file dari session (untuk preview gambar)
-        $tempImagePath = session('temp_image_path');
+        $tempImagePath = session('temp_bukti_infak_keluar');
 
         return view('infak_keluar.edit_infak_keluar', compact('infakKeluar', 'user', 'kategori', 'sisaSaldo', 'tempImagePath'));
     }
@@ -234,10 +235,10 @@ class InfakKeluarController extends Controller
             if ($request->nominal > $sisaSaldo) {
                 // Simpan file sementara untuk preview jika ada
                 if ($request->hasFile('bukti_infak_keluar')) {
-                    $tempPath = $this->saveTempImage($request->file('bukti_infak_keluar'));
-                    session(['temp_image_path' => $tempPath]);
+                    $tempPath = $request->file('bukti_infak_keluar')->store('temp_ttd', 'public');
+                    session(['temp_bukti_infak_keluar' => $tempPath]);
                 }
-                
+
                 return back()->withInput()->with('error', 'Nominal infak keluar melebihi sisa saldo sebesar Rp ' . number_format($sisaSaldo, 0, ',', '.'));
             }
 
@@ -266,10 +267,10 @@ class InfakKeluarController extends Controller
         } catch (Exception $e) {
             // Simpan file sementara untuk preview saat terjadi error
             if ($request->hasFile('bukti_infak_keluar')) {
-                $tempPath = $this->saveTempImage($request->file('bukti_infak_keluar'));
-                session(['temp_image_path' => $tempPath]);
+                $tempPath = $request->file('bukti_infak_keluar')->store('temp_ttd', 'public');
+                session(['temp_bukti_infak_keluar' => $tempPath]);
             }
-            
+
             return redirect()->back()->withInput()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }

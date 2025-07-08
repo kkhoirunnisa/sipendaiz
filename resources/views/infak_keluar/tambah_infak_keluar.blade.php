@@ -131,7 +131,7 @@
                             <small class="text-muted">Bukti jpg, png, jpeg. Maks 10240</small>
 
                             {{-- Jika sebelumnya gagal simpan, munculkan pesan upload ulang --}}
-                            @if(session('temp_image_path'))
+                            @if(session('temp_bukti_infak_keluar'))
                             <div class="text-warning small mt-1">
                                 <i class="bi bi-exclamation-triangle-fill me-1"></i> Upload ulang bukti pengeluaran infak
                             </div>
@@ -140,10 +140,11 @@
                             {{-- Preview Gambar --}}
                             <div class="mt-2">
                                 <img id="preview-gambar"
-                                    src="{{ session('temp_image_path') ? Storage::url(session('temp_image_path')) : '#' }}"
+                                    src="{{ session('temp_bukti_infak_keluar') ? Storage::url(session('temp_bukti_infak_keluar')) : '#' }}"
                                     alt="Preview Gambar"
-                                    class="img-thumbnail {{ session('temp_image_path') ? '' : 'd-none' }}"
+                                    class="img-thumbnail {{ session('temp_bukti_infak_keluar') ? '' : 'd-none' }}"
                                     style="max-height: 93px;">
+                                <input type="hidden" name="temp_bukti_infak_keluar" value="{{ session('temp_bukti_infak_keluar') }}">
                             </div>
 
                             @error('bukti_infak_keluar')

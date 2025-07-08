@@ -224,6 +224,7 @@
                                 <img src="{{ $buktiSementara }}"
                                     alt="Preview Bukti Transaksi"
                                     style="max-height: 100px;" class="border rounded">
+                                <input type="hidden" name="temp_bukti_transaksi" value="{{ session('temp_bukti_transaksi') }}">
                                 <div class="mt-1">
                                     <small class="text-warning">File yang sudah dipilih sebelumnya, harap upload ulang bukti</small>
                                     <!-- <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="hapusBuktiTemp()">
@@ -372,7 +373,7 @@
         toggleFields();
         updateProgress();
         jenisInfak.addEventListener('change', toggleFields);
-        
+
         // Inisialisasi AutoNumeric untuk input nominal
         const nominalInput = new AutoNumeric('#nominal', {
             digitGroupSeparator: '.',
@@ -394,7 +395,7 @@
             reader.onload = function(e) {
                 preview.src = e.target.result;
                 preview.classList.remove("d-none");
-                
+
                 // Sembunyikan preview temporary jika user upload file baru
                 if (tempPreview) {
                     tempPreview.style.display = 'none';
@@ -404,13 +405,13 @@
         } else {
             preview.src = "#";
             preview.classList.add("d-none");
-            
+
             // Tampilkan kembali preview temporary jika ada
             if (tempPreview) {
                 tempPreview.style.display = 'block';
             }
         }
-        
+
         // Update progress setiap kali file berubah
         updateProgress();
     });
@@ -423,10 +424,10 @@
 
         // Kosongkan input file agar bisa upload ulang
         document.getElementById("bukti_transaksi_pemasukan").value = "";
-        
+
         // Update progress
         updateProgress();
-        
+
         // Kirim AJAX request untuk menghapus file temporary di server
         fetch('/hapus-temp-bukti', {
             method: 'POST',

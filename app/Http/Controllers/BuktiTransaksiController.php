@@ -88,8 +88,9 @@ class BuktiTransaksiController extends Controller
 
             if ($request->hasFile('bukti_transaksi')) {
                 $buktiPath = $request->file('bukti_transaksi')->store('bukti', 'public');
-            } elseif (session()->has('temp_bukti_transaksi')) {
-                $tempPath = session('temp_bukti_transaksi');
+            } elseif ($request->input('temp_bukti_transaksi')) {
+                $tempPath = $request->input('temp_bukti_transaksi');
+                Log::info($tempPath);
                 $namaBaru = 'bukti/' . basename($tempPath);
                 Storage::disk('public')->move($tempPath, $namaBaru);
                 $buktiPath = $namaBaru;
@@ -130,12 +131,12 @@ class BuktiTransaksiController extends Controller
             return redirect()->route('bukti_transaksi.index')->with('success', 'Bukti transaksi berhasil ditambahkan!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Simpan file ke temporary jika validasi gagal
-            $this->handleTemporaryFile($request);
+             // Simpan file sementara untuk preview saat terjadi error
+            if ($request->hasFile('bukti_transaksi')) {
+                $tempPath = $request->file('bukti_transaksi')->store('bukti', 'public');
+                session(['temp_bukti_transaksi' => $tempPath]);
+            }
             return back()->withErrors($e->validator)->withInput();
-        } catch (\Exception $e) {
-            // Simpan file ke temporary jika error umum
-            $this->handleTemporaryFile($request);
-            return back()->withInput()->with('error', 'Gagal menambahkan data: ' . $e->getMessage());
         }
     }
 
