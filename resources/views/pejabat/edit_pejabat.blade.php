@@ -96,7 +96,7 @@
                                 <small class="text-warning">Tanda tangan baru (belum disimpan)</small>
                                 <div id="preview-wrapper-ttd">
                                     <img id="preview-gambar-ttd" src="{{ asset('storage/' . session('temp_foto_ttd')) }}" class="img-thumbnail" style="max-height: 150px;" alt="Preview TTD Baru">
-                                    <div class="small text-muted">Preview tanda tangan baru</div>
+                                    <!-- <div class="small text-muted">Preview tanda tangan baru</div> -->
                                 </div>
                                 @elseif($pejabat->foto_ttd)
                                 <!-- Jika ada gambar lama dan tidak ada session, tampilkan gambar lama -->
@@ -110,7 +110,7 @@
                                     <small class="text-warning">Preview tanda tangan baru</small>
                                     <div>
                                         <img id="preview-gambar-ttd" class="img-thumbnail" style="max-height: 150px;" alt="Preview TTD Baru">
-                                        <div class="small text-muted">Preview tanda tangan baru</div>
+                                        <!-- <div class="small text-muted">Preview tanda tangan baru</div> -->
                                     </div>
                                 </div>
                                 @else
@@ -119,7 +119,7 @@
                                     <small class="text-warning">Preview tanda tangan baru</small>
                                     <div>
                                         <img id="preview-gambar-ttd" class="img-thumbnail" style="max-height: 150px;" alt="Preview TTD Baru">
-                                        <div class="small text-muted">Preview tanda tangan baru</div>
+                                        <!-- <div class="small text-muted">Preview tanda tangan baru</div> -->
                                     </div>
                                 </div>
                                 @endif

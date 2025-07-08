@@ -146,7 +146,7 @@
                                 <div id="preview-wrapper">
                                     <img id="preview-gambar" src="{{ asset('storage/' . session('temp_bukti_infak_keluar')) }}"
                                         class="img-thumbnail" style="max-height: 150px;" alt="Preview Bukti Baru">
-                                    <div class="small text-muted">Preview bukti baru</div>
+                                    <!-- <div class="small text-muted">Preview bukti baru</div> -->
                                 </div>
                                 @elseif($infakKeluar->bukti_infak_keluar)
                                 <!-- Jika ada gambar lama dan tidak ada session -->
@@ -160,7 +160,7 @@
                                     <small class="text-warning">Preview bukti baru</small>
                                     <div>
                                         <img id="preview-gambar" class="img-thumbnail" style="max-height: 150px;" alt="Preview Bukti Baru">
-                                        <div class="small text-muted">Preview bukti baru</div>
+                                        <!-- <div class="small text-muted">Preview bukti baru</div> -->
                                     </div>
                                 </div>
                                 @else
@@ -169,7 +169,7 @@
                                     <small class="text-warning">Preview bukti baru</small>
                                     <div>
                                         <img id="preview-gambar" class="img-thumbnail" style="max-height: 150px;" alt="Preview Bukti Baru">
-                                        <div class="small text-muted">Preview bukti baru</div>
+                                        <!-- <div class="small text-muted">Preview bukti baru</div> -->
                                     </div>
                                 </div>
                                 @endif

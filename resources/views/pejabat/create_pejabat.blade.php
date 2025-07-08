@@ -110,7 +110,7 @@
 
                         <div class="mb-3">
                             <label for="tanggal_mulai" class="form-label fw-bold text-dark">Tanggal Mulai Jabatan <span class="text-danger">*</span></label>
-                            <input type="date" name="tanggal_mulai" id="tanggal_mulai" class="form-control @error('tanggal_mulai') is-invalid @enderror" value="{{ old('tanggal_mulai', date('Y-m-d')) }}" required>
+                            <input type="date" name="tanggal_mulai" id="tanggal_mulai" class="form-control @error('tanggal_mulai') is-invalid @enderror" value="{{ old('tanggal_mulai') }}" required>
                             @error('tanggal_mulai')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

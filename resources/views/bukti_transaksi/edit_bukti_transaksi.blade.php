@@ -204,25 +204,61 @@
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <!-- bukti transaksi -->
                         <div class="col-md-6 mb-3">
                             <label for="bukti_transaksi_pemasukan" class="form-label fw-bold text-dark">
                                 <i class="fas fa-receipt me-2 text-primary"></i>
-                                Bukti Transaksi Pemasukan<span class="text-danger"> *</span>
+                                Bukti Transaksi Pemasukan <span class="text-danger">*</span>
                             </label>
 
-                            <input type="file" name="bukti_transaksi" id="bukti_transaksi_pemasukan" class="form-control"
-                                onchange="previewImage(event)">
+                            <!-- Input file -->
+                            <input type="file" name="bukti_transaksi" id="bukti_transaksi_pemasukan"
+                                class="form-control @error('bukti_transaksi') is-invalid @enderror"
+                                accept="image/*" onchange="previewBuktiTransaksi(event)">
 
                             @error('bukti_transaksi')
                             <div class="text-danger mt-1">{{ $message }}</div>
                             @enderror
 
-                            @if($buktiTransaksi->bukti_transaksi)
-                            <small class="text-success">Bukti sudah tersedia</small>
-                            <div class="mt-2">
-                                <img id="preview-gambar" src="{{ asset('storage/' . $buktiTransaksi->bukti_transaksi) }}" alt="Preview Gambar" class="img-thumbnail" style="max-height: 150px;">
+                            <!-- Preview container -->
+                            <div class="mt-2" id="preview-container-transaksi">
+                                @if(session('temp_bukti_transaksi'))
+                                <!-- Jika ada gambar dari session -->
+                                <small class="text-warning">Bukti baru (belum disimpan)</small>
+                                <div id="preview-wrapper-transaksi">
+                                    <img id="preview-gambar-transaksi" src="{{ asset('storage/' . session('temp_bukti_transaksi')) }}"
+                                        class="img-thumbnail" style="max-height: 150px;" alt="Preview Bukti Baru">
+                                    <!-- <div class="small text-muted">Preview bukti baru</div> -->
+                                </div>
+                                @elseif($buktiTransaksi->bukti_transaksi)
+                                <!-- Jika ada gambar lama dan tidak ada session -->
+                                <small class="text-success">Bukti transaksi saat ini</small>
+                                <div id="gambar-transaksi-lama">
+                                    <img src="{{ asset('storage/' . $buktiTransaksi->bukti_transaksi) }}" alt="Bukti Lama"
+                                        class="img-thumbnail" style="max-height: 150px;">
+                                </div>
+                                <!-- Container preview baru, tapi disembunyikan dulu -->
+                                <div class="d-none" id="preview-wrapper-transaksi">
+                                    <small class="text-warning">Preview bukti baru</small>
+                                    <div>
+                                        <img id="preview-gambar-transaksi" class="img-thumbnail" style="max-height: 150px;" alt="Preview Bukti Baru">
+                                        <!-- <div class="small text-muted">Preview bukti baru</div> -->
+                                    </div>
+                                </div>
+                                @else
+                                <!-- Tidak ada gambar sama sekali -->
+                                <div class="d-none" id="preview-wrapper-transaksi">
+                                    <small class="text-warning">Preview bukti baru</small>
+                                    <div>
+                                        <img id="preview-gambar-transaksi" class="img-thumbnail" style="max-height: 150px;" alt="Preview Bukti Baru">
+                                        <!-- <div class="small text-muted">Preview bukti baru</div> -->
+                                    </div>
+                                </div>
+                                @endif
                             </div>
-                            @endif
+
+                            <div class="form-text">Lewati jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 10240.</div>
                         </div>
 
                     </div>
@@ -408,4 +444,31 @@
     });
 </script>
 @endif
+
+<script>
+    function previewBuktiTransaksi(event) {
+        const input = event.target;
+        const previewWrapper = document.getElementById('preview-wrapper-transaksi');
+        const previewImg = document.getElementById('preview-gambar-transaksi');
+        const gambarLama = document.getElementById('gambar-transaksi-lama');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+
+                // Tampilkan preview baru
+                previewWrapper.classList.remove('d-none');
+
+                // Sembunyikan gambar lama
+                if (gambarLama) {
+                    gambarLama.classList.add('d-none');
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+
 @endsection

@@ -131,7 +131,7 @@ class BuktiTransaksiController extends Controller
             return redirect()->route('bukti_transaksi.index')->with('success', 'Bukti transaksi berhasil ditambahkan!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Simpan file ke temporary jika validasi gagal
-             // Simpan file sementara untuk preview saat terjadi error
+            // Simpan file sementara untuk preview saat terjadi error
             if ($request->hasFile('bukti_transaksi')) {
                 $tempPath = $request->file('bukti_transaksi')->store('bukti', 'public');
                 session(['temp_bukti_transaksi' => $tempPath]);
@@ -140,22 +140,6 @@ class BuktiTransaksiController extends Controller
         }
     }
 
-    /**
-     * Handle temporary file storage saat error
-     */
-    private function handleTemporaryFile(Request $request)
-    {
-        if ($request->hasFile('bukti_transaksi')) {
-            // Hapus file temporary lama jika ada
-            if (session()->has('temp_bukti_transaksi')) {
-                Storage::disk('public')->delete(session('temp_bukti_transaksi'));
-            }
-
-            // Simpan file baru ke temporary
-            $tempPath = $request->file('bukti_transaksi')->store('temp_bukti', 'public');
-            session(['temp_bukti_transaksi' => $tempPath]);
-        }
-    }
 
     /**
      * Kirim notifikasi ke bendahara
@@ -221,6 +205,8 @@ class BuktiTransaksiController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $buktiTransaksi = BuktiTransaksiModel::findOrFail($id);
+
             // Validasi input
             $validated = $request->validate([
                 'id_users' => 'required|exists:users,id',
@@ -238,33 +224,52 @@ class BuktiTransaksiController extends Controller
                 'keterangan' => 'required|string|max:100',
             ]);
 
-            $buktiTransaksi = BuktiTransaksiModel::findOrFail($id);
-
-            //jika file baru diupload, ganti file lama
+            // === Penanganan file ===
             if ($request->hasFile('bukti_transaksi')) {
-                // Hapus file lama
-                if ($buktiTransaksi->bukti_transaksi) {
+                // Hapus file lama jika ada
+                if ($buktiTransaksi->bukti_transaksi && Storage::disk('public')->exists($buktiTransaksi->bukti_transaksi)) {
                     Storage::disk('public')->delete($buktiTransaksi->bukti_transaksi);
                 }
+
                 // Simpan file baru
                 $validated['bukti_transaksi'] = $request->file('bukti_transaksi')->store('bukti', 'public');
+            } elseif (session('temp_bukti_transaksi')) {
+                // Jika ada file sementara di session
+                $tempPath = session('temp_bukti_transaksi');
+                $newPath = 'bukti/' . basename($tempPath);
+
+                // Hapus file lama jika ada
+                if ($buktiTransaksi->bukti_transaksi && Storage::disk('public')->exists($buktiTransaksi->bukti_transaksi)) {
+                    Storage::disk('public')->delete($buktiTransaksi->bukti_transaksi);
+                }
+
+                if (Storage::disk('public')->exists($tempPath)) {
+                    Storage::disk('public')->move($tempPath, $newPath);
+                    $validated['bukti_transaksi'] = $newPath;
+                }
             } else {
-                // Gunakan gambar lama jika tidak diganti
                 $validated['bukti_transaksi'] = $buktiTransaksi->bukti_transaksi;
             }
 
-            // Isi data baru dan simpan
+            // Simpan data
             $buktiTransaksi->fill($validated);
-            // Set nominal menjadi null jika kosong
             $buktiTransaksi->nominal = $request->nominal ?: null;
-            // Simpan ke database
             $buktiTransaksi->save();
 
+            $this->cleanupTempBuktiTransaksi();
+
             return redirect()->route('bukti_transaksi.index')->with('success', 'Bukti transaksi berhasil diperbarui!');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            // Simpan file ke sementara jika gagal
+            if ($request->hasFile('bukti_transaksi')) {
+                $tempPath = $request->file('bukti_transaksi')->store('temp_bukti', 'public');
+                session(['temp_bukti_transaksi' => $tempPath]);
+            }
+
             return redirect()->back()->withInput()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }
+
 
     // menghapus bukti transaksi
     public function destroy($id)
@@ -525,5 +530,29 @@ class BuktiTransaksiController extends Controller
                 Storage::disk('public')->delete($file);
             }
         }
+    }
+
+    private function handleTemporaryFile(Request $request)
+    {
+        if ($request->hasFile('bukti_transaksi')) {
+            // Hapus file temporary lama jika ada
+            if (session()->has('temp_bukti_transaksi')) {
+                Storage::disk('public')->delete(session('temp_bukti_transaksi'));
+            }
+
+            // Simpan file baru ke temporary
+            $tempPath = $request->file('bukti_transaksi')->store('temp_bukti', 'public');
+            session(['temp_bukti_transaksi' => $tempPath]);
+        }
+    }
+
+    protected function cleanupTempBuktiTransaksi()
+    {
+        $tempPath = session('temp_bukti_transaksi');
+        if ($tempPath && Storage::disk('public')->exists($tempPath)) {
+            Storage::disk('public')->delete($tempPath);
+        }
+
+        session()->forget('temp_bukti_transaksi');
     }
 }
