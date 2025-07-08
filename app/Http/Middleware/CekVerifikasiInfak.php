@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\BuktiTransaksiModel;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,10 +16,17 @@ class CekVerifikasiInfak
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $bukti_infak = $request->bukti_transaksi->status;
-        if ($bukti_infak !== 'Terverifikasi') {
-            return redirect()->back()->with('error', 'Bukti infak belum terverifikasi.');
+        $id = $request->route('id'); // Ambil ID dari route parameter
+        $bukti = BuktiTransaksiModel::find($id);
+
+        if (!$bukti) {
+            return redirect()->back()->with('error', 'Data bukti transaksi tidak ditemukan.');
         }
+
+        if ($bukti->status === 'Terverifikasi') {
+            return redirect()->route('bukti-transaksi.index')->with('error', 'Data sudah terverifikasi dan tidak bisa diubah.');
+        }
+
         return $next($request);
     }
 }

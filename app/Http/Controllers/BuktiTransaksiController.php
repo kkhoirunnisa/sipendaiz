@@ -128,12 +128,10 @@ class BuktiTransaksiController extends Controller
             $this->sendNotificationToBendahara($validated);
 
             return redirect()->route('bukti_transaksi.index')->with('success', 'Bukti transaksi berhasil ditambahkan!');
-            
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Simpan file ke temporary jika validasi gagal
             $this->handleTemporaryFile($request);
             return back()->withErrors($e->validator)->withInput();
-            
         } catch (\Exception $e) {
             // Simpan file ke temporary jika error umum
             $this->handleTemporaryFile($request);
@@ -151,7 +149,7 @@ class BuktiTransaksiController extends Controller
             if (session()->has('temp_bukti_transaksi')) {
                 Storage::disk('public')->delete(session('temp_bukti_transaksi'));
             }
-            
+
             // Simpan file baru ke temporary
             $tempPath = $request->file('bukti_transaksi')->store('temp_bukti', 'public');
             session(['temp_bukti_transaksi' => $tempPath]);
@@ -165,14 +163,14 @@ class BuktiTransaksiController extends Controller
     {
         $client = new Client();
         $bendaharas = UserModel::where('role', 'Bendahara')->whereNotNull('nomor_telepon')->get();
-        
+
         $message = "*BUKTI TRANSAKSI BARU MASUK*\n\n";
         $message .= "Ada transaksi infak yang perlu dikonfirmasi:\n";
         $message .= "*Nama Donatur:* {$validated['donatur']}\n";
         $message .= "*Kategori:* {$validated['kategori']}\n";
         $message .= "*Metode:* {$validated['metode']}\n";
         $message .= "*Infak:* ";
-        
+
         if (!empty($validated['nominal'])) {
             $message .= "Rp " . number_format($validated['nominal'], 0, ',', '.');
         } elseif (!empty($validated['barang'])) {
@@ -180,7 +178,7 @@ class BuktiTransaksiController extends Controller
         } else {
             $message .= "-";
         }
-        
+
         $message .= "\n";
         $message .= "*Tanggal:* " . Carbon::parse($validated['tanggal_infak'])->format('d-m-Y') . "\n";
         $message .= "*Status:* Pending\n\n";
@@ -210,6 +208,11 @@ class BuktiTransaksiController extends Controller
     {
         $buktiTransaksi = BuktiTransaksiModel::findOrFail($id);
         $user = Auth::user();
+
+        if ($buktiTransaksi->status === 'Terverifikasi') {
+            return redirect()->route('bukti_transaksi.index')->with('error', 'Data sudah terverifikasi dan tidak bisa diubah.');
+        }
+
         return view('bukti_transaksi.edit_bukti_transaksi', compact('buktiTransaksi', 'user'));
     }
 
@@ -235,7 +238,7 @@ class BuktiTransaksiController extends Controller
             ]);
 
             $buktiTransaksi = BuktiTransaksiModel::findOrFail($id);
-            
+
             //jika file baru diupload, ganti file lama
             if ($request->hasFile('bukti_transaksi')) {
                 // Hapus file lama
@@ -390,7 +393,7 @@ class BuktiTransaksiController extends Controller
         $message .= "*Kategori:* {$bukti->kategori}\n";
         $message .= "*Alamat:* {$bukti->alamat}\n";
         $message .= "*Infak:* ";
-        
+
         if (!empty($bukti->nominal)) {
             $message .= "Rp " . number_format($bukti->nominal, 0, ',', '.');
         } elseif (!empty($bukti->barang)) {
@@ -398,7 +401,7 @@ class BuktiTransaksiController extends Controller
         } else {
             $message .= "-";
         }
-        
+
         $message .= "\n";
         $message .= "*Tanggal Infak:* " . Carbon::parse($bukti->tanggal_infak)->format('d-m-Y') . "\n";
         $message .= "*Tanggal Konfirmasi:* " . Carbon::parse($infakMasuk->tanggal_konfirmasi)->format('d-m-Y') . "\n";
@@ -422,7 +425,7 @@ class BuktiTransaksiController extends Controller
         $msgUser .= "*Kategori:* {$bukti->kategori}\n";
         $msgUser .= "*Alamat:* {$bukti->alamat}\n";
         $msgUser .= "*Infak:* ";
-        
+
         if (!empty($bukti->nominal)) {
             $msgUser .= "Rp " . number_format($bukti->nominal, 0, ',', '.');
         } elseif (!empty($bukti->barang)) {
@@ -430,7 +433,7 @@ class BuktiTransaksiController extends Controller
         } else {
             $msgUser .= "-";
         }
-        
+
         $msgUser .= "\n\n";
         $msgUser .= "Transaksi infak sudah *TERVERIFIKASI*\n";
         $msgUser .= "Cek pemasukan infak untuk melihat kuitansi.\n";
@@ -494,7 +497,7 @@ class BuktiTransaksiController extends Controller
         $msgUser .= "*Kategori:* {$transaksi->kategori}\n";
         $msgUser .= "*Alamat:* {$transaksi->alamat}\n";
         $msgUser .= "*Infak:* ";
-        
+
         if (!empty($transaksi->nominal)) {
             $msgUser .= "Rp " . number_format($transaksi->nominal, 0, ',', '.');
         } elseif (!empty($transaksi->barang)) {
@@ -502,7 +505,7 @@ class BuktiTransaksiController extends Controller
         } else {
             $msgUser .= "-";
         }
-        
+
         $msgUser .= "\n\n";
         $msgUser .= "Transaksi infak *DITOLAK*\n";
         $msgUser .= "Cek kembali data atau hubungi bendahara.\n";
