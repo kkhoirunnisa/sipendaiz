@@ -128,7 +128,7 @@
                             </label>
 
                             <input type="file" name="bukti_infak_keluar" id="bukti_infak_keluar" class="form-control">
-                            <small class="text-muted">Bukti jpg, png, jpeg (maks. 10MB)</small>
+                            <small class="text-muted">Bukti jpg, png, jpeg. Maks 10240</small>
 
                             {{-- Jika sebelumnya gagal simpan, munculkan pesan upload ulang --}}
                             @if(session('temp_image_path'))
