@@ -112,19 +112,25 @@ class PejabatMasjidController extends Controller
         }
     }
 
-    // menampilkan form untuk mengedit pejabat
+    // Method edit - tambahkan pembersihan session temp jika baru masuk form
     public function edit($id)
     {
         try {
             $pejabat = PejabatMasjidModel::findOrFail($id);
             $user = Auth::user();
+
+            // Jika user baru masuk form edit (tidak dari redirect withInput), bersihkan session temp
+            if (!old()) {
+                session()->forget('temp_foto_ttd');
+            }
+
             return view('pejabat.edit_pejabat', compact('pejabat', 'user'));
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal membuka form edit: ' . $e->getMessage());
         }
     }
 
-    // memperbarui data pejabat
+    // Method update - perbaiki handling file upload dan session
     public function update(Request $request, $id)
     {
         try {
@@ -141,16 +147,18 @@ class PejabatMasjidController extends Controller
             $data = $request->only(['nama', 'tanggal_mulai', 'tanggal_selesai']);
             $data['id_users'] = Auth::id();
 
-            // jika upload foto baru, hapus foto lama
+            // Handle foto TTD
             if ($request->hasFile('foto_ttd')) {
+                // Hapus foto lama jika ada
                 if ($pejabat->foto_ttd && Storage::disk('public')->exists($pejabat->foto_ttd)) {
                     Storage::disk('public')->delete($pejabat->foto_ttd);
                 }
 
-                // simpan foto tanda tangan baru
+                // Simpan foto baru
                 $path = $request->file('foto_ttd')->store('ttd_pejabat', 'public');
                 $data['foto_ttd'] = $path;
             } elseif ($request->filled('foto_ttd_temp')) {
+                // Jika menggunakan foto dari session temp
                 if ($pejabat->foto_ttd && Storage::disk('public')->exists($pejabat->foto_ttd)) {
                     Storage::disk('public')->delete($pejabat->foto_ttd);
                 }
@@ -161,7 +169,7 @@ class PejabatMasjidController extends Controller
                 $data['foto_ttd'] = $newPath;
             }
 
-            // jika tanggal selesai diisi dan sudah lewat, set aktif ke false nonaktif
+            // jika tanggal selesai diisi dan sudah lewat, set aktif ke false
             if ($request->tanggal_selesai && Carbon::parse($request->tanggal_selesai)->isPast()) {
                 $data['aktif'] = false;
             }

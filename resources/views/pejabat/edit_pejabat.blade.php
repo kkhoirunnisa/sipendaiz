@@ -33,7 +33,10 @@
             <form id="edit-form" action="{{ route('pejabat.update', $pejabat->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-
+                {{-- Tambahkan input hidden untuk gambar sementara --}}
+                @if(session('temp_foto_ttd'))
+                <input type="hidden" name="foto_ttd_temp" value="{{ session('temp_foto_ttd') }}">
+                @endif
                 <div class="card shadow border-0 mb-4">
                     <div class="card-header bg-warning text-dark fw-bold">
                         <i class="bi bi-clipboard-fill me-2"></i>Formulir Edit Pengurus
@@ -70,22 +73,60 @@
                             @enderror
                         </div>
 
+                        <!-- Input file untuk mengunggah tanda tangan pejabat -->
                         <div class="mb-3">
                             <label for="foto_ttd" class="form-label fw-bold text-dark">
                                 <i class="fas fa-signature me-2 text-warning"></i>
                                 Tanda Tangan (Opsional)
                             </label>
-                            @if($pejabat->foto_ttd)
-                            <div class="mb-2">
-                                <img src="{{ asset('storage/' . $pejabat->foto_ttd) }}" alt="Tanda Tangan Saat Ini" class="img-thumbnail" style="max-width: 200px;">
-                                <div class="small text-muted">Tanda tangan saat ini</div>
-                            </div>
-                            @endif
-                            <input type="file" name="foto_ttd" id="foto_ttd" class="form-control @error('foto_ttd') is-invalid @enderror" accept="image/*">
-                            <div class="form-text">Kosongkan jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 2MB</div>
+
+                            <!-- Input file yang memicu preview saat gambar baru dipilih -->
+                            <input type="file" name="foto_ttd" id="foto_ttd" class="form-control @error('foto_ttd') is-invalid @enderror"
+                                accept="image/*" onchange="previewTTD(event)">
+
+                            <!-- Tampilkan pesan error jika validasi gagal -->
                             @error('foto_ttd')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
+
+                            <!-- Preview gambar - akan menampilkan gambar lama, gambar dari session, atau gambar baru -->
+                            <div class="mt-2" id="preview-container">
+                                @if(session('temp_foto_ttd'))
+                                <!-- Jika ada gambar dari session (validasi gagal), tampilkan ini -->
+                                <small class="text-warning">Tanda tangan baru (belum disimpan)</small>
+                                <div id="preview-wrapper-ttd">
+                                    <img id="preview-gambar-ttd" src="{{ asset('storage/' . session('temp_foto_ttd')) }}" class="img-thumbnail" style="max-height: 150px;" alt="Preview TTD Baru">
+                                    <div class="small text-muted">Preview tanda tangan baru</div>
+                                </div>
+                                @elseif($pejabat->foto_ttd)
+                                <!-- Jika ada gambar lama dan tidak ada session, tampilkan gambar lama -->
+                                <small class="text-success">Tanda tangan saat ini</small>
+                                <div id="gambar-ttd-lama">
+                                    <img src="{{ asset('storage/' . $pejabat->foto_ttd) }}" alt="Tanda Tangan Saat Ini" class="img-thumbnail"
+                                        style="max-height: 150px;">
+                                </div>
+                                <!-- Container untuk preview gambar baru (hidden by default) -->
+                                <div class="d-none" id="preview-wrapper-ttd">
+                                    <small class="text-warning">Preview tanda tangan baru</small>
+                                    <div>
+                                        <img id="preview-gambar-ttd" class="img-thumbnail" style="max-height: 150px;" alt="Preview TTD Baru">
+                                        <div class="small text-muted">Preview tanda tangan baru</div>
+                                    </div>
+                                </div>
+                                @else
+                                <!-- Jika tidak ada gambar sama sekali -->
+                                <div class="d-none" id="preview-wrapper-ttd">
+                                    <small class="text-warning">Preview tanda tangan baru</small>
+                                    <div>
+                                        <img id="preview-gambar-ttd" class="img-thumbnail" style="max-height: 150px;" alt="Preview TTD Baru">
+                                        <div class="small text-muted">Preview tanda tangan baru</div>
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+
+                            <!-- Info tambahan -->
+                            <div class="form-text">Kosongkan jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 2MB</div>
                         </div>
 
                         <div class="mb-3">
@@ -141,12 +182,43 @@
             }
         });
     }
+
+    function previewTTD(event) {
+        const input = event.target;
+        const previewImg = document.getElementById('preview-gambar-ttd');
+        const previewWrapper = document.getElementById('preview-wrapper-ttd');
+        const gambarLama = document.getElementById('gambar-ttd-lama');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Set gambar preview
+                previewImg.src = e.target.result;
+
+                // Tampilkan preview gambar baru
+                previewWrapper.classList.remove('d-none');
+
+                // Sembunyikan gambar lama jika ada
+                if (gambarLama) {
+                    gambarLama.classList.add('d-none');
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            // Jika tidak ada file yang dipilih, kembalikan ke kondisi semula
+            previewWrapper.classList.add('d-none');
+            if (gambarLama) {
+                gambarLama.classList.remove('d-none');
+            }
+        }
+    }
 </script>
 
 <!-- Notifikasi Error -->
 @if ($errors->any())
 <script>
     let errorMessages = '';
+
 
     Swal.fire({
         icon: 'error',
@@ -158,4 +230,5 @@
     });
 </script>
 @endif
+
 @endsection
