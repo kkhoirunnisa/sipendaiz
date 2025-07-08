@@ -126,24 +126,57 @@
                         <div class="col-md-6 mb-3">
                             <label for="bukti_infak_keluar" class="form-label fw-bold text-dark">
                                 <i class="fas fa-receipt me-2 text-warning"></i>
-                                Bukti Infak Keluar<span class="text-danger"> *</span>
+                                Bukti Infak Keluar <span class="text-danger">*</span>
                             </label>
 
-                            <input type="file" name="bukti_infak_keluar" id="bukti_infak_keluar" class="form-control"
-                                onchange="previewImage(event)">
+                            <!-- Input file -->
+                            <input type="file" name="bukti_infak_keluar" id="bukti_infak_keluar"
+                                class="form-control @error('bukti_infak_keluar') is-invalid @enderror"
+                                accept="image/*" onchange="previewBukti(event)">
 
                             @error('bukti_infak_keluar')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
 
-                            @if($infakKeluar->bukti_infak_keluar)
-                            <small class="text-success">Bukti sudah tersedia</small>
-                            <div class="mt-2">
-                                <img id="preview-gambar" src="{{ asset('storage/' . $infakKeluar->bukti_infak_keluar) }}" alt="Preview Gambar" class="img-thumbnail" style="max-height: 150px;">
+                            <!-- Preview container -->
+                            <div class="mt-2" id="preview-container">
+                                @if(session('temp_bukti_infak_keluar'))
+                                <!-- Jika ada gambar dari session -->
+                                <small class="text-warning">Bukti baru (belum disimpan)</small>
+                                <div id="preview-wrapper">
+                                    <img id="preview-gambar" src="{{ asset('storage/' . session('temp_bukti_infak_keluar')) }}"
+                                        class="img-thumbnail" style="max-height: 150px;" alt="Preview Bukti Baru">
+                                    <div class="small text-muted">Preview bukti baru</div>
+                                </div>
+                                @elseif($infakKeluar->bukti_infak_keluar)
+                                <!-- Jika ada gambar lama dan tidak ada session -->
+                                <small class="text-success">Bukti infak saat ini</small>
+                                <div id="gambar-bukti-lama">
+                                    <img src="{{ asset('storage/' . $infakKeluar->bukti_infak_keluar) }}" alt="Bukti Lama"
+                                        class="img-thumbnail" style="max-height: 150px;">
+                                </div>
+                                <!-- Container preview baru, tapi disembunyikan dulu -->
+                                <div class="d-none" id="preview-wrapper">
+                                    <small class="text-warning">Preview bukti baru</small>
+                                    <div>
+                                        <img id="preview-gambar" class="img-thumbnail" style="max-height: 150px;" alt="Preview Bukti Baru">
+                                        <div class="small text-muted">Preview bukti baru</div>
+                                    </div>
+                                </div>
+                                @else
+                                <!-- Tidak ada gambar sama sekali -->
+                                <div class="d-none" id="preview-wrapper">
+                                    <small class="text-warning">Preview bukti baru</small>
+                                    <div>
+                                        <img id="preview-gambar" class="img-thumbnail" style="max-height: 150px;" alt="Preview Bukti Baru">
+                                        <div class="small text-muted">Preview bukti baru</div>
+                                    </div>
+                                </div>
+                                @endif
                             </div>
-                            @endif
-                        </div>
 
+                            <div class="form-text">Lewati jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 10240.</div>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -280,4 +313,24 @@
     });
 </script>
 @endif
+
+<script>
+    function previewBukti(event) {
+        const input = event.target;
+        const previewWrapper = document.getElementById('preview-wrapper');
+        const previewImg = document.getElementById('preview-gambar');
+        const gambarLama = document.getElementById('gambar-bukti-lama');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewWrapper.classList.remove('d-none');
+                if (gambarLama) gambarLama.classList.add('d-none'); // sembunyikan gambar lama
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
 @endsection

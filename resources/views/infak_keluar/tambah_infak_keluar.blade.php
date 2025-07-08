@@ -133,7 +133,7 @@
                             {{-- Jika sebelumnya gagal simpan, munculkan pesan upload ulang --}}
                             @if(session('temp_bukti_infak_keluar'))
                             <div class="text-warning small mt-1">
-                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Upload ulang bukti pengeluaran infak
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Bukti infak keluar sebelumnya
                             </div>
                             @endif
 

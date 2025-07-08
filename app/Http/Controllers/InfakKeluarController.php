@@ -108,20 +108,17 @@ class InfakKeluarController extends Controller
             // tambahkan user id ke data yang akan disimpan
             $validated['id_users'] = $user->id;
 
-            // simpan bukti infak keluar
-            // if ($request->hasFile('bukti_infak_keluar')) {
-            //     $validated['bukti_infak_keluar'] = $request->file('bukti_infak_keluar')->store('bukti', 'public');
-            // }
+
             // Simpan file tanda tangan jika ada
             if ($request->hasFile('bukti_infak_keluar')) {
                 $path = $request->file('bukti_infak_keluar')->store('bukti', 'public');
-                $validated['bukti_infak_keluar'] = $path;
+                $data['bukti_infak_keluar'] = $path;
             } elseif ($request->input('temp_bukti_infak_keluar')) {
                 Log::info($request->input('temp_bukti_infak_keluar'));
                 $pathTemp = $request->input('temp_bukti_infak_keluar');
                 $newPath = 'bukti/' . basename($pathTemp);
                 Storage::disk('public')->move($pathTemp, $newPath);
-                $validated['bukti_infak_keluar'] = $newPath;
+                $data['bukti_infak_keluar'] = $newPath;
             }
 
             // simpan data infak keluar
@@ -143,48 +140,38 @@ class InfakKeluarController extends Controller
         }
     }
 
-
-
-    /**
-     * Bersihkan file gambar sementara
-     */
-    private function cleanupTempImage()
-    {
-        $tempPath = session('temp_bukti_infak_keluar');
-
-        if ($tempPath && Storage::disk('public')->exists($tempPath)) {
-            Storage::disk('public')->delete($tempPath);
-        }
-
-        // Hapus dari session
-        session()->forget('temp_bukti_infak_keluar');
-    }
-
     // form edit data
     public function edit(Request $request, $id)
     {
         $infakKeluar = InfakKeluarModel::findOrFail($id);
         $user = Auth::user();
-        $kategori = $request->has('kategori') ? $request->kategori : $infakKeluar->kategori;
 
+        // Ambil kategori dari model yang sedang diedit
+        $kategori = $infakKeluar->kategori;
+
+        // Jika ada kategori dikirim dari form, override kategori bawaan
+        if ($request->has('kategori')) {
+            $kategori = $request->kategori;
+        }
+
+        // total infak masuk yang sudah dikonfirmasi (ada di tabel infak masuk)
         $totalMasuk = BuktiTransaksiModel::where('kategori', $kategori)
             ->whereIn('id', function ($query) {
-                $query->select('id_bukti_transaksi')->from('infak_masuk');
+                $query->select('id_bukti_transaksi')
+                    ->from('infak_masuk');
             })
             ->sum('nominal');
 
+        // total infak keluar untuk kategori sama
         $totalKeluar = InfakKeluarModel::where('kategori', $kategori)->sum('nominal');
+
+        // hitung sisa saldo
         $sisaSaldo = $totalMasuk - $totalKeluar;
 
-        $tempImagePath = $this->getTempImagePath();
+        // Ambil gambar sementara jika ada
+        $tempImagePath = session('temp_bukti_infak_keluar');
 
-        return view('infak_keluar.edit_infak_keluar', compact(
-            'infakKeluar',
-            'user',
-            'kategori',
-            'sisaSaldo',
-            'tempImagePath'
-        ));
+        return view('infak_keluar.edit_infak_keluar', compact('infakKeluar', 'user', 'kategori', 'sisaSaldo', 'tempImagePath'));
     }
 
     // menyimpan hasil update data
@@ -203,67 +190,74 @@ class InfakKeluarController extends Controller
                 'keterangan' => 'required|string|max:100',
                 'bukti_infak_keluar' => 'nullable|file|mimes:jpg,png,jpeg|max:10240',
             ]);
+
             $kategori = $request->kategori;
 
-            // total infak masuk untuk kategori tertentu, hanya yang sudah konfirmasi (ada di tabel infak_masuk)
+            // Hitung total masuk & keluar
             $totalMasuk = BuktiTransaksiModel::where('kategori', $kategori)
                 ->whereIn('id', function ($query) {
-                    $query->select('id_bukti_transaksi')
-                        ->from('infak_masuk');
+                    $query->select('id_bukti_transaksi')->from('infak_masuk');
                 })
                 ->sum('nominal');
 
-            // total infak keluar untuk kategori yang sama
             $totalKeluar = InfakKeluarModel::where('kategori', $kategori)->sum('nominal');
 
-            // hitung sisa saldo
             $sisaSaldo = $totalMasuk - $totalKeluar;
 
-            // mengecek jika nominal > sisa saldo
+            // Jika nominal melebihi saldo
             if ($request->nominal > $sisaSaldo) {
-                // Simpan file sementara untuk preview jika ada
+                // Simpan file sementara jika ada
                 if ($request->hasFile('bukti_infak_keluar')) {
                     $tempPath = $request->file('bukti_infak_keluar')->store('temp_ttd', 'public');
                     session(['temp_bukti_infak_keluar' => $tempPath]);
                 }
-
                 return back()->withInput()->with('error', 'Nominal infak keluar melebihi sisa saldo sebesar Rp ' . number_format($sisaSaldo, 0, ',', '.'));
             }
 
-            // cek apakah ada file baru
+            // === Penanganan gambar ===
             if ($request->hasFile('bukti_infak_keluar')) {
-
-                // hapus file lama jika ada
+                // Hapus file lama jika ada
                 if ($infakKeluar->bukti_infak_keluar && Storage::disk('public')->exists($infakKeluar->bukti_infak_keluar)) {
                     Storage::disk('public')->delete($infakKeluar->bukti_infak_keluar);
                 }
 
-                // simpan file baru
+                // Simpan file baru
                 $validated['bukti_infak_keluar'] = $request->file('bukti_infak_keluar')->store('bukti', 'public');
+            } elseif (session('temp_bukti_infak_keluar')) {
+                // Jika ada file sementara di session, pindahkan ke folder permanen
+                $tempPath = session('temp_bukti_infak_keluar');
+                $newPath = 'bukti/' . basename($tempPath);
+
+                if (Storage::disk('public')->exists($tempPath)) {
+                    Storage::disk('public')->move($tempPath, $newPath);
+                    $validated['bukti_infak_keluar'] = $newPath;
+                } else {
+                    $validated['bukti_infak_keluar'] = $infakKeluar->bukti_infak_keluar;
+                }
             } else {
-                // gunakan file lama jika tidak diganti
+                // Gunakan file lama
                 $validated['bukti_infak_keluar'] = $infakKeluar->bukti_infak_keluar;
             }
 
-            // update data
+            // Update data
             $infakKeluar->update($validated);
 
-            // Hapus temporary file jika ada
+            // Hapus file sementara jika ada
             $this->cleanupTempImage();
 
-            return redirect()->route('infak_keluar.index', ['kategori' => $infakKeluar->kategori])->with('success', 'Data infak keluar berhasil diupdate');
-        } catch (Exception $e) {
-            // Simpan file sementara untuk preview saat terjadi error
+            return redirect()->route('infak_keluar.index', ['kategori' => $infakKeluar->kategori])
+                ->with('success', 'Data infak keluar berhasil diupdate');
+        } catch (\Exception $e) {
+            // Simpan file sementara jika terjadi error
             if ($request->hasFile('bukti_infak_keluar')) {
                 $tempPath = $request->file('bukti_infak_keluar')->store('temp_ttd', 'public');
                 session(['temp_bukti_infak_keluar' => $tempPath]);
             }
 
-            return redirect()->route('infak_keluar.edit', $id)
-                ->withInput()
-                ->with('error', 'Nominal infak keluar melebihi sisa saldo sebesar Rp ' . number_format($sisaSaldo, 0, ',', '.'));
+            return back()->withInput()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }
+
 
     // hapus data
     public function destroy($id)
@@ -285,12 +279,14 @@ class InfakKeluarController extends Controller
         }
     }
 
-    private function getTempImagePath()
+    protected function cleanupTempImage()
     {
-        if (session()->has('temp_bukti_infak_keluar')) {
-            return 'storage/' . session('temp_bukti_infak_keluar');
+        $tempPath = session('temp_bukti_infak_keluar');
+
+        if ($tempPath && Storage::disk('public')->exists($tempPath)) {
+            Storage::disk('public')->delete($tempPath);
         }
 
-        return null;
+        session()->forget('temp_bukti_infak_keluar');
     }
 }
