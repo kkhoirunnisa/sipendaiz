@@ -105,20 +105,16 @@ class InfakKeluarController extends Controller
                 return back()->withInput()->with('error', 'Nominal infak keluar melebihi sisa saldo sebesar Rp ' . number_format($sisaSaldo, 0, ',', '.'));
             }
 
-            // tambahkan user id ke data yang akan disimpan
             $validated['id_users'] = $user->id;
 
-
-            // Simpan file tanda tangan jika ada
             if ($request->hasFile('bukti_infak_keluar')) {
                 $path = $request->file('bukti_infak_keluar')->store('bukti', 'public');
-                $data['bukti_infak_keluar'] = $path;
+                $validated['bukti_infak_keluar'] = $path;
             } elseif ($request->input('temp_bukti_infak_keluar')) {
-                Log::info($request->input('temp_bukti_infak_keluar'));
                 $pathTemp = $request->input('temp_bukti_infak_keluar');
                 $newPath = 'bukti/' . basename($pathTemp);
                 Storage::disk('public')->move($pathTemp, $newPath);
-                $data['bukti_infak_keluar'] = $newPath;
+                $validated['bukti_infak_keluar'] = $newPath;
             }
 
             // simpan data infak keluar

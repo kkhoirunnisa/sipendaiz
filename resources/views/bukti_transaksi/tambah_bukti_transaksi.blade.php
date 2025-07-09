@@ -226,7 +226,7 @@
                                     style="max-height: 100px;" class="border rounded">
                                 <input type="hidden" name="temp_bukti_transaksi" value="{{ session('temp_bukti_transaksi') }}">
                                 <div class="mt-1">
-                                    <small class="text-warning">File yang sudah dipilih sebelumnya, harap upload ulang bukti</small>
+                                    <small class="text-warning">File yang sudah dipilih sebelumnya</small>
                                     <!-- <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="hapusBuktiTemp()">
                                         <i class="bi bi-trash"></i> Hapus
                                     </button> -->
