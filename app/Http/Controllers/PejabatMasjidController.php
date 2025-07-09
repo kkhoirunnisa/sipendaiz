@@ -53,7 +53,7 @@ class PejabatMasjidController extends Controller
             $request->validate([
                 'jabatan' => 'required|in:ketua_takmir,bendahara_takmir,ketua_pembangunan,bendahara_pembangunan',
                 'nama' => 'required|string|max:255',
-                'foto_ttd' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+                'foto_ttd' => 'nullable|image|mimes:png,jpg,jpeg|max:10240',
                 'tanggal_mulai' => 'required|date',
             ]);
 
@@ -86,10 +86,11 @@ class PejabatMasjidController extends Controller
             PejabatMasjidModel::create($data);
 
             // hapus file sementara jika ada
-            if ($request->filled('foto_ttd_temp')) {
-                Storage::disk('public')->delete($request->input('foto_ttd_temp'));
+            if (session()->has('temp_foto_ttd')) {
+                Storage::disk('public')->delete(session('temp_foto_ttd'));
+                session()->forget('temp_foto_ttd');
             }
-            session()->forget('temp_foto_ttd');
+
 
             return redirect()->route('pejabat.index')->with('success', 'Pejabat berhasil ditambahkan');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -178,10 +179,12 @@ class PejabatMasjidController extends Controller
             $pejabat->update($data);
 
             // hapus file sementara jika ada
-            if ($request->filled('foto_ttd_temp')) {
-                Storage::disk('public')->delete($request->input('foto_ttd_temp'));
+            // hapus file sementara jika ada
+            if (session()->has('temp_foto_ttd')) {
+                Storage::disk('public')->delete(session('temp_foto_ttd'));
+                session()->forget('temp_foto_ttd');
             }
-            session()->forget('temp_foto_ttd');
+
 
             return redirect()->route('pejabat.index')->with('success', 'Pejabat berhasil diperbarui');
         } catch (\Illuminate\Validation\ValidationException $e) {

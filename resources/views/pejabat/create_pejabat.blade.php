@@ -99,7 +99,7 @@
                             </div>
                             @endif
 
-                            <div class="form-text">Format PNG, JPG, JPEG. Maksimal 2MB</div>
+                            <div class="form-text">Format PNG, JPG, JPEG. Maksimal 10240</div>
                             <div class="mt-2">
                                 <img id="preview-gambar" src="#" alt="Preview Gambar" class="img-thumbnail d-none" style="max-height: 93px;">
                             </div>
