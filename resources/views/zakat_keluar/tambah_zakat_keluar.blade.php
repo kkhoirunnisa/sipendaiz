@@ -80,72 +80,27 @@
                         </div>
 
                         <!-- mustahik bisa multiple -->
-                        <div class="row">
-                            <label for="id_user" class="form-label fw-bold text-dark">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-dark">
                                 <i class="fas fa-user me-2 text-primary"></i>
                                 Mustahik
                             </label>
-                            <!-- Mustahik dan Jenis Zakat -->
-                            <!-- Bagian Mustahik -->
-                            <div id="mustahik-wrapper">
-                                @php
-                                $oldMustahik = old('id_mustahik', []);
-                                @endphp
-                                @if (count($oldMustahik) > 0)
-
-                                <!-- Jika sebelumnya ada data mustahik dari validasi -->
-                                @foreach ($oldMustahik as $index => $id)
-                                <div class="row mustahik-group mb-3">
-                                    <div class="col-md-11">
-                                        <select name="id_mustahik[]" class="form-control select2-mustahik" required>
-                                            <option value="" disabled>Pilih Mustahik</option>
-                                            @foreach ($mustahik as $item)
-                                            <option value="{{ $item->id }}" {{ $item->id == $id ? 'selected' : '' }}>{{ $item->nama }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <!-- Tombol hapus mustahik -->
-                                    <div class="col-md-1 d-flex align-items-end">
-                                        <button type="button" class="btn btn-danger btn-sm btn-remove-mustahik p-1" style="font-size: 0.8rem; height: 30px; width: 30px;">
-                                            <i class="bi bi-x-circle-fill" style="font-size: 14px;"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                            <select name="id_mustahik[]" id="id_mustahik" class="form-control select2-mustahik" multiple required>
+                                @foreach ($mustahik as $item)
+                                <option value="{{ $item->id }}"
+                                    {{ in_array($item->id, old('id_mustahik', [])) ? 'selected' : '' }}>
+                                    {{ $item->nama }}
+                                </option>
                                 @endforeach
-                                @else
-
-                                <!-- Form default jika belum ada input sebelumnya -->
-                                <div class="row mustahik-group mb-3">
-                                    <div class="col-md-11">
-                                        <select name="id_mustahik[]" class="form-control select2-mustahik" required>
-                                            <option value="" disabled selected>Pilih Mustahik</option>
-                                            @foreach ($mustahik as $item)
-                                            <option value="{{ $item->id }}">{{ $item->nama }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <!-- Tombol hapus mustahik -->
-                                    <div class="col-md-1 d-flex align-items-end">
-                                        <button type="button" class="btn btn-danger btn-sm btn-remove-mustahik p-1" style="font-size: 0.8rem; height: 30px; width: 30px;">
-                                            <i class="bi bi-x-circle-fill" style="font-size: 14px;"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                @endif
-                            </div>
+                            </select>
+                            <small class="text-muted">Pilih lebih dari satu mustahik jika perlu</small>
                         </div>
+
 
                         <!-- Tombol Tambah Mustahik -->
-                        <div class="mb-3">
-                            <button type="button" id="btn-tambah-mustahik" class="btn btn-sm btn-success">
-                                <i class="bi bi-plus-circle-fill me-1"></i> Tambah Mustahik
-                            </button>
-                            <small class="text-muted ms-2">
-                                Jumlah Mustahik Dipilih: <span id="jumlah-mustahik" class="fw-bold">0</span>
-                            </small>
-                        </div>
+                        <small class="text-muted mb-2 d-block">
+                            Jumlah Mustahik Dipilih: <span id="jumlah-mustahik" class="fw-bold">0</span>
+                        </small>
 
                         <!-- Jenis dan Bentuk Zakat -->
                         <div class="row">
@@ -272,154 +227,6 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function() {
-        // inisialisasi select2 untuk elemen mustahik
-        function refreshSelect2() {
-            $('.select2-mustahik').select2({
-                placeholder: "Pilih Mustahik",
-                width: '100%'
-            });
-        }
-
-        refreshSelect2();
-
-        // fungsi untuk menghitung jumlah mustahik
-        function hitungJumlahMustahik() {
-            const mustahikSelects = document.querySelectorAll('select[name="id_mustahik[]"]');
-            let jumlahMustahik = 0;
-
-            mustahikSelects.forEach(select => {
-                if (select.value && select.value !== '') {
-                    jumlahMustahik++;
-                }
-            });
-
-            document.getElementById('jumlah-mustahik').textContent = jumlahMustahik;
-            hitungTotal(); // panggil fungsi hitungTotal untuk memperbarui total
-            return jumlahMustahik;
-        }
-
-        // menyembunyikan tombol remove untuk mustahik pertama, tampilkan untuk yang lainnya
-        function updateRemoveButtons() {
-            const mustahikGroups = document.querySelectorAll('.mustahik-group');
-
-            mustahikGroups.forEach((group, index) => {
-                const removeButton = group.querySelector('.btn-remove-mustahik');
-                if (removeButton) {
-                    // Sembunyikan tombol remove untuk mustahik pertama (index 0)
-                    // atau jika hanya ada 1 mustahik
-                    if (index === 0 || mustahikGroups.length === 1) {
-                        removeButton.style.display = 'none';
-                    } else {
-                        removeButton.style.display = 'block';
-                    }
-                }
-            });
-        }
-
-        // fungsi untuk menghitung total zakat keluar berdasarkan jumlah mustahik dan input per mustahik
-        function hitungTotal() {
-            const jumlahMustahik = parseInt(document.getElementById('jumlah-mustahik').textContent) || 0;
-            const bentukZakat = document.getElementById('bentuk_zakat').value;
-            const fieldContainer = document.getElementById('field-nominal-jumlah');
-            fieldContainer.innerHTML = ''; // kosongkan field sebelum menambahkan input baru
-
-            if (bentukZakat === 'Uang') {
-                const nominalPerMustahik = AutoNumeric.getNumber('#nominal_per_mustahik') || 0;
-                const totalNominal = nominalPerMustahik * jumlahMustahik;
-
-                for (let i = 0; i < jumlahMustahik; i++) {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'nominal[]';
-                    input.value = nominalPerMustahik;
-                    fieldContainer.appendChild(input);
-                }
-
-                // tampilkan ringkasan perhitungan
-                document.getElementById('perhitungan-text').textContent =
-                    `${jumlahMustahik} mustahik × Rp ${nominalPerMustahik.toLocaleString('id-ID')} = Rp ${totalNominal.toLocaleString('id-ID')}`;
-
-            } else if (bentukZakat === 'Beras') {
-                const jumlahPerMustahik = parseFloat(document.getElementById('jumlah_per_mustahik').value) || 0;
-                const totalJumlah = jumlahPerMustahik * jumlahMustahik;
-
-                for (let i = 0; i < jumlahMustahik; i++) {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'jumlah[]';
-                    input.value = jumlahPerMustahik;
-                    fieldContainer.appendChild(input);
-                }
-
-                // tampilkan ringkasan perhitungan
-                document.getElementById('perhitungan-text').textContent =
-                    `${jumlahMustahik} mustahik × ${jumlahPerMustahik} kg = ${totalJumlah} kg`;
-            }
-        }
-
-        // tambah input baru untuk mustahik
-        $('#btn-tambah-mustahik').on('click', function() {
-            const newGroup = `
-           
-
-             <div class="row mustahik-group mb-3">
-                                     <div class="col-md-11">
-                            <select name="id_mustahik[]" class="form-control select2-mustahik" required>
-                                <option value="" disabled selected>Pilih Mustahik</option>
-                                @foreach ($mustahik as $item)
-                                <option value="{{ $item->id }}">{{ $item->nama }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                                    <div class="col-md-1 d-flex align-items-end">
-                                        <button type="button" class="btn btn-danger btn-sm btn-remove-mustahik p-1" style="font-size: 0.8rem; height: 30px; width: 30px;">
-                                            <i class="bi bi-x-circle-fill" style="font-size: 14px;"></i>
-                                        </button>
-                                    </div>
-                                </div>
-        `;
-
-            $('#mustahik-wrapper').append(newGroup);
-            refreshSelect2();
-
-            // Update visibility tombol remove setelah menambah mustahik baru
-            updateRemoveButtons();
-        });
-
-        // hapus input mustahik
-        $(document).on('click', '.btn-remove-mustahik', function() {
-            const mustahikGroup = $(this).closest('.mustahik-group');
-            const isFirstGroup = mustahikGroup.is('.mustahik-group:first');
-
-            // Jangan hapus jika ini adalah mustahik pertama
-            if (isFirstGroup) {
-                return;
-            }
-
-            mustahikGroup.remove();
-            hitungJumlahMustahik();
-
-            // Update visibility tombol remove setelah menghapus
-            updateRemoveButtons();
-        });
-
-        // event listener untuk perubahan select mustahik
-        $(document).on('change', 'select[name="id_mustahik[]"]', function() {
-            hitungJumlahMustahik();
-        });
-
-        // event listener untuk input per mustahik
-        $(document).on('input change', '#nominal_per_mustahik, #jumlah_per_mustahik', function() {
-            hitungTotal();
-        });
-
-        // inisialisasi awal
-        hitungJumlahMustahik();
-        updateRemoveButtons(); // panggil fungsi ini untuk mengatur tombol remove pada load awal
-    });
-</script>
 
 <script>
     function konfirmasiTambah() {
@@ -481,139 +288,6 @@
     }
 </script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inisialisasi elemen
-        const bentukZakat = document.getElementById('bentuk_zakat');
-        const nominalPerMustahikSection = document.getElementById('nominal_per_mustahik_section');
-        const jumlahPerMustahikSection = document.getElementById('jumlah_per_mustahik_section');
-        const nominalPerMustahikInput = document.getElementById('nominal_per_mustahik');
-        const jumlahPerMustahikInput = document.getElementById('jumlah_per_mustahik');
-        const sisaSaldoSpan = document.getElementById('sisa-saldo');
-
-        // Fungsi untuk mengatur field berdasarkan bentuk zakat
-        function toggleFields() {
-            const bentukValue = bentukZakat.value;
-
-            if (bentukValue === 'Beras') {
-                // Sembunyikan nominal per mustahik, tampilkan jumlah per mustahik
-                nominalPerMustahikSection.style.display = 'none';
-                jumlahPerMustahikSection.style.display = 'block';
-
-                // Hapus required dari nominal, tambah ke jumlah
-                nominalPerMustahikInput.removeAttribute('required');
-                jumlahPerMustahikInput.setAttribute('required', 'required');
-
-                // Clear nominal value
-                nominalPerMustahikInput.value = '';
-
-                // Update sisa saldo display
-                sisaSaldoSpan.innerHTML = `
-                    <small class="text-muted d-block">Sisa Fitrah Beras: <strong>{{ number_format($sisa['Fitrah_Beras'], 2, ',', '.') }} Kg</strong></small>
-                    <small class="text-muted d-block">Sisa Maal Beras: <strong>{{ number_format($sisa['Maal_Beras'], 2, ',', '.') }} Kg</strong></small>
-                `;
-
-                // Update perhitungan text
-                document.getElementById('perhitungan-text').textContent = '0 mustahik × 0 kg = 0 kg';
-
-            } else if (bentukValue === 'Uang') {
-                // Tampilkan nominal per mustahik, sembunyikan jumlah per mustahik
-                nominalPerMustahikSection.style.display = 'block';
-                jumlahPerMustahikSection.style.display = 'none';
-
-                // Tambah required ke nominal, hapus dari jumlah
-                nominalPerMustahikInput.setAttribute('required', 'required');
-                jumlahPerMustahikInput.removeAttribute('required');
-
-                // Clear jumlah value
-                jumlahPerMustahikInput.value = '';
-
-                // Update sisa saldo display
-                sisaSaldoSpan.innerHTML = `
-                    <small class="text-muted d-block">Sisa Fitrah Uang: <strong>Rp {{ number_format($sisa['Fitrah_Uang'], 2, ',', '.') }}</strong></small>
-                    <small class="text-muted d-block">Sisa Maal Uang: <strong>Rp {{ number_format($sisa['Maal_Uang'], 2, ',', '.') }}</strong></small>
-                `;
-
-                // Update perhitungan text
-                document.getElementById('perhitungan-text').textContent = '0 mustahik × Rp 0 = Rp 0';
-            }
-
-            // Update progress dan perhitungan setelah toggle
-            updateProgress();
-            if (typeof hitungTotal === 'function') {
-                hitungTotal();
-            }
-        }
-
-        // Progress bar functionality
-        function updateProgress() {
-            const fields = [
-                document.getElementById('nama_user'),
-                document.getElementById('id_mustahik'),
-                document.getElementById('tanggal'),
-                document.getElementById('jenis_zakat'),
-                document.getElementById('bentuk_zakat'),
-                document.getElementById('keterangan')
-            ];
-
-            // Tambahkan field yang sedang aktif
-            if (nominalPerMustahikSection.style.display !== 'none') {
-                fields.push(nominalPerMustahikInput);
-            }
-            if (jumlahPerMustahikSection.style.display !== 'none') {
-                fields.push(jumlahPerMustahikInput);
-            }
-
-            let filledFields = 0;
-            let totalFields = fields.length;
-
-            fields.forEach(field => {
-                if (field && field.value && field.value.trim() !== '') {
-                    filledFields++;
-                }
-            });
-
-            const progress = (totalFields > 0) ? (filledFields / totalFields) * 100 : 0;
-            document.getElementById('form-progress').style.width = progress + '%';
-            document.getElementById('progress-text').textContent = Math.round(progress) + '%';
-        }
-
-        // Event listeners
-        bentukZakat.addEventListener('change', toggleFields);
-
-        // Event listeners untuk progress
-        const allInputs = document.querySelectorAll('input, select, textarea');
-        allInputs.forEach(input => {
-            input.addEventListener('input', updateProgress);
-            input.addEventListener('change', updateProgress);
-        });
-
-        // Inisialisasi awal
-        toggleFields();
-        updateProgress();
-    });
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inisialisasi AutoNumeric untuk input nominal per mustahik
-        const nominalPerMustahikInput = new AutoNumeric('#nominal_per_mustahik', {
-            digitGroupSeparator: '.',
-            decimalCharacter: ',',
-            decimalPlaces: 0,
-            modifyValueOnWheel: false,
-            unformatOnSubmit: false
-        });
-
-        // Event listener untuk recalculate saat input berubah
-        nominalPerMustahikInput.node.addEventListener('autoNumeric:formatted', function() {
-            if (typeof hitungTotal === 'function') {
-                hitungTotal();
-            }
-        });
-    });
-</script>
-
 <!-- Notifikasi Error -->
 @if (session('error'))
 <script>
@@ -627,4 +301,255 @@
     });
 </script>
 @endif
+
+<script>
+    $(document).ready(function() {
+        // inisialisasi select2 untuk elemen mustahik
+        function refreshSelect2() {
+            $('.select2-mustahik').select2({
+                placeholder: "Pilih Mustahik",
+                width: '100%',
+                closeOnSelect: false,
+                allowClear: true
+            });
+        }
+
+        refreshSelect2();
+
+        // fungsi untuk menghitung jumlah mustahik dan memperbarui perhitungan
+        function hitungJumlahMustahik() {
+            const select = document.querySelector('select[name="id_mustahik[]"]');
+            const selectedOptions = Array.from(select.selectedOptions);
+            const jumlahMustahik = selectedOptions.length;
+
+            document.getElementById('jumlah-mustahik').textContent = jumlahMustahik;
+
+            // Selalu panggil hitungTotal setelah menghitung jumlah mustahik
+            hitungTotal();
+
+            return jumlahMustahik;
+        }
+
+        // fungsi untuk menghitung total zakat keluar berdasarkan jumlah mustahik dan input per mustahik
+        function hitungTotal() {
+            const jumlahMustahik = parseInt(document.getElementById('jumlah-mustahik').textContent) || 0;
+            const bentukZakat = document.getElementById('bentuk_zakat').value;
+            const fieldContainer = document.getElementById('field-nominal-jumlah');
+
+            // Kosongkan container sebelum menambahkan ulang
+            fieldContainer.innerHTML = '';
+
+            if (bentukZakat === 'Uang') {
+                const nominalPerMustahik = AutoNumeric.getNumber('#nominal_per_mustahik') || 0;
+                const totalNominal = nominalPerMustahik * jumlahMustahik;
+
+                // Buat hidden input untuk setiap mustahik
+                for (let i = 0; i < jumlahMustahik; i++) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'nominal[]';
+                    input.value = nominalPerMustahik;
+                    fieldContainer.appendChild(input);
+                }
+
+                // Update tampilan perhitungan
+                document.getElementById('perhitungan-text').textContent =
+                    `${jumlahMustahik} mustahik × Rp ${nominalPerMustahik.toLocaleString('id-ID')} = Rp ${totalNominal.toLocaleString('id-ID')}`;
+
+            } else if (bentukZakat === 'Beras') {
+                const jumlahPerMustahik = parseFloat(document.getElementById('jumlah_per_mustahik').value) || 0;
+                const totalJumlah = jumlahPerMustahik * jumlahMustahik;
+
+                // Buat hidden input untuk setiap mustahik
+                for (let i = 0; i < jumlahMustahik; i++) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'jumlah[]';
+                    input.value = jumlahPerMustahik;
+                    fieldContainer.appendChild(input);
+                }
+
+                // Update tampilan perhitungan
+                document.getElementById('perhitungan-text').textContent =
+                    `${jumlahMustahik} mustahik × ${jumlahPerMustahik} kg = ${totalJumlah} kg`;
+            }
+
+            // Update progress setelah perhitungan
+            updateProgress();
+        }
+
+        // Event listener untuk perubahan select mustahik
+        $(document).on('change', 'select[name="id_mustahik[]"]', function() {
+            hitungJumlahMustahik();
+        });
+
+        // Event listener untuk input per mustahik
+        $(document).on('input change', '#nominal_per_mustahik, #jumlah_per_mustahik', function() {
+            hitungTotal();
+        });
+
+        // Event listener untuk perubahan bentuk zakat
+        $(document).on('change', '#bentuk_zakat', function() {
+            // Tunggu sebentar untuk memastikan toggleFields() sudah selesai
+            setTimeout(function() {
+                hitungTotal();
+            }, 100);
+        });
+
+        // Event listener untuk perubahan jenis zakat
+        $(document).on('change', '#jenis_zakat', function() {
+            setTimeout(function() {
+                hitungTotal();
+            }, 100);
+        });
+
+        // inisialisasi awal
+        hitungJumlahMustahik();
+    });
+
+    // Fungsi untuk mengatur field berdasarkan bentuk zakat (diperbaiki)
+    function toggleFields() {
+        const bentukZakat = document.getElementById('bentuk_zakat');
+        const jenisZakat = document.getElementById('jenis_zakat');
+        const nominalPerMustahikSection = document.getElementById('nominal_per_mustahik_section');
+        const jumlahPerMustahikSection = document.getElementById('jumlah_per_mustahik_section');
+        const nominalPerMustahikInput = document.getElementById('nominal_per_mustahik');
+        const jumlahPerMustahikInput = document.getElementById('jumlah_per_mustahik');
+        const sisaSaldoSpan = document.getElementById('sisa-saldo');
+
+        const bentukValue = bentukZakat.value;
+
+        if (bentukValue === 'Beras') {
+            // Sembunyikan nominal per mustahik, tampilkan jumlah per mustahik
+            nominalPerMustahikSection.style.display = 'none';
+            jumlahPerMustahikSection.style.display = 'block';
+
+            // Hapus required dari nominal, tambah ke jumlah
+            nominalPerMustahikInput.removeAttribute('required');
+            jumlahPerMustahikInput.setAttribute('required', 'required');
+
+            // Clear nominal value
+            nominalPerMustahikInput.value = '';
+
+            // Update sisa saldo display
+            sisaSaldoSpan.innerHTML = `
+            <small class="text-muted d-block">Sisa Fitrah Beras: <strong>{{ number_format($sisa['Fitrah_Beras'], 2, ',', '.') }} Kg</strong></small>
+            <small class="text-muted d-block">Sisa Maal Beras: <strong>{{ number_format($sisa['Maal_Beras'], 2, ',', '.') }} Kg</strong></small>
+        `;
+
+        } else if (bentukValue === 'Uang') {
+            // Tampilkan nominal per mustahik, sembunyikan jumlah per mustahik
+            nominalPerMustahikSection.style.display = 'block';
+            jumlahPerMustahikSection.style.display = 'none';
+
+            // Tambah required ke nominal, hapus dari jumlah
+            nominalPerMustahikInput.setAttribute('required', 'required');
+            jumlahPerMustahikInput.removeAttribute('required');
+
+            // Clear jumlah value
+            jumlahPerMustahikInput.value = '';
+
+            // Update sisa saldo display
+            sisaSaldoSpan.innerHTML = `
+            <small class="text-muted d-block">Sisa Fitrah Uang: <strong>Rp {{ number_format($sisa['Fitrah_Uang'], 2, ',', '.') }}</strong></small>
+            <small class="text-muted d-block">Sisa Maal Uang: <strong>Rp {{ number_format($sisa['Maal_Uang'], 2, ',', '.') }}</strong></small>
+        `;
+        }
+
+        // Update progress dan perhitungan setelah toggle
+        updateProgress();
+
+        // Pastikan perhitungan dijalankan setelah field berubah
+        setTimeout(function() {
+            hitungTotal();
+        }, 50);
+    }
+
+    // Progress bar functionality (diperbaiki)
+    function updateProgress() {
+        const fields = [
+            document.getElementById('nama_user'),
+            document.getElementById('tanggal'),
+            document.getElementById('jenis_zakat'),
+            document.getElementById('bentuk_zakat'),
+            document.getElementById('keterangan')
+        ];
+
+        const nominalPerMustahikSection = document.getElementById('nominal_per_mustahik_section');
+        const jumlahPerMustahikSection = document.getElementById('jumlah_per_mustahik_section');
+        const nominalPerMustahikInput = document.getElementById('nominal_per_mustahik');
+        const jumlahPerMustahikInput = document.getElementById('jumlah_per_mustahik');
+
+        if (nominalPerMustahikSection.style.display !== 'none') {
+            fields.push(nominalPerMustahikInput);
+        }
+        if (jumlahPerMustahikSection.style.display !== 'none') {
+            fields.push(jumlahPerMustahikInput);
+        }
+
+        let filledFields = 0;
+        let totalFields = fields.length;
+
+        fields.forEach(field => {
+            if (field && field.value && field.value.trim() !== '') {
+                filledFields++;
+            }
+        });
+
+        const progress = (totalFields > 0) ? (filledFields / totalFields) * 100 : 0;
+        document.getElementById('form-progress').style.width = progress + '%';
+        document.getElementById('progress-text').textContent = Math.round(progress) + '%';
+    }
+
+    // Inisialisasi saat dokumen siap
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inisialisasi elemen
+        const bentukZakat = document.getElementById('bentuk_zakat');
+        const jenisZakat = document.getElementById('jenis_zakat');
+
+        // Event listeners
+        bentukZakat.addEventListener('change', () => {
+            toggleFields();
+        });
+
+        jenisZakat.addEventListener('change', () => {
+            // Pastikan perhitungan dijalankan saat jenis zakat berubah
+            setTimeout(function() {
+                hitungTotal();
+            }, 50);
+        });
+
+        const allInputs = document.querySelectorAll('input, select, textarea');
+        allInputs.forEach(input => {
+            input.addEventListener('input', updateProgress);
+            input.addEventListener('change', updateProgress);
+        });
+
+        // Inisialisasi awal
+        toggleFields();
+        updateProgress();
+
+        // Pastikan perhitungan awal dijalankan
+        setTimeout(function() {
+            hitungJumlahMustahik();
+        }, 200);
+    });
+
+    // Inisialisasi AutoNumeric
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inisialisasi AutoNumeric untuk input nominal per mustahik
+        const nominalPerMustahikInput = new AutoNumeric('#nominal_per_mustahik', {
+            digitGroupSeparator: '.',
+            decimalCharacter: ',',
+            decimalPlaces: 0,
+            modifyValueOnWheel: false,
+            unformatOnSubmit: false
+        });
+
+        // Event listener untuk recalculate saat input berubah
+        nominalPerMustahikInput.node.addEventListener('autoNumeric:formatted', function() {
+            hitungTotal();
+        });
+    });
+</script>
 @endsection
