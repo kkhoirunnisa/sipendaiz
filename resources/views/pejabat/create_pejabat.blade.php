@@ -99,10 +99,17 @@
                             </div>
                             @endif
 
-                            <div class="form-text">Format PNG, JPG, JPEG. Maksimal 10240</div>
-                            <div class="mt-2">
-                                <img id="preview-gambar" src="#" alt="Preview Gambar" class="img-thumbnail d-none" style="max-height: 93px;">
+                            <!-- {{-- Preview gambar baru yang dipilih --}} -->
+                            <div class="mt-2" id="preview-wrapper" style="display: none;">
+                                <img id="preview-gambar" src="#" alt="Preview Gambar" class="img-thumbnail" style="max-height: 93px;">
+                                <div class="mt-1">
+                                    <small class="text-muted">Gambar baru yang dipilih</small>
+                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="hapusGambarBaru()">
+                                        <i class="bi bi-trash"></i> Hapus
+                                    </button>
+                                </div>
                             </div>
+                            <div class="form-text">Format PNG, JPG, JPEG. Maksimal 10240</div>
                             @error('foto_ttd')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -228,12 +235,14 @@
     document.getElementById("foto_ttd").addEventListener("change", function(event) {
         const input = event.target;
         const preview = document.getElementById("preview-gambar");
+        const wrapper = document.getElementById("preview-wrapper");
         const tempPreview = document.getElementById("temp-preview");
 
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 preview.src = e.target.result;
+                wrapper.style.display = 'block';
                 preview.classList.remove("d-none");
 
                 // Sembunyikan preview temporary jika ada
@@ -243,9 +252,7 @@
             };
             reader.readAsDataURL(input.files[0]);
         } else {
-            preview.classList.add("d-none");
-
-            // Tampilkan kembali preview temporary jika ada
+            wrapper.style.display = 'none';
             if (tempPreview) {
                 tempPreview.style.display = 'block';
             }
@@ -260,5 +267,22 @@
         }
     });
 </script>
+<script>
+    function hapusGambarBaru() {
+        // Reset input file
+        document.getElementById('foto_ttd').value = '';
 
+        // Sembunyikan wrapper preview
+        const wrapper = document.getElementById('preview-wrapper');
+        if (wrapper) {
+            wrapper.style.display = 'none';
+        }
+
+        // Tampilkan kembali preview gambar temp jika ada
+        const tempPreview = document.getElementById('temp-preview');
+        if (tempPreview) {
+            tempPreview.style.display = 'block';
+        }
+    }
+</script>
 @endsection
