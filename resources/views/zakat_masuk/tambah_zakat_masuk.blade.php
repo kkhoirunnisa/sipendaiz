@@ -69,7 +69,7 @@
                                     <i class="bi bi-calendar2-range-fill me-2 text-primary"></i>
                                     Tanggal<span class="text-danger"> *</span>
                                 </label>
-                                <input type="date" name="tanggal" id="tanggal" class="form-control" required value="{{ old('tanggal') }}">
+                                <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal') }}" required>
                                 @error('tanggal')
                                 <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -84,7 +84,7 @@
                                     Jenis Zakat<span class="text-danger"> *</span>
                                 </label>
                                 <select name="jenis_zakat" id="jenis_zakat" class="form-select" required>
-                                    <option value="" disabled selected>Pilih Jenis Zakat</option>
+                                    <option value="" disabled {{ old('jenis_zakat') == null ? 'selected' : '' }}>Pilih Jenis Zakat</option>
                                     <option value="Fitrah" {{ old('jenis_zakat') == 'Fitrah' ? 'selected' : '' }}>Fitrah</option>
                                     <option value="Maal" {{ old('jenis_zakat') == 'Maal' ? 'selected' : '' }}>Maal</option>
                                 </select>
@@ -97,7 +97,7 @@
                                     <i class="bi bi-box2-fill me-2 text-primary"></i>
                                     Bentuk Zakat<span class="text-danger"> *</span>
                                 </label>
-                                <select name="bentuk_zakat" id="bentuk_zakat" class="form-select">
+                                <select name="bentuk_zakat" class="form-select @error('bentuk_zakat') is-invalid @enderror" id="bentuk_zakat" required>
                                     <option value="Uang" {{ old('bentuk_zakat') == 'Uang' ? 'selected' : '' }}>Uang</option>
                                     <option value="Beras" {{ old('bentuk_zakat', 'Beras') == 'Beras' ? 'selected' : '' }}>Beras</option>
                                 </select>
@@ -114,7 +114,7 @@
                                     <i class="fas fa-scale-balanced me-2 text-primary"></i>
                                     Jumlah (Kg)<span class="text-danger"> *</span>
                                 </label>
-                                <input type="number" name="jumlah" id="jumlah" class="form-control" placeholder="Masukkan berat beras, contoh 2.8" value="{{ old('jumlah') }}">
+                                <input type="number" name="jumlah" id="jumlah" class="form-control" placeholder="Masukkan berat beras, contoh 2.8" value="{{ old('jumlah') }}" required>
                                 @error('jumlah')
                                 <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -126,7 +126,7 @@
                                 </label>
                                 <input type="text" name="nominal" id="nominal" class="form-control"
                                     placeholder="Masukkan besar nominal zakat, contoh 45000"
-                                    value="{{ old('nominal') }}">
+                                    value="{{ old('nominal') }}" required>
                                 @error('nominal')
                                 <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -140,7 +140,7 @@
                                     <i class="bi bi-card-text me-2 text-primary"></i>
                                     Keterangan (Muzaki)<span class="text-danger"> *</span>
                                 </label>
-                                <textarea name="keterangan" id="keterangan" class="form-control" placeholder="Masukkan nama muzaki" rows="3">{{ old('keterangan') }}</textarea>
+                                <textarea name="keterangan" id="keterangan" class="form-control" placeholder="Masukkan nama muzaki" rows="3" required>{{ old('keterangan') }}</textarea>
                                 @error('keterangan')
                                 <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -148,7 +148,7 @@
                         </div>
 
                         <div class="text-end">
-                            <button type="button" class="btn btn-primary" onclick="konfirmasiTambah()">
+                            <button type="button" class="btn btn-primary" onclick="validasiSebelumKonfirmasi()">
                                 <i class="bi bi-save-fill me-1"></i>
                                 Simpan
                             </button>
@@ -161,7 +161,64 @@
 </div>
 
 <script>
-    function konfirmasiTambah() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('tambah-form');
+
+        // Bersihkan error lama dari validasi dinamis sebelumnya
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        const requiredFields = [
+            'tanggal',
+            'jenis_zakat',
+            'bentuk_zakat',
+            'keterangan'
+        ];
+
+        // Tambahkan validasi khusus sesuai bentuk zakat
+        const bentukZakat = document.getElementById('bentuk_zakat').value.toLowerCase();
+        if (bentukZakat === 'uang') {
+            requiredFields.push('nominal');
+        } else if (bentukZakat === 'beras') {
+            requiredFields.push('jumlah');
+        }
+
+        let firstInvalidField = null;
+
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            const val = field?.value?.trim();
+            const isEmpty = !val;
+
+            if (isEmpty) {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Kolom ini wajib diisi';
+                field.parentNode.appendChild(errorDiv);
+
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+            }
+        }
+
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+
+            return;
+        }
+
+        // Semua valid, tampilkan konfirmasi
         Swal.fire({
             title: "Simpan data zakat masuk?",
             text: "Apakah Anda yakin ingin menyimpan data zakat masuk ini?",
@@ -173,16 +230,19 @@
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                // Unformat nominal sebelum submit
-                const nominalInput = AutoNumeric.getAutoNumericElement('#nominal');
-                if (nominalInput) {
-                    nominalInput.unformat();
+                // Unformat AutoNumeric sebelum submit
+                const nominalElement = AutoNumeric.getAutoNumericElement('#nominal');
+                if (nominalElement) {
+                    nominalElement.unformat();
                 }
 
-                document.getElementById("tambah-form").submit();
+                form.submit();
             }
         });
     }
+</script>
+
+<script>
     // Update progress bar
     // Inisialisasi elemen global
     const fields = [

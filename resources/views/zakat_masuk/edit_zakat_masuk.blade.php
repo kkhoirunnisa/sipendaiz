@@ -69,7 +69,8 @@
                                         <i class="bi bi-calendar2-range-fill me-2 text-warning"></i>
                                         Tanggal<span class="text-danger"> *</span>
                                     </label>
-                                    <input type="date" name="tanggal" id="tanggal" class="form-control" required value="{{ old('tanggal', $zakatMasuk->tanggal) }}">
+                                    <input type="date" name="tanggal" id="tanggal" class="form-control"
+                                        value="{{ old('tanggal', $zakatMasuk->tanggal) }}" required>
                                     @error('tanggal')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -97,7 +98,7 @@
                                         <i class="bi bi-box2-fill me-2 text-warning"></i>
                                         Bentuk Zakat<span class="text-danger"> *</span>
                                     </label>
-                                    <select name="bentuk_zakat" id="bentuk_zakat" class="form-select">
+                                    <select name="bentuk_zakat" id="bentuk_zakat" class="form-select" required>
                                         <option value="Uang" {{ old('bentuk_zakat', $zakatMasuk->bentuk_zakat) == 'Uang' ? 'selected' : '' }}>Uang</option>
                                         <option value="Beras" {{ old('bentuk_zakat', $zakatMasuk->bentuk_zakat) == 'Beras' ? 'selected' : '' }}>Beras</option>
                                     </select>
@@ -117,7 +118,7 @@
                                         Nominal (Rp)<span class="text-danger"> *</span>
                                     </label>
                                     <input type="text" name="nominal" id="nominal" class="form-control"
-                                        value="{{ old('nominal', $zakatMasuk->nominal) }}">
+                                        value="{{ old('nominal', $zakatMasuk->nominal) }}" required>
                                     @error('nominal')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -127,7 +128,8 @@
                                         <i class="fas fa-scale-balanced me-2 text-warning"></i>
                                         Jumlah (Kg)<span class="text-danger"> *</span>
                                     </label>
-                                    <input type="number" name="jumlah" id="jumlah" class="form-control" value="{{ old('jumlah', rtrim(rtrim(number_format($zakatMasuk->jumlah, 2, '.', ''), '0'), '.')) }}">
+                                    <input type="number" name="jumlah" id="jumlah" class="form-control"
+                                        value="{{ old('jumlah', rtrim(rtrim(number_format($zakatMasuk->jumlah, 2, '.', ''), '0'), '.')) }}" required>
                                     @error('jumlah')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -141,7 +143,7 @@
                                         <i class="bi bi-card-text me-2 text-warning"></i>
                                         Keterangan (Muzaki)<span class="text-danger"> *</span>
                                     </label>
-                                    <textarea name="keterangan" id="keterangan" class="form-control" rows="3">{{ old('keterangan', $zakatMasuk->keterangan) }}</textarea>
+                                    <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required>{{ old('keterangan', $zakatMasuk->keterangan) }}</textarea>
                                     @error('keterangan')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -149,7 +151,7 @@
                             </div>
 
                             <div class="text-end">
-                                <button type="button" class="btn btn-warning" onclick="konfirmasiEdit()">
+                                <button type="button" class="btn btn-warning" onclick="validasiSebelumKonfirmasi()">
                                     <i class="bi bi-save-fill me-1"></i>
                                     Edit
                                 </button>
@@ -163,29 +165,90 @@
 </div>
 
 <script>
-    function konfirmasiEdit() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('edit-form');
+
+        // Hapus pesan error dinamis sebelumnya
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        // Field yang selalu wajib
+        const requiredFields = [
+            'tanggal',
+            'jenis_zakat',
+            'bentuk_zakat',
+            'keterangan'
+        ];
+
+        // Tambah field wajib berdasarkan bentuk zakat
+        const bentukZakat = document.getElementById('bentuk_zakat')?.value?.toLowerCase();
+        if (bentukZakat === 'uang') {
+            requiredFields.push('nominal');
+        } else if (bentukZakat === 'beras') {
+            requiredFields.push('jumlah');
+        }
+
+        let firstInvalidField = null;
+
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            const val = field?.value?.trim();
+            const isEmpty = !val;
+
+            if (isEmpty) {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Kolom ini wajib diisi';
+                field.parentNode.appendChild(errorDiv);
+
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+            }
+        }
+
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+
+            return;
+        }
+
+        // Konfirmasi sebelum submit
         Swal.fire({
-            title: "Simpan perubahan data zakat masuk?",
+            title: "Simpan Perubahan Data?",
             text: "Apakah Anda yakin ingin menyimpan perubahan data zakat masuk ini?",
-            icon: "warning",
+            icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#ffc107",
             cancelButtonColor: "#6c757d",
-            confirmButtonText: "Ya, edit",
+            confirmButtonText: "Ya, simpan",
             cancelButtonText: "Batal",
         }).then((result) => {
-        if (result.isConfirmed) {
-            const nominalInput = AutoNumeric.getAutoNumericElement('#nominal');
-            if (nominalInput) {
-                const unformattedValue = nominalInput.getNumber();
-                // Set value input ke angka murni (string)
-                document.getElementById('nominal').value = unformattedValue !== null ? unformattedValue.toString() : '';
-            }
+            if (result.isConfirmed) {
+                // Unformat input nominal (jika AutoNumeric aktif)
+                const nominalElement = AutoNumeric.getAutoNumericElement('#nominal');
+                if (nominalElement) {
+                    document.getElementById('nominal').value = nominalElement.getNumber().toString();
+                }
 
-            document.getElementById("edit-form").submit();
-        }
+                form.submit();
+            }
         });
     }
+</script>
+
+
+<script>
     // Update progress bar
     // Inisialisasi elemen global
     const fields = [

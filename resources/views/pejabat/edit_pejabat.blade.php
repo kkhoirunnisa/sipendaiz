@@ -67,7 +67,8 @@
                                 <i class="fas fa-user me-2 text-warning"></i>
                                 Nama<span class="text-danger"> *</span>
                             </label>
-                            <input type="text" name="nama" id="nama" class="form-control @error('nama') is-invalid @enderror" value="{{ old('nama', $pejabat->nama) }}" required>
+                            <input type="text" name="nama" id="nama" class="form-control @error('nama') is-invalid @enderror"
+                                value="{{ old('nama', $pejabat->nama) }}" required>
                             @error('nama')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -124,14 +125,15 @@
                                 </div>
                                 @endif
                             </div>
-                            <div class="mt-1">
+                            <!-- Container untuk tombol hapus gambar -->
+                            <div id="hapus-gambar-wrapper" class="mt-1 {{ session('temp_foto_ttd') || $pejabat->foto_ttd ? '' : 'd-none' }}">
                                 <small class="text-muted">File yang sudah dipilih sebelumnya</small>
                                 <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="hapusGambarTemp()">
                                     <i class="bi bi-trash"></i> Hapus
                                 </button>
                             </div>
                             <!-- Info tambahan -->
-                            <div class="form-text">Kosongkan jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 10240</div>
+                            <div class="form-text">Kosongkan jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 10Mb</div>
                         </div>
 
                         <div class="mb-3">
@@ -139,7 +141,9 @@
                                 <i class="fas fa-calendar-plus me-2 text-warning"></i>
                                 Tanggal Mulai Jabatan<span class="text-danger"> *</span>
                             </label>
-                            <input type="date" name="tanggal_mulai" id="tanggal_mulai" class="form-control @error('tanggal_mulai') is-invalid @enderror" value="{{ old('tanggal_mulai', $pejabat->tanggal_mulai->format('Y-m-d')) }}" required>
+                            <input type="date" name="tanggal_mulai" id="tanggal_mulai"
+                                class="form-control @error('tanggal_mulai') is-invalid @enderror"
+                                value="{{ old('tanggal_mulai', $pejabat->tanggal_mulai->format('Y-m-d')) }}" required>
                             @error('tanggal_mulai')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -150,7 +154,9 @@
                                 <i class="fas fa-calendar-times me-2 text-warning"></i>
                                 Tanggal Selesai Jabatan
                             </label>
-                            <input type="date" name="tanggal_selesai" id="tanggal_selesai" class="form-control @error('tanggal_selesai') is-invalid @enderror" value="{{ old('tanggal_selesai', $pejabat->tanggal_selesai?->format('Y-m-d')) }}">
+                            <input type="date" name="tanggal_selesai" id="tanggal_selesai"
+                                class="form-control @error('tanggal_selesai') is-invalid @enderror"
+                                value="{{ old('tanggal_selesai', $pejabat->tanggal_selesai?->format('Y-m-d')) }}">
                             <div class="form-text">Kosongkan jika masih aktif</div>
                             @error('tanggal_selesai')
                             <div class="text-danger">{{ $message }}</div>
@@ -158,7 +164,7 @@
                         </div>
 
                         <div class="text-end">
-                            <button type="button" class="btn btn-warning" onclick="konfirmasiEdit()">
+                            <button type="button" class="btn btn-warning" onclick="validasiSebelumKonfirmasi()">
                                 <i class="bi bi-save-fill me-1"></i>
                                 Update
                             </button>
@@ -169,55 +175,93 @@
         </div>
     </div>
 </div>
-
 <script>
-    function konfirmasiEdit() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('edit-form');
+
+        // Bersihkan error lama dari validasi frontend
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        const requiredFields = ['nama', 'tanggal_mulai'];
+        let firstInvalidField = null;
+
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            const val = field?.value?.trim();
+            const isEmpty = !val;
+
+            if (isEmpty) {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Kolom ini wajib diisi';
+                field.parentNode.appendChild(errorDiv);
+
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+            }
+        }
+
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+
+            return;
+        }
+
+        // Semua valid, tampilkan konfirmasi simpan
         Swal.fire({
-            title: "Edit Perubahan?",
-            html: "Apakah Anda yakin ingin mengedit perubahan pejabat masjid ini?",
+            title: "Simpan Perubahan Data?",
+            html: "Apakah Anda yakin ingin menyimpan perubahan data pengurus ini?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#ffc107",
             cancelButtonColor: "#6c757d",
-            confirmButtonText: "Ya, edit",
+            confirmButtonText: "Ya, simpan",
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                document.getElementById("edit-form").submit();
+                form.submit();
             }
         });
     }
+</script>
 
+<script>
     function previewTTD(event) {
         const input = event.target;
         const previewImg = document.getElementById('preview-gambar-ttd');
         const previewWrapper = document.getElementById('preview-wrapper-ttd');
         const gambarLama = document.getElementById('gambar-ttd-lama');
+        const hapusWrapper = document.getElementById('hapus-gambar-wrapper');
 
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Set gambar preview
                 previewImg.src = e.target.result;
-
-                // Tampilkan preview gambar baru
                 previewWrapper.classList.remove('d-none');
-
-                // Sembunyikan gambar lama jika ada
-                if (gambarLama) {
-                    gambarLama.classList.add('d-none');
-                }
+                if (gambarLama) gambarLama.classList.add('d-none');
+                if (hapusWrapper) hapusWrapper.classList.remove('d-none');
             };
             reader.readAsDataURL(input.files[0]);
         } else {
-            // Jika tidak ada file yang dipilih, kembalikan ke kondisi semula
             previewWrapper.classList.add('d-none');
-            if (gambarLama) {
-                gambarLama.classList.remove('d-none');
-            }
+            if (gambarLama) gambarLama.classList.remove('d-none');
+            if (hapusWrapper) hapusWrapper.classList.add('d-none');
         }
     }
 </script>
+
 
 <!-- Notifikasi Error -->
 @if ($errors->any())
@@ -280,6 +324,39 @@
                     console.warn('Gagal menghapus gambar:', data.message);
                 }
             });
+    }
+</script>
+<script>
+    function hapusGambarTemp() {
+        document.getElementById('foto_ttd').value = '';
+
+        const previewWrapper = document.getElementById('preview-wrapper-ttd');
+        const previewImg = document.getElementById('preview-gambar-ttd');
+        const gambarLama = document.getElementById('gambar-ttd-lama');
+        const hapusWrapper = document.getElementById('hapus-gambar-wrapper');
+
+        if (previewWrapper) previewWrapper.classList.add('d-none');
+        if (previewImg) previewImg.src = '';
+        if (gambarLama) gambarLama.classList.add('d-none');
+        if (hapusWrapper) hapusWrapper.classList.add('d-none');
+
+        const inputTemp = document.querySelector('input[name="foto_ttd_temp"]');
+        if (inputTemp) inputTemp.remove();
+
+        fetch('{{ route("pejabat.hapus_gambar", $pejabat->id) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Gambar berhasil dihapus');
+            } else {
+                console.warn('Gagal menghapus gambar:', data.message);
+            }
+        });
     }
 </script>
 

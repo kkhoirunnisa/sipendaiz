@@ -109,7 +109,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="form-text">Format PNG, JPG, JPEG. Maksimal 10240</div>
+                            <div class="form-text">Format PNG, JPG, JPEG. Maksimal 10Mb</div>
                             @error('foto_ttd')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -129,7 +129,7 @@
                         </div>
 
                         <div class="text-end">
-                            <button type="button" class="btn btn-primary" onclick="konfirmasiTambah()">
+                            <button type="button" class="btn btn-primary" onclick="validasiSebelumKonfirmasi()">
                                 <i class="bi bi-save-fill me-1"></i>
                                 Simpan
                             </button>
@@ -140,25 +140,70 @@
         </div>
     </div>
 </div>
-
 <script>
-    function konfirmasiTambah() {
-        Swal.fire({
-            title: "Simpan Pengurus Masjid?",
-            text: "Apakah Anda yakin ingin menyimpan data pengurus masjid ini?",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonColor: "#0d6efd",
-            cancelButtonColor: "#6c757d",
-            confirmButtonText: "Ya, simpan",
-            cancelButtonText: "Batal",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById("tambah-form").submit();
+function validasiSebelumKonfirmasi() {
+    const form = document.getElementById('tambah-form');
+
+    // Bersihkan error lama
+    document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+    const requiredFields = ['jabatan', 'nama', 'tanggal_mulai'];
+    let firstInvalidField = null;
+
+    for (const fieldId of requiredFields) {
+        const field = document.getElementById(fieldId);
+        const val = field?.value?.trim();
+        const isEmpty = !val;
+
+        if (isEmpty) {
+            const errorDiv = document.createElement('div');
+            errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+            errorDiv.textContent = 'Kolom ini wajib diisi';
+            field.parentNode.appendChild(errorDiv);
+
+            if (!firstInvalidField) {
+                firstInvalidField = field;
             }
-        });
+        }
     }
 
+    if (firstInvalidField) {
+        firstInvalidField.focus();
+        firstInvalidField.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Lengkapi Data!',
+            text: 'Mohon lengkapi semua field yang wajib diisi.',
+            confirmButtonColor: '#dc3545',
+        });
+
+        return;
+    }
+
+    // Semua valid, tampilkan konfirmasi
+    Swal.fire({
+        title: "Simpan Data Pengurus Masjid?",
+        text: "Apakah Anda yakin ingin menyimpan data pengurus masjid ini?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#0d6efd",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Ya, simpan",
+        cancelButtonText: "Batal",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+}
+</script>
+
+
+<script>
     function hapusGambarTemp() {
         // Hapus preview temporary
         const tempPreview = document.getElementById('temp-preview');

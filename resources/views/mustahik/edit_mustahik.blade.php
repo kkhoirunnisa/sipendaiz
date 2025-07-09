@@ -56,8 +56,11 @@
                                 <i class="fas fa-user me-2 text-warning"></i>
                                 Nama<span class="text-danger"> *</span>
                             </label>
-                             <!-- Semua karakter selain huruf (a-z, A-Z) dan spasi akan dihapus (''). -->
+                            <!-- Semua karakter selain huruf (a-z, A-Z) dan spasi akan dihapus (''). -->
                             <input oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" type="text" name="nama" id="nama" value="{{ $mustahik->nama }}" class="form-control" required>
+                            @error('nama')
+                            <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="kategori" class="form-label fw-bold text-dark">
@@ -107,7 +110,7 @@
 
 
                         <div class="text-end">
-                            <button type="button" class="btn btn-warning" onclick="konfirmasiEdit()">
+                            <button type="button" class="btn btn-warning" onclick="validasiSebelumKonfirmasi()">
                                 <i class="bi bi-save-fill me-1"></i>Edit
                             </button>
                         </div>
@@ -118,11 +121,56 @@
     </div>
 </div>
 <script>
-    function konfirmasiEdit() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('edit-form');
+
+        // Hapus error lama
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        const requiredFields = ['nama', 'kategori', 'alamat'];
+        let firstInvalidField = null;
+
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            const val = field?.value?.trim();
+            const isEmpty = !val;
+
+            if (isEmpty) {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Kolom ini wajib diisi';
+
+                // Tambahkan pesan error setelah elemen input/select
+                field.parentNode.appendChild(errorDiv);
+
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+            }
+        }
+
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+
+            return;
+        }
+
+        // Jika semua valid, tampilkan konfirmasi
         Swal.fire({
-            title: "Edit Perubahan?",
-            html: "Apakah Anda yakin ingin mengedit perubahan mustahik ini?",
-            icon: "warning",
+            title: "Simpan Perubahan Data?",
+            html: "Apakah Anda yakin ingin menyimpan perubahan data mustahik ini?",
+            icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#ffc107",
             cancelButtonColor: "#6c757d",
@@ -130,10 +178,13 @@
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                document.getElementById("edit-form").submit();
+                form.submit();
             }
         });
     }
+</script>
+
+<script>
     // Update progress bar
     // Definisi fungsi
     function updateProgress() {

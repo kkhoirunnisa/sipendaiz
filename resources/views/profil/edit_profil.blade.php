@@ -67,7 +67,8 @@
                             <label class="form-label fw-bold text-dark">
                                 <i class="bi bi-lock-fill me-2 text-warning"></i>Password Lama
                             </label>
-                            <input type="password" name="current_password" class="form-control bg-light" id="current_password" placeholder="Masukkan password lama">
+                            <input type="password" name="current_password" class="form-control bg-light"
+                                id="current_password" placeholder="Masukkan password lama">
                             <small class="text-muted">Kosongkan jika tidak ingin ubah password</small>
                             <div>
                                 @error('current_password')
@@ -80,7 +81,8 @@
                             <label class="form-label fw-bold text-dark">
                                 <i class="bi bi-shield-lock-fill me-2 text-warning"></i>Password Baru
                             </label>
-                            <input type="password" name="new_password" class="form-control bg-light" id="new_password" placeholder="Kosongkan jika tidak ingin mengubah password">
+                            <input type="password" name="new_password" class="form-control bg-light"
+                                id="new_password" placeholder="Kosongkan jika tidak ingin mengubah password">
                             <small class="text-muted">Kosongkan jika tidak ingin ubah password</small>
                         </div>
 
@@ -88,7 +90,8 @@
                             <label class="form-label fw-bold text-dark">
                                 <i class="bi bi-shield-lock me-2 text-warning"></i>Konfirmasi Password Baru
                             </label>
-                            <input type="password" name="new_password_confirmation" class="form-control bg-light" id="new_password_confirmation" placeholder="Ulangi password baru">
+                            <input type="password" name="new_password_confirmation" class="form-control bg-light"
+                                id="new_password_confirmation" placeholder="Ulangi password baru">
                             <small class="text-muted">Kosongkan jika tidak ingin ubah password</small>
                             <div>
                                 @error('new_password')
@@ -101,17 +104,17 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold text-dark">
                                 <i class="bi bi-telephone-fill me-2 text-warning"></i>Nomor Telepon
-                            </label>
+                            </label><span class="text-danger"> *</span>
                             <input type="text" name="nomor_telepon" class="form-control bg-light"
                                 id="nomor_telepon"
                                 inputmode="numeric"
                                 pattern="[0-9]+"
                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                                value="{{ $profil->nomor_telepon }}">
+                                value="{{ $profil->nomor_telepon }}" required>
                         </div>
 
                         <div class="text-end">
-                            <button type="button" class="btn btn-warning" onclick="konfirmasiEdit()">
+                            <button type="button" class="btn btn-warning" onclick="validasiSebelumKonfirmasi()">
                                 <i class="bi bi-save-fill me-1"></i>Edit
                             </button>
                         </div>
@@ -122,12 +125,97 @@
         </div>
     </div>
 </div>
-
 <script>
-    function konfirmasiEdit() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('edit-form');
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        const fieldIds = ['nama', 'username', 'nomor_telepon'];
+        let isValid = true;
+        let firstInvalidField = null;
+
+        for (const fieldId of fieldIds) {
+            const field = document.getElementById(fieldId);
+            const val = field?.value?.trim() || '';
+            let errorMessage = '';
+
+            if (val === '') {
+                errorMessage = 'Kolom ini wajib diisi';
+            } else if (fieldId === 'nomor_telepon') {
+                if (!/^\d{10,14}$/.test(val)) {
+                    errorMessage = 'Nomor telepon harus berupa 10-14 digit angka';
+                }
+            }
+
+            if (errorMessage !== '') {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = errorMessage;
+                field.parentNode.appendChild(errorDiv);
+
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+                isValid = false;
+            }
+        }
+
+        // Validasi password baru (jika ingin ubah password)
+        const newPassword = document.getElementById('new_password').value.trim();
+        const confirmPassword = document.getElementById('new_password_confirmation').value.trim();
+
+        if (newPassword !== '') {
+            if (newPassword.length < 6) {
+                const field = document.getElementById('new_password');
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Password minimal 6 karakter';
+                field.parentNode.appendChild(errorDiv);
+                isValid = false;
+                if (!firstInvalidField) firstInvalidField = field;
+            }
+
+            if (confirmPassword === '') {
+                const field = document.getElementById('new_password_confirmation');
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Mohon konfirmasi password baru';
+                field.parentNode.appendChild(errorDiv);
+                isValid = false;
+                if (!firstInvalidField) firstInvalidField = field;
+            } else if (newPassword !== confirmPassword) {
+                const field = document.getElementById('new_password_confirmation');
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Konfirmasi password tidak cocok';
+                field.parentNode.appendChild(errorDiv);
+                isValid = false;
+                if (!firstInvalidField) firstInvalidField = field;
+            }
+        }
+
+        if (!isValid) {
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+                firstInvalidField.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi data yang wajib diisi atau perbaiki input yang tidak valid.',
+                confirmButtonColor: '#dc3545',
+            });
+
+            return;
+        }
+
         Swal.fire({
-            title: "Edit Perubahan?",
-            html: "Apakah Anda yakin ingin mengedit perubahan profil ini?",
+            title: "Simpan Perubahan Data?",
+            html: "Apakah Anda yakin ingin menyimpan perubahan data profil ini?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#ffc107",
@@ -136,11 +224,12 @@
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                document.getElementById("edit-form").submit();
+                form.submit();
             }
         });
     }
 </script>
+
 <script>
     // Update progress bar
     // Definisi fungsi

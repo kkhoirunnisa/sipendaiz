@@ -72,7 +72,7 @@
                                 pattern="[0-9]+"
                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 value="{{ $user->nomor_telepon }}"
-                                class="form-control">
+                                class="form-control" required>
                             @error('nomor_telepon')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -119,7 +119,7 @@
                             @enderror
                         </div>
                         <div class="text-end">
-                            <button type="button" class="btn btn-warning" onclick="konfirmasiEdit()">
+                            <button type="button" class="btn btn-warning" onclick="validasiSebelumKonfirmasi()">
                                 <i class="bi bi-save-fill me-1"></i>
                                 Edit
                             </button>
@@ -131,23 +131,81 @@
     </div>
 </div>
 <script>
-    function konfirmasiEdit() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('edit-form');
+
+        // Hapus error lama
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        const requiredFields = ['nama', 'nomor_telepon', 'role', 'username'];
+        let isValid = true;
+        let firstInvalidField = null;
+
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            const val = field?.value?.trim() || '';
+            let errorMessage = '';
+
+            if (val === '') {
+                errorMessage = 'Kolom ini wajib diisi';
+            } else if (fieldId === 'nomor_telepon') {
+                if (!/^\d{10,14}$/.test(val)) {
+                    errorMessage = 'Nomor telepon harus berupa 10-14 digit angka';
+                }
+            }
+
+            if (errorMessage !== '') {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = errorMessage;
+                field.parentNode.appendChild(errorDiv);
+
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+                firstInvalidField.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+
+            return;
+        }
+
+        // Semua valid, tampilkan konfirmasi
         Swal.fire({
             title: "Edit Perubahan?",
-            html: "Apakah Anda yakin ingin mengedit perubahan user ini?",
-            icon: "warning",
+            html: "Apakah Anda yakin ingin menyimpan perubahan data user ini?",
+            icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#ffc107",
             cancelButtonColor: "#6c757d",
-            confirmButtonText: "Ya, edit",
+            confirmButtonText: "Ya, simpan",
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                document.getElementById("edit-form").submit();
+                form.submit();
             }
         });
     }
+</script>
 
+<script>
     document.getElementById('togglePassword').addEventListener('click', function() {
         const passwordInput = document.getElementById('passwordInput');
         const icon = document.getElementById('iconToggle');

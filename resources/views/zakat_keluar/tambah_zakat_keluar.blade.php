@@ -72,7 +72,7 @@
                                     <i class="bi bi-calendar2-range-fill me-2 text-primary"></i>
                                     Tanggal<span class="text-danger"> *</span>
                                 </label>
-                                <input type="date" name="tanggal" id="tanggal" class="form-control" required value="{{ old('tanggal') }}">
+                                <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal') }}" required>
                                 @error('tanggal')
                                 <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -110,7 +110,7 @@
                                     Jenis Zakat<span class="text-danger"> *</span>
                                 </label>
                                 <select name="jenis_zakat" id="jenis_zakat" class="form-select" required>
-                                    <option value="" disabled selected>Pilih Jenis Zakat</option>
+                                    <option value="" disabled {{ old('jenis_zakat') == null ? 'selected' : '' }}>Pilih Jenis Zakat</option>
                                     <option value="Fitrah" {{ old('jenis_zakat') == 'Fitrah' ? 'selected' : '' }}>Fitrah</option>
                                     <option value="Maal" {{ old('jenis_zakat') == 'Maal' ? 'selected' : '' }}>Maal</option>
                                 </select>
@@ -125,7 +125,7 @@
                                     <i class="bi bi-box2-fill me-2 text-primary"></i>
                                     Bentuk Zakat<span class="text-danger"> *</span>
                                 </label>
-                                <select name="bentuk_zakat" id="bentuk_zakat" class="form-select" required>
+                                <select name="bentuk_zakat" class="form-select @error('bentuk_zakat') is-invalid @enderror" id="bentuk_zakat" required>
                                     <option value="Uang" {{ old('bentuk_zakat') == 'Uang' ? 'selected' : '' }}>Uang</option>
                                     <option value="Beras" {{ old('bentuk_zakat', 'Beras') == 'Beras' ? 'selected' : '' }}>Beras</option>
                                 </select>
@@ -215,7 +215,7 @@
 
                         <!-- button simpan -->
                         <div class="text-end">
-                            <button type="button" class="btn btn-primary" onclick="konfirmasiTambah()">
+                            <button type="button" class="btn btn-primary" onclick="validasiSebelumKonfirmasi()">
                                 <i class="bi bi-save-fill me-1"></i>
                                 Simpan
                             </button>
@@ -227,47 +227,91 @@
     </div>
 </div>
 
-
 <script>
-    function konfirmasiTambah() {
-        // validasi apakah sudah ada mustahik yang dipilih
-        const jumlahMustahik = parseInt(document.getElementById('jumlah-mustahik').textContent);
-        if (jumlahMustahik === 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Peringatan!',
-                text: 'Silakan pilih minimal 1 mustahik terlebih dahulu.',
-                confirmButtonColor: '#0d6efd'
-            });
-            return;
-        }
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('tambah-form');
 
-        // validasi input per mustahik
+        // Bersihkan error lama
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        let isValid = true;
+        let firstInvalidField = null;
+
+        const requiredFields = ['tanggal', 'id_mustahik', 'jenis_zakat', 'bentuk_zakat', 'keterangan'];
+        requiredFields.forEach(id => {
+            const field = document.getElementById(id);
+            if (field && !field.value.trim()) {
+                isValid = false;
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Kolom ini wajib diisi';
+                field.parentNode.appendChild(errorDiv);
+                if (!firstInvalidField) firstInvalidField = field;
+            }
+        });
+
+        // Validasi mustahik
+        // const jumlahMustahik = parseInt(document.getElementById('jumlah-mustahik').textContent) || 0;
+        // if (jumlahMustahik === 0) {
+        //     isValid = false;
+        //     Swal.fire({
+        //         icon: 'warning',
+        //         title: 'Peringatan!',
+        //         text: 'Silakan pilih minimal 1 mustahik terlebih dahulu.',
+        //         confirmButtonColor: '#0d6efd'
+        //     });
+        //     return;
+        // }
+
+        // Validasi per mustahik (nominal atau jumlah)
         const bentukZakat = document.getElementById('bentuk_zakat').value;
         let inputPerMustahik = 0;
 
         if (bentukZakat === 'Uang') {
             inputPerMustahik = AutoNumeric.getNumber('#nominal_per_mustahik') || 0;
+            if (inputPerMustahik === 0) {
+                isValid = false;
+                const field = document.getElementById('nominal_per_mustahik');
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Nominal per mustahik harus diisi';
+                field.parentNode.appendChild(errorDiv);
+                if (!firstInvalidField) firstInvalidField = field;
+            }
         } else if (bentukZakat === 'Beras') {
             inputPerMustahik = parseFloat(document.getElementById('jumlah_per_mustahik').value) || 0;
+            if (inputPerMustahik === 0) {
+                isValid = false;
+                const field = document.getElementById('jumlah_per_mustahik');
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Jumlah per mustahik harus diisi';
+                field.parentNode.appendChild(errorDiv);
+                if (!firstInvalidField) firstInvalidField = field;
+            }
         }
 
-        if (inputPerMustahik === 0) {
+        if (!isValid) {
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+                firstInvalidField.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
             Swal.fire({
                 icon: 'warning',
-                title: 'Peringatan!',
-                text: 'Silakan masukkan jumlah zakat per mustahik.',
-                confirmButtonColor: '#0d6efd'
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
             });
             return;
         }
 
-        // konfirmasi sebelum submit
+        // Semua valid, tampilkan konfirmasi
         Swal.fire({
             title: "Simpan data zakat keluar?",
-            html: `
-                <p>Apakah Anda yakin ingin menyimpan data zakat keluar ini?</p>
-            `,
+            html: `<p>Apakah Anda yakin ingin menyimpan data zakat keluar ini?</p>`,
             icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#0d6efd",
@@ -276,13 +320,13 @@
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                // Unformat nominal sebelum submit
-                const nominalPerMustahikInput = AutoNumeric.getAutoNumericElement('#nominal_per_mustahik');
-                if (nominalPerMustahikInput) {
-                    nominalPerMustahikInput.unformat();
+                // Unformat nilai nominal uang sebelum submit
+                const nominalAutoNumeric = AutoNumeric.getAutoNumericElement('#nominal_per_mustahik');
+                if (nominalAutoNumeric) {
+                    nominalAutoNumeric.unformat();
                 }
 
-                document.getElementById("tambah-form").submit();
+                form.submit();
             }
         });
     }

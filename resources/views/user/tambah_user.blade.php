@@ -57,7 +57,7 @@
                                 Nama<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama user"
-                                required value="{{ old('nama') }}">
+                                value="{{ old('nama') }}" required>
                             @error('nama')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -76,7 +76,7 @@
                                 inputmode="numeric"
                                 pattern="[0-9]+"
                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                                value="{{ old('nomor_telepon') }}">
+                                value="{{ old('nomor_telepon') }}" required>
                             @error('nomor_telepon')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -88,7 +88,7 @@
                                 Role<span class="text-danger"> *</span>
                             </label>
                             <select name="role" id="role" class="form-select" required>
-                                <option value="" disabled selected>Pilih Role</option>
+                                <option value="" disabled {{ old('role') == null ? 'selected' : '' }}>Pilih Role</option>
                                 <option value="Bendahara" {{ old('role') == 'Bendahara' ? 'selected' : '' }}>Bendahara</option>
                                 <option value="Petugas" {{ old('role') == 'Petugas' ? 'selected' : '' }}>Petugas</option>
                                 <option value="Ketua" {{ old('role') == 'Ketua' ? 'selected' : '' }}>Ketua</option>
@@ -104,7 +104,7 @@
                                 Username<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="username" id="username" class="form-control" placeholder="Masukkan username user"
-                                required value="{{ old('username') }}">
+                                value="{{ old('username') }}" required>
                             @error('username')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -122,7 +122,7 @@
                         </div>
 
                         <div class="text-end">
-                            <button type="button" class="btn btn-primary" onclick="konfirmasiTambahUser()">
+                            <button type="button" class="btn btn-primary" onclick="validasiSebelumKonfirmasi()">
                                 <i class="bi bi-save-fill me-1"></i>
                                 Simpan
                             </button>
@@ -133,10 +133,65 @@
         </div>
     </div>
 </div>
+
 <script>
-    function konfirmasiTambahUser() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('tambah-form');
+
+        // Bersihkan error lama
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        const requiredFields = ['nama', 'nomor_telepon', 'role', 'username', 'password'];
+        let isValid = true;
+        let firstInvalidField = null;
+
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            const value = field?.value?.trim() || '';
+
+            let errorMessage = '';
+
+            if (value === '') {
+                errorMessage = 'Kolom ini wajib diisi';
+            } else if (fieldId === 'nomor_telepon') {
+                if (!/^\d{10,14}$/.test(value)) {
+                    errorMessage = 'Nomor telepon harus berupa 10-14 digit angka';
+                }
+            }
+
+            if (errorMessage !== '') {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = errorMessage;
+                field.parentNode.appendChild(errorDiv);
+
+                if (!firstInvalidField) firstInvalidField = field;
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+                firstInvalidField.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+
+            return;
+        }
+
+        // Semua valid, tampilkan konfirmasi
         Swal.fire({
-            title: "Simpan User?",
+            title: "Simpan Data User?",
             text: "Apakah Anda yakin ingin menyimpan data user ini?",
             icon: "question",
             showCancelButton: true,
@@ -146,10 +201,14 @@
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                document.getElementById("tambah-form").submit();
+                form.submit();
             }
         });
     }
+</script>
+
+
+<script>
     // Update progress bar
     // Definisi fungsi
     function updateProgress() {

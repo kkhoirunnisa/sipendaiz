@@ -77,7 +77,7 @@
                                 <i class="bi bi-calendar2-range-fill me-2 text-warning"></i>
                                 Tanggal<span class="text-danger"> *</span>
                             </label>
-                            <input type="date" name="tanggal" id="tanggal" class="form-control" required value="{{ old('tanggal', $infakKeluar->tanggal) }}">
+                            <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal', $infakKeluar->tanggal) }}" required>
                             @error('tanggal')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -103,7 +103,7 @@
                                 Nominal (Rp)<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="nominal" id="nominal" class="form-control"
-                                value="{{ old('nominal', ($infakKeluar->nominal)) }}">
+                                value="{{ old('nominal', ($infakKeluar->nominal)) }}" required>
                             <small class="text-muted">Sisa Saldo {{ ucfirst($kategori) }}:</small> <strong> {{ number_format($sisaSaldo, 0, ',', '.') }}</strong>
                             @error('nominal')
                             <div class="text-danger">{{ $message }}</div>
@@ -118,7 +118,7 @@
                                 <i class="bi bi-box-seam-fill me-2 text-warning"></i>
                                 Barang<span class="text-danger"> *</span>
                             </label>
-                            <input type="text" name="barang" id="barang" class="form-control" value="{{ old('barang', $infakKeluar->barang) }}">
+                            <input type="text" name="barang" id="barang" class="form-control" value="{{ old('barang', $infakKeluar->barang) }}" required>
                             @error('barang')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -175,7 +175,7 @@
                                 @endif
                             </div>
 
-                            <div class="form-text">Lewati jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 10240.</div>
+                            <div class="form-text">Lewati jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 10Mb.</div>
                         </div>
                     </div>
 
@@ -184,14 +184,14 @@
                             <i class="bi bi-card-text me-2 text-warning"></i>
                             Keterangan<span class="text-danger"> *</span>
                         </label>
-                        <textarea name="keterangan" id="keterangan" class="form-control" rows="3">{{ old('keterangan', $infakKeluar->keterangan) }}</textarea>
+                        <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required>{{ old('keterangan', $infakKeluar->keterangan) }}</textarea>
                         @error('keterangan')
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="text-end">
-                        <button type="button" class="btn btn-warning" onclick="konfirmasiEdit()">
+                        <button type="button" class="btn btn-warning" onclick="validasiSebelumKonfirmasi()">
                             <i class="bi bi-save-fill me-1"></i>
                             Edit
                         </button>
@@ -203,9 +203,67 @@
 </div>
 
 <script>
-    function konfirmasiEdit() {
+    function validasiSebelumKonfirmasi() {
+        
+        const form = document.getElementById('edit-form');
+
+        // Bersihkan error lama
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        const requiredFields = [
+            'tanggal', 'kategori', 'nominal', 'barang', 'keterangan'
+        ];
+
+        let firstInvalidField = null;
+
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            let isEmpty = false;
+
+            if (fieldId === 'bukti_infak_keluar') {
+                const file = field.files[0];
+                const hasTemp = document.querySelector('input[name="temp_bukti_infak_keluar"]')?.value;
+                if (!file && !hasTemp) {
+                    isEmpty = true;
+                }
+            } else {
+                const val = field?.value?.trim();
+                isEmpty = !val;
+            }
+
+            if (isEmpty) {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error');
+                errorDiv.textContent = 'Kolom ini wajib diisi';
+
+                field.parentNode.appendChild(errorDiv);
+
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+            }
+        }
+
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+
+            return;
+        }
+
+        // Semua valid, tampilkan konfirmasi
         Swal.fire({
-            title: "Simpan perubahan data infak keluar?",
+            title: "Simpan Perubahan Data?",
             text: "Apakah Anda yakin ingin menyimpan perubahan data infak keluar ini?",
             icon: "warning",
             showCancelButton: true,
@@ -226,6 +284,9 @@
             }
         });
     }
+</script>
+
+<script>
     // Update progress bar
     // Definisi fungsi
     function updateProgress() {

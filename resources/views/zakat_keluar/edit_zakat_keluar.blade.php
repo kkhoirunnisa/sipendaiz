@@ -121,7 +121,7 @@
                                         <i class="bi bi-box2-fill me-2 text-warning"></i>
                                         Bentuk Zakat<span class="text-danger"> *</span>
                                     </label>
-                                    <select name="bentuk_zakat" id="bentuk_zakat" class="form-select">
+                                    <select name="bentuk_zakat" id="bentuk_zakat" class="form-select" required>
                                         <option value="Uang" {{ (old('bentuk_zakat', $zakatKeluar->bentuk_zakat) == 'Uang') ? 'selected' : '' }}>Uang</option>
                                         <option value="Beras" {{ (old('bentuk_zakat', $zakatKeluar->bentuk_zakat) == 'Beras') ? 'selected' : '' }}>Beras</option>
                                     </select>
@@ -137,7 +137,7 @@
                                         Nominal (Rp)<span class="text-danger"> *</span>
                                     </label>
                                     <input type="text" name="nominal" id="nominal" class="form-control"
-                                        value="{{ old('nominal', $zakatKeluar->nominal) }}">
+                                        value="{{ old('nominal', $zakatKeluar->nominal) }}" required>
                                     <small class="text-muted d-block">Sisa Fitrah Uang: <strong>{{ number_format($sisa['Fitrah_Uang'], 0, ',', '.') }}</strong></small>
                                     <small class="text-muted d-block">Sisa Maal Uang: <strong>{{ number_format($sisa['Maal_Uang'], 0, ',', '.') }}</strong></small>
                                     @error('nominal')
@@ -154,7 +154,7 @@
                                         Jumlah (Kg)<span class="text-danger"> *</span>
                                     </label>
                                     <input type="number" name="jumlah" id="jumlah" class="form-control"
-                                        value="{{ old('jumlah', rtrim(rtrim(number_format($zakatKeluar->jumlah, 2, '.', ''), '0'), '.')) }}">
+                                        value="{{ old('jumlah', rtrim(rtrim(number_format($zakatKeluar->jumlah, 2, '.', ''), '0'), '.')) }}" required>
                                     <small class="text-muted d-block">Sisa Fitrah Beras: <strong>{{ number_format($sisa['Fitrah_Beras'], 2, ',', '.') }} Kg</strong></small>
                                     <small class="text-muted d-block">Sisa Maal Beras: <strong>{{ number_format($sisa['Maal_Beras'], 2, ',', '.') }} Kg</strong></small>
                                     @error('jumlah')
@@ -167,7 +167,7 @@
                                         <i class="bi bi-card-text me-2 text-warning"></i>
                                         Keterangan<span class="text-danger"> *</span>
                                     </label>
-                                    <textarea name="keterangan" id="keterangan" class="form-control" rows="3">{{ old('keterangan', $zakatKeluar->keterangan) }}</textarea>
+                                    <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required>{{ old('keterangan', $zakatKeluar->keterangan) }}</textarea>
                                     @error('keterangan')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -175,7 +175,7 @@
                             </div>
 
                             <div class="text-end">
-                                <button type="button" class="btn btn-warning" onclick="konfirmasiEdit()">
+                                <button type="button" class="btn btn-warning" onclick="validasiSebelumKonfirmasi()">
                                     <i class="bi bi-save-fill me-1"></i>
                                     Edit
                                 </button>
@@ -189,10 +189,76 @@
 </div>
 
 <script>
-    function konfirmasiEdit() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('edit-form');
+
+        // Bersihkan error lama
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        let isValid = true;
+        let firstInvalidField = null;
+
+        const requiredFields = ['tanggal', 'id_mustahik', 'jenis_zakat', 'bentuk_zakat', 'keterangan'];
+        requiredFields.forEach(id => {
+            const field = document.getElementById(id);
+            if (field && field.offsetParent !== null && !field.value.trim()) {
+                isValid = false;
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Kolom ini wajib diisi';
+                field.parentNode.appendChild(errorDiv);
+                if (!firstInvalidField) firstInvalidField = field;
+            }
+        });
+
+        // Validasi nominal atau jumlah sesuai bentuk zakat
+        const bentukZakat = document.getElementById('bentuk_zakat').value;
+
+        if (bentukZakat === 'Uang') {
+            const nominalEl = document.getElementById('nominal');
+            const nominalValue = AutoNumeric.getNumber('#nominal') || 0;
+            if (nominalEl.offsetParent !== null && nominalValue <= 0) {
+                isValid = false;
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Nominal harus diisi dan lebih dari 0';
+                nominalEl.parentNode.appendChild(errorDiv);
+                if (!firstInvalidField) firstInvalidField = nominalEl;
+            }
+        } else if (bentukZakat === 'Beras') {
+            const jumlahEl = document.getElementById('jumlah');
+            const jumlahValue = parseFloat(jumlahEl.value) || 0;
+            if (jumlahEl.offsetParent !== null && jumlahValue <= 0) {
+                isValid = false;
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Jumlah harus diisi dan lebih dari 0';
+                jumlahEl.parentNode.appendChild(errorDiv);
+                if (!firstInvalidField) firstInvalidField = jumlahEl;
+            }
+        }
+
+        if (!isValid) {
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+                firstInvalidField.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+            return;
+        }
+
+        // Konfirmasi sebelum submit
         Swal.fire({
-            title: "Update data zakat keluar?",
-            text: "Apakah Anda yakin ingin memperbarui data ini?",
+            title: "Simpan Perubahan Data?",
+            text: "Apakah Anda yakin ingin menyimpan perubahan data zakat keluar ini?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#ffc107",
@@ -204,7 +270,6 @@
                 const nominalInput = AutoNumeric.getAutoNumericElement('#nominal');
                 if (nominalInput) {
                     const unformattedValue = nominalInput.getNumber();
-                    // Set value input ke angka murni (string)
                     document.getElementById('nominal').value = unformattedValue !== null ? unformattedValue.toString() : '';
                 }
 
@@ -212,6 +277,10 @@
             }
         });
     }
+</script>
+
+
+<script>
     // Update progress bar
     // Inisialisasi elemen global
     const fields = [

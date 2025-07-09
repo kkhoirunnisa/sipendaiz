@@ -58,7 +58,7 @@
                                 Nama<span class="text-danger"> *</span>
                             </label>
                             <!-- Semua karakter selain huruf (a-z, A-Z) dan spasi akan dihapus (''). -->
-                            <input oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama mustahik" required value="{{ old('nama') }}">
+                            <input oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama mustahik" value="{{ old('nama') }}" required>
                             @error('nama')
                             <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -70,7 +70,7 @@
                                 Kategori Penerima<span class="text-danger"> *</span>
                             </label>
                             <select name="kategori" id="kategori" class="form-select" required>
-                                <option value="" disabled selected>Pilih Kategori</option>
+                                 <option value="" disabled {{ old('kategori') == null ? 'selected' : '' }}>Pilih Kategori</option>
                                 <option value="Fakir" {{ old('kategori') == 'Fakir' ? 'selected' : '' }}>Fakir</option>
                                 <option value="Miskin" {{ old('kategori') == 'Miskin' ? 'selected' : '' }}>Miskin</option>
                                 <option value="Amil" {{ old('kategori') == 'Amil' ? 'selected' : '' }}>Amil</option>
@@ -92,7 +92,7 @@
                                 Alamat Penerima<span class="text-danger"> *</span>
                             </label>
                             <select name="alamat" id="alamat" class="form-select" required>
-                                <option value="" disabled selected>Pilih Alamat</option>
+                                <option value="" disabled {{ old('alamat') == null ? 'selected' : '' }}>Pilih Alamat</option>
                                 <option value="Jl. Melati Selatan s/d Wates Timur Utara - DK1" {{ old('alamat') == 'Jl. Melati Selatan s/d Wates Timur Utara - DK1' ? 'selected' : '' }}>Jl. Melati Selatan s/d Wates Timur Utara - DK1</option>
                                 <option value="Jl. Nusa Indah Selatan s/d Melati utara - DK2" {{ old('alamat') == 'Jl. Nusa Indah Selatan s/d Melati utara - DK2' ? 'selected' : '' }}>Jl. Nusa Indah Selatan s/d Melati utara - DK2</option>
                                 <option value="JL. Nusa indah Utara s/d Kantil Selatan - DK3" {{ old('alamat') == 'JL. Nusa indah Utara s/d Kantil Selatan - DK3' ? 'selected' : '' }}>JL. Nusa indah Utara s/d Kantil Selatan - DK3</option>
@@ -112,7 +112,7 @@
 
 
                         <div class="text-end">
-                            <button type="button" class="btn btn-primary" onclick="konfirmasiTambah()">
+                            <button type="button" class="btn btn-primary" onclick="validasiSebelumKonfirmasi()">
                                 <i class="bi bi-save-fill me-1"></i> Simpan
                             </button>
                         </div>
@@ -122,8 +122,54 @@
         </div>
     </div>
 </div>
+
 <script>
-    function konfirmasiTambah() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('tambah-form');
+
+        // Bersihkan error lama
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        const requiredFields = ['nama', 'kategori', 'alamat'];
+        let firstInvalidField = null;
+
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            let isEmpty = false;
+
+            const val = field?.value?.trim();
+            isEmpty = !val;
+
+            if (isEmpty) {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error', 'small');
+                errorDiv.textContent = 'Kolom ini wajib diisi';
+                field.parentNode.appendChild(errorDiv);
+
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+            }
+        }
+
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+
+            return;
+        }
+
+        // Semua valid, tampilkan konfirmasi
         Swal.fire({
             title: "Simpan data mustahik?",
             text: "Apakah Anda yakin ingin menyimpan data mustahik ini?",
@@ -139,7 +185,9 @@
             }
         });
     }
+</script>
 
+<script>
     // update progress bar
     // definisi fungsi untuk memperbarui progress bar
     function updateProgress() {

@@ -94,7 +94,7 @@
                                 <i class="fas fa-map-marker-alt me-2 text-warning"></i>
                                 Alamat
                             </label>
-                            <input type="text" name="alamat" class="form-control" id="alamat" value="{{ $buktiTransaksi->alamat }}" required>
+                            <input type="text" name="alamat" class="form-control" id="alamat" value="{{ $buktiTransaksi->alamat }}">
                             @error('alamat')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -110,7 +110,7 @@
                             </label>
                             <input type="text" name="nomor_telepon" class="form-control" id="nomor_telepon" inputmode="numeric"
                                 pattern="[0-9]+"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')" value="{{ $buktiTransaksi->nomor_telepon }}" required>
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')" value="{{ $buktiTransaksi->nomor_telepon }}">
                             @error('nomor_telepon')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -185,7 +185,7 @@
                                 Nominal (Rp)<span class="text-danger"> *</span>
                             </label>
                             <input type="text" name="nominal" id="nominal" class="form-control"
-                                value="{{ old('nominal', intval($buktiTransaksi->nominal)) }}">
+                                value="{{ old('nominal', intval($buktiTransaksi->nominal)) }}" required>
                             @error('nominal')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -199,7 +199,7 @@
                                 <i class="bi bi-box-seam-fill me-2 text-warning"></i>
                                 Barang<span class="text-danger"> *</span>
                             </label>
-                            <input type="text" name="barang" class="form-control" id="barang" value="{{ $buktiTransaksi->barang }}">
+                            <input type="text" name="barang" class="form-control" id="barang" value="{{ $buktiTransaksi->barang }}" required>
                             @error('barang')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -258,7 +258,7 @@
                                 @endif
                             </div>
 
-                            <div class="form-text">Lewati jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 10240.</div>
+                            <div class="form-text">Lewati jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 10Mb.</div>
                         </div>
 
                     </div>
@@ -269,7 +269,7 @@
                                 <i class="bi bi-card-text me-2 text-warning"></i>
                                 Keterangan<span class="text-danger"> *</span>
                             </label>
-                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Keterangan infak">{{ old('keterangan', $buktiTransaksi->keterangan) }}</textarea>
+                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Keterangan infak" required>{{ old('keterangan', $buktiTransaksi->keterangan) }}</textarea>
                             @error('keterangan')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -277,7 +277,7 @@
                     </div>
 
                     <div class="text-end">
-                        <button type="button" class="btn btn-warning" onclick="konfirmasiEdit()">
+                        <button type="button" class="btn btn-warning" onclick="validasiSebelumKonfirmasi()">
                             <i class="bi bi-save-fill me-1"></i>
                             Edit
                         </button>
@@ -288,10 +288,63 @@
 </div>
 
 <script>
-    function konfirmasiEdit() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('edit-form');
+        const jenisInfak = document.getElementById('jenis_infak').value;
+
+        // Bersihkan semua pesan error lama
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        // Daftar ID field wajib
+        const requiredFields = [
+            'tanggal', 'donatur', 'kategori', 'sumber', 'metode',
+            'jenis_infak', 'keterangan'
+        ];
+
+        // Tambahkan sesuai jenis infak
+        if (jenisInfak === 'Uang') {
+            requiredFields.push('nominal');
+        } else if (jenisInfak === 'Barang') {
+            requiredFields.push('barang');
+        }
+
+        let firstInvalidField = null;
+
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            if (!field) continue;
+
+            const val = field.value.trim();
+            if (val === '') {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error');
+                errorDiv.textContent = 'Kolom ini wajib diisi';
+
+                field.parentNode.appendChild(errorDiv);
+                if (!firstInvalidField) firstInvalidField = field;
+            }
+        }
+
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+            return;
+        }
+
+        // Konfirmasi submit
         Swal.fire({
-            title: "Simpan perubahan?",
-            text: "Apakah Anda yakin ingin menyimpan perubahan data ini?",
+            title: "Simpan perubahan data?",
+            text: "Apakah Anda yakin ingin menyimpan perubahan data bukti transaksi pemasukan ini?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#ffc107",
@@ -300,30 +353,20 @@
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
+                // Unformat nominal jika pakai AutoNumeric
                 const nominalInput = AutoNumeric.getAutoNumericElement('#nominal');
                 if (nominalInput) {
-                    const unformattedValue = nominalInput.getNumber();
-                    // Set value input ke angka murni (string)
-                    document.getElementById('nominal').value = unformattedValue !== null ? unformattedValue.toString() : '';
+                    nominalInput.unformat();
                 }
 
-                document.getElementById("edit-form").submit();
+                form.submit();
             }
         });
     }
-    // Update otomatis isi textarea keterangan saat donatur diisi
-    // document.querySelector('input[name="donatur"]').addEventListener('input', function() {
-    //     const namaDonatur = this.value.trim();
-    //     const keteranganField = document.getElementById('keterangan');
+</script>
 
-    //     if (namaDonatur !== '') {
-    //         keteranganField.value = 'Infak atas nama ' + namaDonatur;
-    //     } else {
-    //         keteranganField.value = '';
-    //     }
-    //     updateProgress();
-    // });
 
+<script>
     // Update progress bar
     // Inisialisasi elemen global
     const fields = [
@@ -469,6 +512,5 @@
         }
     }
 </script>
-
 
 @endsection

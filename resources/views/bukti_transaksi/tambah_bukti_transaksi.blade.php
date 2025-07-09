@@ -95,7 +95,7 @@
                                 <i class="fas fa-map-marker-alt me-2 text-primary"></i>
                                 Alamat
                             </label>
-                            <input type="text" name="alamat" class="form-control" id="alamat" placeholder="Masukkan alamat singkat donatur" value="{{ old('alamat') }}" required>
+                            <input type="text" name="alamat" class="form-control" id="alamat" placeholder="Masukkan alamat singkat donatur" value="{{ old('alamat') }}">
                             @error('alamat')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -118,7 +118,7 @@
                                 inputmode="numeric"
                                 pattern="[0-9]+"
                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                                value="{{ old('nomor_telepon') }}" required>
+                                value="{{ old('nomor_telepon') }}">
                             @error('nomor_telepon')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -129,7 +129,7 @@
                                 Kategori<span class="text-danger"> *</span>
                             </label>
                             <select name="kategori" class="form-select" id="kategori" required>
-                                <option disabled selected>Pilih Kategori</option>
+                                <option value="" disabled {{ old('kategori') == null ? 'selected' : '' }}>Pilih Kategori</option>
                                 <option value="Pembangunan" {{ old('kategori') == 'Pembangunan' ? 'selected' : '' }}>Pembangunan</option>
                                 <option value="Takmir" {{ old('kategori') == 'Takmir' ? 'selected' : '' }}>Takmir</option>
                             </select>
@@ -146,7 +146,7 @@
                                 Sumber<span class="text-danger"> *</span>
                             </label>
                             <select name="sumber" class="form-select" id="sumber" required>
-                                <option disabled selected>Pilih Sumber</option>
+                                <option value="" disabled {{ old('sumber') == null ? 'selected' : '' }}>Pilih Sumber</option>
                                 <option value="Donatur" {{ old('sumber') == 'Donatur' ? 'selected' : '' }}>Donatur</option>
                                 <option value="Kotak Amal" {{ old('sumber') == 'Kotak Amal' ? 'selected' : '' }}>Kotak Amal</option>
                             </select>
@@ -160,7 +160,7 @@
                                 Metode<span class="text-danger"> *</span>
                             </label>
                             <select name="metode" class="form-select" id="metode" required>
-                                <option disabled selected>Pilih Metode</option>
+                                <option value="" disabled {{ old('metode') == null ? 'selected' : '' }}>Pilih Metode</option>
                                 <option value="Tunai (Langsung)" {{ old('metode') == 'Tunai (Langsung)' ? 'selected' : '' }}>Tunai (Langsung)</option>
                                 <option value="Transfer" {{ old('metode') == 'Transfer' ? 'selected' : '' }}>Transfer</option>
                             </select>
@@ -176,14 +176,15 @@
                                 <i class="bi bi-box2-fill me-2 text-primary"></i>
                                 Jenis Infak<span class="text-danger"> *</span>
                             </label>
-                            <select name="jenis_infak" class="form-select" id="jenis_infak" required>
+                            <select name="jenis_infak" class="form-select @error('jenis_infak') is-invalid @enderror" id="jenis_infak" required>
                                 <option value="Uang" {{ old('jenis_infak', 'Uang') == 'Uang' ? 'selected' : '' }}>Uang</option>
                                 <option value="Barang" {{ old('jenis_infak') == 'Barang' ? 'selected' : '' }}>Barang</option>
                             </select>
                             @error('jenis_infak')
-                            <div class="text-danger">{{ $message }}</div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
+
                         <div class="col-md-6 mb-3" id="nominal_section">
                             <label for="nominal" class="form-label fw-bold text-dark">
                                 <i class="bi bi-cash-coin me-2 text-primary"></i>
@@ -203,7 +204,7 @@
                                 <i class="bi bi-box-seam-fill me-2 text-primary"></i>
                                 Barang<span class="text-danger"> *</span>
                             </label>
-                            <input type="text" name="barang" id="barang" class="form-control" placeholder="Masukkan barang yang diinfakkan donatur" value="{{ old('barang') }}">
+                            <input type="text" name="barang" id="barang" class="form-control" placeholder="Masukkan barang yang diinfakkan donatur" value="{{ old('barang') }}" required>
                             @error('barang')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -215,8 +216,8 @@
                             </label>
                             <input type="file" name="bukti_transaksi" id="bukti_transaksi_pemasukan"
                                 class="form-control @error('bukti_transaksi') is-invalid @enderror"
-                                accept="image/*">
-                            <small class="text-muted">Bukti jpg, png, jpeg maksimal 10240</small>
+                                accept="image/*" required>
+                            <small class="text-muted">Bukti jpg, png, jpeg maksimal 10Mb</small>
 
                             {{-- Jika ada bukti sementara di session --}}
                             @if($buktiSementara)
@@ -233,12 +234,10 @@
                                 </div>
                             </div>
                             @endif
-
                             {{-- Preview baru (jika user ganti gambar) --}}
                             <div class="mt-2">
                                 <img id="preview-gambar" src="#" alt="Preview Gambar" class="img-thumbnail d-none" style="max-height: 100px;">
                             </div>
-
                             @error('bukti_transaksi')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -258,7 +257,7 @@
                         </div>
                     </div>
                     <div class="text-end">
-                        <button type="button" class="btn btn-primary" onclick="konfirmasiTambah()">
+                        <button type="button" class="btn btn-primary" onclick="validasiSebelumKonfirmasi()">
                             <i class="bi bi-save-fill me-1"></i>
                             Simpan
                         </button>
@@ -270,7 +269,73 @@
 </div>
 
 <script>
-    function konfirmasiTambah() {
+    function validasiSebelumKonfirmasi() {
+        const form = document.getElementById('tambah-form');
+        const jenisInfak = document.getElementById('jenis_infak').value;
+
+        // Bersihkan semua error lama
+        document.querySelectorAll('.text-danger.dynamic-error').forEach(e => e.remove());
+
+        const requiredFields = [
+            'tanggal', 'donatur', 'kategori', 'sumber', 'metode',
+            'jenis_infak', 'nominal', 'barang', 'bukti_transaksi_pemasukan', 'keterangan'
+        ];
+
+        let firstInvalidField = null;
+
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            let isEmpty = false;
+
+            if ((jenisInfak === 'Uang' && fieldId === 'barang') ||
+                (jenisInfak === 'Barang' && fieldId === 'nominal')) {
+                continue; // lewati field yang tidak relevan
+            }
+
+            if (fieldId === 'bukti_transaksi_pemasukan') {
+                const hasTemp = document.getElementById("temp-bukti-preview");
+                if (field.files.length === 0 && !hasTemp) {
+                    isEmpty = true;
+                }
+            } else {
+                const val = field.value.trim();
+                isEmpty = val === '';
+            }
+
+            if (isEmpty) {
+                // Buat pesan error
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('text-danger', 'dynamic-error');
+                errorDiv.textContent = 'Kolom ini wajib diisi';
+
+                // Tempelkan error setelah field
+                field.parentNode.appendChild(errorDiv);
+
+                // Simpan field pertama yang kosong
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+            }
+        }
+
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi Data!',
+                text: 'Mohon lengkapi semua field yang wajib diisi.',
+                confirmButtonColor: '#dc3545',
+            });
+
+            return;
+        }
+
+        // Semua valid, tampilkan konfirmasi
         Swal.fire({
             title: "Simpan data bukti transaksi?",
             text: "Apakah Anda yakin ingin menyimpan data bukti transaksi ini?",
@@ -282,17 +347,17 @@
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                // Unformat nominal sebelum submit
                 const nominalInput = AutoNumeric.getAutoNumericElement('#nominal');
                 if (nominalInput) {
                     nominalInput.unformat();
                 }
-
-                document.getElementById("tambah-form").submit();
+                form.submit();
             }
         });
     }
+</script>
 
+<script>
     // Inisialisasi elemen global
     const fields = [
         document.getElementById('nama_user'),
@@ -416,6 +481,7 @@
         updateProgress();
     });
 
+
     function hapusBuktiTemp() {
         const temp = document.getElementById("temp-bukti-preview");
         if (temp) {
@@ -461,6 +527,7 @@
 <script>
     let errorMessages = '';
 
+
     Swal.fire({
         icon: 'error',
         title: 'Error Validasi!',
@@ -471,5 +538,4 @@
     });
 </script>
 @endif
-
 @endsection
