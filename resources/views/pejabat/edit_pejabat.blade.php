@@ -124,9 +124,14 @@
                                 </div>
                                 @endif
                             </div>
-
+                            <div class="mt-1">
+                                <small class="text-muted">File yang sudah dipilih sebelumnya</small>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="hapusGambarTemp()">
+                                    <i class="bi bi-trash"></i> Hapus
+                                </button>
+                            </div>
                             <!-- Info tambahan -->
-                            <div class="form-text">Kosongkan jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 2MB</div>
+                            <div class="form-text">Kosongkan jika tidak ingin mengubah. Format PNG, JPG, JPEG. Maksimal 10240</div>
                         </div>
 
                         <div class="mb-3">
@@ -230,5 +235,54 @@
     });
 </script>
 @endif
+
+<script>
+    function hapusGambarTemp() {
+        // Reset input file
+        document.getElementById('foto_ttd').value = '';
+
+        // Sembunyikan preview baru
+        const previewWrapper = document.getElementById('preview-wrapper-ttd');
+        if (previewWrapper) {
+            previewWrapper.classList.add('d-none');
+        }
+
+        // Kosongkan gambar preview (tapi jangan hapus element-nya)
+        const previewImg = document.getElementById('preview-gambar-ttd');
+        if (previewImg) {
+            previewImg.src = '';
+        }
+
+        // Sembunyikan gambar lama (jika ada)
+        const gambarLama = document.getElementById('gambar-ttd-lama');
+        if (gambarLama) {
+            gambarLama.classList.add('d-none');
+        }
+
+        // Hapus input hidden foto_ttd_temp dari form (jika ada)
+        const inputTemp = document.querySelector('input[name="foto_ttd_temp"]');
+        if (inputTemp) {
+            inputTemp.remove();
+        }
+
+        // Kirim request ke server untuk hapus gambar, baik temp atau tetap
+        fetch('{{ route("pejabat.hapus_gambar", $pejabat->id) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Gambar berhasil dihapus');
+                } else {
+                    console.warn('Gagal menghapus gambar:', data.message);
+                }
+            });
+    }
+</script>
+
+
 
 @endsection

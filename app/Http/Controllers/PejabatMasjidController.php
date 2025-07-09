@@ -179,7 +179,6 @@ class PejabatMasjidController extends Controller
             $pejabat->update($data);
 
             // hapus file sementara jika ada
-            // hapus file sementara jika ada
             if (session()->has('temp_foto_ttd')) {
                 Storage::disk('public')->delete(session('temp_foto_ttd'));
                 session()->forget('temp_foto_ttd');
@@ -249,6 +248,30 @@ class PejabatMasjidController extends Controller
             if (Storage::disk('public')->lastModified($file) < now()->subHour()->timestamp) {
                 Storage::disk('public')->delete($file);
             }
+        }
+    }
+
+    public function hapusGambar($id)
+    {
+        try {
+            // Hapus file dari session jika ada
+            if (session()->has('temp_foto_ttd')) {
+                Storage::disk('public')->delete(session('temp_foto_ttd'));
+                session()->forget('temp_foto_ttd');
+                return response()->json(['success' => true, 'message' => 'File sementara dihapus']);
+            }
+
+            // Jika tidak ada session, hapus dari database
+            $pejabat = PejabatMasjidModel::findOrFail($id);
+            if ($pejabat->foto_ttd && Storage::disk('public')->exists($pejabat->foto_ttd)) {
+                Storage::disk('public')->delete($pejabat->foto_ttd);
+                $pejabat->update(['foto_ttd' => null]);
+                return response()->json(['success' => true, 'message' => 'Foto lama dihapus']);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Tidak ada file untuk dihapus']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 }

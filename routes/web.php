@@ -144,5 +144,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/infak/laporan/download', [LaporanInfakController::class, 'downloadReport'])->name('laporan_infak.download');
 
     Route::post('/upload-temp-gambar', [InfakKeluarController::class, 'uploadTempGambar'])->name('upload.temp.gambar');
+   Route::post('/pejabat/{id}/hapus-gambar', [PejabatMasjidController::class, 'hapusGambar'])->name('pejabat.hapus_gambar');
+
+
 
 });
