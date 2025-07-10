@@ -180,7 +180,19 @@
             <a href="{{url('/') }}" class="btn btn-success mt-0 mb-3">
                 <i class="fas fa-arrow-left me-1"></i> Kembali
             </a>
-
+            <div class="d-flex flex-column gap-2 ms-md-auto mb-2" style="max-width: 100%; min-width: 335px;">
+                <!-- Form Pencarian -->
+                <form method="GET" action="{{ route('pengeluaran.pembangunan') }}" class="d-flex">
+                    <div class="input-group shadow rounded-3 overflow-hidden">
+                        <input type="text" id="search" name="search"
+                            class="form-control form-control-sm border-0 bg-light px-3"
+                            placeholder="Cari data infak..." value="{{ request('search') }}">
+                        <button class="input-group-text bg-success text-white border-0" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
             <div class="table-responsive border shadow rounded-4">
                 <table class="table table-bordered table-hover align-items-center mb-0" style="min-width: 800px;">
                     <thead class="table-gradient text-white">

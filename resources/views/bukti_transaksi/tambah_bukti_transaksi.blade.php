@@ -257,7 +257,7 @@
                         </div>
                     </div>
                     <div class="text-end">
-                        <button type="button" class="btn btn-primary" onclick="validasiSebelumKonfirmasi()">
+                        <button type="submit" class="btn btn-primary" onclick="validasiSebelumKonfirmasi()">
                             <i class="bi bi-save-fill me-1"></i>
                             Simpan
                         </button>

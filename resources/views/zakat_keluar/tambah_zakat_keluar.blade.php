@@ -196,8 +196,8 @@
                          <input type="hidden" name="nominal[]" value="20000">
                         <input type="hidden" name="nominal[]" value="20000">
                         <input type="hidden" name="nominal[]" value="20000"> -->
-                        <input type="hidden" name="nominal[]" id="nominal_total" value="{{ old('nominal')[0] ?? '' }}">
-                        <input type="hidden" name="jumlah[]" id="jumlah_total" value="{{ old('jumlah')[0] ?? '' }}">
+                        <!-- <input type="text" name="nominal[]" id="nominal_total" value="{{ old('nominal')[0] ?? '' }}">
+                        <input type="text" name="jumlah[]" id="jumlah_total" value="{{ old('jumlah')[0] ?? '' }}"> -->
 
                         <!-- Keterangan -->
                         <div class="row">

@@ -191,20 +191,40 @@ class LandingPageController extends Controller
             'sisaZakatBerasMaal'
         ));
     }
-    public function detailPengeluaranTakmir()
+      public function detailPengeluaranTakmir()
     {
-        $pengeluaranTakmir = InfakKeluarModel::where('kategori', 'takmir')
-            ->orderBy('tanggal', 'desc')
-            ->paginate(10);
-         
+        $query = InfakKeluarModel::where('kategori', 'takmir');
+
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('barang', 'like', '%' . $search . '%')
+                    ->orWhere('keterangan', 'like', '%' . $search . '%')
+                    ->orWhere('tanggal', 'like', '%' . $search . '%')
+                    ->orWhere('nominal', 'like', '%' . $search . '%');
+            });
+        }
+
+        $pengeluaranTakmir = $query->orderBy('tanggal', 'desc')->paginate(10);
 
         return view('landing_page.detail_pengeluaran_takmir', compact('pengeluaranTakmir'));
     }
+
     public function detailPengeluaranPembangunan()
     {
-        $pengeluaranPembangunan = InfakKeluarModel::where('kategori', 'pembangunan')
-            ->orderBy('tanggal', 'desc')
-            ->paginate(10);
+        $query = InfakKeluarModel::where('kategori', 'pembangunan');
+
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('barang', 'like', '%' . $search . '%')
+                    ->orWhere('keterangan', 'like', '%' . $search . '%')
+                    ->orWhere('tanggal', 'like', '%' . $search . '%')
+                    ->orWhere('nominal', 'like', '%' . $search . '%');
+            });
+        }
+
+        $pengeluaranPembangunan = $query->orderBy('tanggal', 'desc')->paginate(10);
 
         return view('landing_page.detail_pengeluaran_pembangunan', compact('pengeluaranPembangunan'));
     }

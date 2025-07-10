@@ -101,11 +101,11 @@ class ZakatKeluarController extends Controller
             $sisa = $masuk - $keluar;
 
             if ($bentuk === 'Uang' && $totalNominal > $sisa) {
-                return back()->withInput()->with('error', 'Nominal zakat keluar melebihi sisa saldo untuk Zakat ' . $jenis . ' sebesar Rp ' . number_format($sisa, 0, ',', '.'));
+                return back()->withInput()->with('error', 'Nominal zakat keluar melebihi sisa saldo untuk Zakat ' . $jenis . ' sebesar Rp ' . number_format($sisa, 0, ',', '.') . ' sebesar Rp ' . number_format($totalNominal, 0, ',', '.'));
             }
 
             if ($bentuk === 'Beras' && $totalJumlah > $sisa) {
-                return back()->withInput()->with('error', 'Jumlah beras zakat keluar melebihi sisa stok untuk Zakat ' . $jenis . ' sebesar ' . number_format($sisa, 0, ',', '.') . ' Kg');
+                return back()->withInput()->with('error', 'Jumlah beras zakat keluar melebihi sisa stok untuk Zakat ' . $jenis . ' sebesar ' . number_format($sisa, 0, ',', '.') . ' Kg' . number_format($totalJumlah, 0, ',', '.') . ' Kg');
             }
 
             // Simpan per mustahik

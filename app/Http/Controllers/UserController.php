@@ -40,7 +40,7 @@ class UserController extends Controller
             $validator = Validator::make($request->all(), [
                 'role' => 'required|string|max:10',
                 'nama' => 'required|string|max:50',
-                'username' => 'required|max:10',
+                'username' => 'required|max:10|unique:users,username',
                 'password' => 'required|string',
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
             ]);
@@ -86,7 +86,8 @@ class UserController extends Controller
             $validator = Validator::make($request->all(), [
                 'role' => 'required|string|max:10',
                 'nama' => 'required|string|max:50',
-                'username' => 'required|max:10' . $id, // exclude current user from unique check
+                // 'username' => 'required|max:10' . $id,
+                'username' => 'required|max:10|unique:users,username',
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
                 'password' => 'nullable', // optional password
             ]);
