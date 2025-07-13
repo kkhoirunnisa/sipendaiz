@@ -87,7 +87,7 @@ class UserController extends Controller
                 'role' => 'required|string|max:10',
                 'nama' => 'required|string|max:50',
                 // 'username' => 'required|max:10' . $id,
-                'username' => 'required|max:10|unique:users,username',
+                'username' => 'required|max:10|unique:users,username' . ($id ? ',' . $id : ''),
                 'nomor_telepon' => 'required|numeric|digits_between:10,14',
                 'password' => 'nullable', // optional password
             ]);

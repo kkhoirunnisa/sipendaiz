@@ -230,7 +230,7 @@ class LaporanInfakController extends Controller
             // 'tanggalCetak' => $tanggalCetak,
         ])->setPaper('A4', 'landscape');
 
-        return $pdf->stream("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
-        // return $pdf->download("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
+        // return $pdf->stream("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
+        return $pdf->download("Laporan_Infak_{$kategori}_{$formattedStartDate}_sd_{$formattedEndDate}.pdf");
     }
 }
